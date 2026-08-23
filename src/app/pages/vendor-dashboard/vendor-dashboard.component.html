@@ -1,0 +1,78 @@
+<div class="vd-page">
+  <aside class="vd-sidebar">
+    <div class="vds-logo serif" routerLink="/">Invitel<span>y</span></div>
+    <nav class="vds-nav">
+      <a class="vds-link active" routerLink="/vendor/dashboard">📊 Dashboard</a>
+      <a class="vds-link" routerLink="/vendor/profile">✏️ Edit listing</a>
+      <a class="vds-link" routerLink="/moments">📸 Moments</a>
+      <a class="vds-link" routerLink="/vendors">🔍 Browse vendors</a>
+    </nav>
+    <div class="vds-spacer"></div>
+    <div class="vds-plan" [class.pro]="isPro">
+      <div class="vdsp-badge">{{ isPro ? '⭐ Pro' : 'Free tier' }}</div>
+      <div class="vdsp-desc" *ngIf="!isPro">Upgrade to Pro for WhatsApp alerts, featured listing & more</div>
+      <button class="btn btn-gold vdsp-btn" *ngIf="!isPro">Upgrade — ₦5,000/mo</button>
+    </div>
+  </aside>
+
+  <main class="vd-main">
+    <div class="vdm-header">
+      <div>
+        <h1 class="serif">{{ vendor?.businessName || vendor?.name }}</h1>
+        <div class="vdm-cat">{{ vendor?.businessCategory | titlecase }} · {{ vendor?.businessCity }}</div>
+      </div>
+      <a class="btn btn-outline" routerLink="/vendor/profile">Edit listing</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="vd-stats">
+      <div class="vds-card">
+        <div class="vdsc-num">{{ stats.views }}</div>
+        <div class="vdsc-label">Profile views</div>
+        <div class="vdsc-sub">This month</div>
+      </div>
+      <div class="vds-card">
+        <div class="vdsc-num">{{ stats.enquiries }}</div>
+        <div class="vdsc-label">Enquiries</div>
+        <div class="vdsc-sub">WhatsApp & email</div>
+      </div>
+      <div class="vds-card">
+        <div class="vdsc-num">{{ stats.rating }}</div>
+        <div class="vdsc-label">Rating</div>
+        <div class="vdsc-sub">★★★★★</div>
+      </div>
+    </div>
+
+    <!-- Pro features locked -->
+    <div class="vd-locked" *ngIf="!isPro">
+      <div class="vdl-header">
+        <h3 class="serif">Unlock Pro features</h3>
+        <button class="btn btn-gold">Upgrade to Pro</button>
+      </div>
+      <div class="vdl-features">
+        <div class="vdlf-item" *ngFor="let f of [
+          { icon: '📱', title: 'WhatsApp alerts', desc: 'Get instant WhatsApp messages when hosts enquire' },
+          { icon: '⭐', title: 'Featured listing', desc: 'Appear at the top of vendor search results' },
+          { icon: '💬', title: 'Blog & Moments', desc: 'Comment on moments and build your brand presence' },
+          { icon: '📊', title: 'Full analytics', desc: 'See detailed views, clicks and conversion rates' }
+        ]">
+          <div class="vdlfi-icon">{{ f.icon }}</div>
+          <div>
+            <div class="vdlfi-title">{{ f.title }}</div>
+            <div class="vdlfi-desc">{{ f.desc }}</div>
+          </div>
+          <div class="vdlfi-lock">🔒</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verification status -->
+    <div class="vd-verification">
+      <div class="vdv-icon">⏳</div>
+      <div class="vdv-info">
+        <div class="vdv-title">Verification pending</div>
+        <div class="vdv-sub">Our team is reviewing your application. You'll receive an email within 48 hours. Your listing is live but marked as "Pending verification".</div>
+      </div>
+    </div>
+  </main>
+</div>

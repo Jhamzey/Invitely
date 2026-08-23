@@ -1,0 +1,112 @@
+<div class="vp-page">
+
+  <div class="vp-topbar">
+    <a class="vp-back" routerLink="/vendor/dashboard">← Dashboard</a>
+    <div class="vp-title serif">Edit listing</div>
+    <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+      {{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save changes' }}
+    </button>
+  </div>
+
+  <div class="vp-body container" *ngIf="!loading">
+    <div class="vp-tabs">
+      <button class="vp-tab" [class.active]="activeTab === 'listing'" (click)="activeTab = 'listing'">Listing details</button>
+      <button class="vp-tab" [class.active]="activeTab === 'contact'" (click)="activeTab = 'contact'">Contact & notifications</button>
+      <button class="vp-tab" [class.active]="activeTab === 'security'" (click)="activeTab = 'security'">Security</button>
+    </div>
+
+    <!-- LISTING TAB -->
+    <div class="vp-panel" *ngIf="activeTab === 'listing'">
+      <div class="form-group">
+        <label>Business / brand name</label>
+        <input [(ngModel)]="profile.businessName" placeholder="Your business name" />
+      </div>
+      <div class="form-group">
+        <label>Your full name</label>
+        <input [(ngModel)]="profile.name" placeholder="Contact person" />
+      </div>
+      <div class="form-group">
+        <label>Service category</label>
+        <div class="cat-grid">
+          <div *ngFor="let c of categories"
+            class="cat-opt"
+            [class.active]="profile.businessCategory === c.id"
+            (click)="profile.businessCategory = c.id">
+            <span>{{ c.icon }}</span>
+            <span class="co-label">{{ c.label }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <select [(ngModel)]="profile.businessCity">
+          <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>About your business</label>
+        <textarea [(ngModel)]="profile.businessDescription" rows="5" placeholder="Describe your services..."></textarea>
+      </div>
+      <div class="auth-error" *ngIf="error">{{ error }}</div>
+    </div>
+
+    <!-- CONTACT TAB -->
+    <div class="vp-panel" *ngIf="activeTab === 'contact'">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone number</label>
+          <input [(ngModel)]="profile.phone" placeholder="+2348..." />
+        </div>
+        <div class="form-group">
+          <label>WhatsApp number</label>
+          <input [(ngModel)]="profile.whatsapp" placeholder="+2348..." />
+        </div>
+      </div>
+      <div class="toggle-section">
+        <div class="toggle-row">
+          <div class="tr-info">
+            <div class="tr-title">Email notifications</div>
+            <div class="tr-sub">Get email when hosts make enquiries</div>
+          </div>
+          <div class="tr-toggle" [class.on]="profile.emailNotifications" (click)="profile.emailNotifications = !profile.emailNotifications">
+            <div class="tt-knob"></div>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div class="tr-info">
+            <div class="tr-title">WhatsApp notifications <span class="pro-badge">Pro</span></div>
+            <div class="tr-sub">Instant WhatsApp alerts for new enquiries</div>
+          </div>
+          <div class="tr-toggle" [class.on]="profile.whatsappNotifications" [class.disabled]="profile.vendorPlan !== 'pro'" (click)="profile.vendorPlan === 'pro' && (profile.whatsappNotifications = !profile.whatsappNotifications)">
+            <div class="tt-knob"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+        {{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save' }}
+      </button>
+    </div>
+
+    <!-- SECURITY TAB -->
+    <div class="vp-panel" *ngIf="activeTab === 'security'">
+      <h3 style="font-size:1rem; font-weight:500; font-family:var(--sans); margin-bottom:16px;">Change password</h3>
+      <div class="form-group">
+        <label>Current password</label>
+        <input type="password" [(ngModel)]="currentPassword" />
+      </div>
+      <div class="form-group">
+        <label>New password</label>
+        <input type="password" [(ngModel)]="newPassword" placeholder="At least 8 characters" />
+      </div>
+      <div class="form-group">
+        <label>Confirm new password</label>
+        <input type="password" [(ngModel)]="confirmPassword" />
+      </div>
+      <div class="auth-error" *ngIf="passwordError">{{ passwordError }}</div>
+      <div class="pp-success" *ngIf="passwordSaved">✓ Password changed successfully!</div>
+      <button class="btn btn-primary" (click)="changePassword()" [disabled]="changingPassword">
+        {{ changingPassword ? 'Changing...' : 'Change password' }}
+      </button>
+    </div>
+  </div>
+</div>

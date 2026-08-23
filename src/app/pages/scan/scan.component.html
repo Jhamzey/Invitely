@@ -1,0 +1,111 @@
+<div class="scan-page">
+  <div class="scan-topbar">
+    <a class="st-back" [routerLink]="['/event', eventId, 'builder']">← Builder</a>
+    <div class="st-title">Entry scanner</div>
+    <div class="st-event" *ngIf="event">{{ event.title }}</div>
+  </div>
+
+  <div class="scan-layout">
+    <div class="scan-main">
+
+      <!-- Stats -->
+      <div class="scan-stats">
+        <div class="ss-card"><div class="ss-num" style="color:var(--success)">{{ stats.arrivedCount }}</div><div class="ss-label">Arrived</div></div>
+        <div class="ss-card"><div class="ss-num" style="color:var(--text-muted)">{{ stats.pending }}</div><div class="ss-label">Pending</div></div>
+        <div class="ss-card"><div class="ss-num">{{ stats.total }}</div><div class="ss-label">Total</div></div>
+      </div>
+
+      <!-- TEMPORARY ACCESS PANEL -->
+      <div class="session-panel">
+        <div class="sp-header">
+          <div class="sp-info">
+            <div class="sp-title">🔐 Security device access</div>
+            <div class="sp-sub">Give a security team member a temporary link to scan — without sharing your account</div>
+          </div>
+          <div class="sp-status" *ngIf="activeSession">
+            <div class="sp-active-badge">● Active — {{ sessionTimeLeft }}</div>
+            <button class="btn btn-outline sp-terminate" (click)="terminateSession()">Terminate</button>
+          </div>
+        </div>
+
+        <div class="sp-active" *ngIf="activeSession && showSessionPanel">
+          <div class="spa-qr">
+            <img [src]="sessionQR" alt="Scan session QR" />
+          </div>
+          <div class="spa-info">
+            <div class="spa-label">Share this link with your security team:</div>
+            <div class="spa-url">{{ sessionUrl }}</div>
+            <button class="btn btn-outline spa-copy" (click)="copySessionLink()">Copy link</button>
+            <div class="spa-note">⚠️ Only 1 device can use this link at a time. Expires in {{ sessionTimeLeft }}. No data is stored on the security device.</div>
+          </div>
+        </div>
+
+        <div class="sp-create" *ngIf="!activeSession">
+          <div class="spc-row">
+            <label>Access duration:</label>
+            <select [(ngModel)]="sessionDuration" class="spc-select">
+              <option [value]="12">12 hours</option>
+              <option [value]="24">24 hours</option>
+              <option [value]="48">48 hours</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" (click)="createSession()" [disabled]="creatingSession">
+            {{ creatingSession ? 'Generating...' : '🔗 Generate security access link' }}
+          </button>
+        </div>
+
+        <div class="sp-view-existing" *ngIf="activeSession && !showSessionPanel">
+          <button class="btn btn-outline" (click)="showSessionPanel = true; checkActiveSession()">
+            View active session QR & link
+          </button>
+        </div>
+      </div>
+
+      <!-- Manual verify (host use) -->
+      <div class="scan-or">— or scan directly here —</div>
+      <div class="manual-row">
+        <input class="manual-input" [(ngModel)]="manualCode" placeholder="Enter guest QR code..." (keyup.enter)="verify(manualCode)" [disabled]="scanning" />
+        <button class="btn btn-primary" (click)="verify(manualCode)" [disabled]="scanning || !manualCode">
+          {{ scanning ? '...' : 'Verify' }}
+        </button>
+      </div>
+
+      <div class="scan-result" *ngIf="scanResult">
+        <div class="sr-valid" *ngIf="scanResult.valid">
+          <div class="srv-icon">✓</div>
+          <div class="srv-content">
+            <div class="srv-status">Valid — Welcome!</div>
+            <div class="srv-name">{{ scanResult.guest?.name }}</div>
+            <div class="srv-details">Table {{ scanResult.guest?.tableNumber }} · Seat {{ scanResult.guest?.seatNumber }}<br>{{ scanResult.guest?.mealChoice }}</div>
+          </div>
+        </div>
+        <div class="sr-invalid" *ngIf="!scanResult.valid">
+          <div class="sri-icon">✗</div>
+          <div class="sri-content">
+            <div class="sri-status">{{ scanResult.reason === 'duplicate' ? 'Already scanned' : scanResult.reason === 'declined' ? 'Declined' : 'Invalid' }}</div>
+            <div class="sri-message">{{ scanResult.message }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="scan-history">
+      <div class="sh-header">
+        <div class="sh-title">Arrivals ({{ stats.arrivedCount }})</div>
+        <button class="sh-refresh" (click)="loadHistory()">↻</button>
+      </div>
+      <div class="sh-list">
+        <div class="sh-empty" *ngIf="history.length === 0">No arrivals yet.</div>
+        <div class="sh-row" *ngFor="let h of history">
+          <div class="shr-dot"></div>
+          <div class="shr-info">
+            <div class="shr-name">{{ h.name }}</div>
+            <div class="shr-meta">Table {{ h.tableNumber }} · {{ h.arrivedAt | date:'h:mm a' }}</div>
+          </div>
+          <div class="shr-valid">✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,790 @@
+<div class="dashboard">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar">
+
+    <div class="sb-logo serif" routerLink="/">
+      Invitel<span>y</span>
+    </div>
+
+    <nav class="sb-nav">
+
+      <a
+        class="sb-link"
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span class="sb-icon">🏠</span>
+        Dashboard
+      </a>
+
+      <a
+        class="sb-link"
+        routerLink="/moments"
+        routerLinkActive="active"
+      >
+        <span class="sb-icon">📸</span>
+        Moments
+      </a>
+
+      <a
+        class="sb-link"
+        routerLink="/vendors"
+        routerLinkActive="active"
+      >
+        <span class="sb-icon">🛍️</span>
+        Vendors
+      </a>
+
+      <a
+        class="sb-link"
+        routerLink="/vendor/register"
+        routerLinkActive="active"
+      >
+        <span class="sb-icon">📋</span>
+        List your services
+      </a>
+
+    </nav>
+
+    <div class="sb-spacer"></div>
+
+    <!-- User -->
+    <div class="sb-user">
+
+      <div class="sbu-avatar">
+        {{ auth.user()?.name?.charAt(0) || '?' }}
+      </div>
+
+      <div class="sbu-info">
+
+        <div class="sbu-name">
+          {{ auth.user()?.name || 'User' }}
+        </div>
+
+        <div class="sbu-plan badge badge-gold">
+          {{ auth.user()?.plan || 'Free' }}
+        </div>
+
+      </div>
+
+      <a
+        class="sbu-profile"
+        routerLink="/profile"
+        title="Profile"
+      >
+        ⚙️
+      </a>
+
+      <button
+        class="sbu-logout"
+        type="button"
+        (click)="logout()"
+        title="Sign out"
+      >
+        ⏏
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ==================== MAIN ==================== -->
+  <main class="dash-main">
+
+    <!-- Top bar -->
+    <div class="dash-topbar">
+
+      <div>
+
+        <h1 class="dash-greeting serif">
+          Good day,
+          {{ auth.user()?.name?.split(' ')?.[0] || 'there' }}
+          👋
+        </h1>
+
+        <p class="dash-sub">
+          Here are your events at a glance.
+        </p>
+
+      </div>
+
+      <div class="dt-right">
+
+        <!-- Notification bell -->
+        <div
+          class="notif-bell"
+          (click)="toggleNotifications($event)"
+        >
+
+          <span class="nb-icon">🔔</span>
+
+          <div
+            class="nb-dot"
+            *ngIf="notifications.length > 0"
+          >
+            {{ notifications.length > 9 ? '9+' : notifications.length }}
+          </div>
+
+          <!-- Notifications dropdown -->
+          <div
+            class="notif-dropdown"
+            *ngIf="showNotifications"
+            (click)="$event.stopPropagation()"
+          >
+
+            <div class="nd-header">
+
+              <span>Notifications</span>
+
+              <button
+                type="button"
+                class="nd-clear"
+                (click)="clearNotifications()"
+              >
+                Clear all
+              </button>
+
+            </div>
+
+            <div
+              class="nd-empty"
+              *ngIf="notifications.length === 0"
+            >
+              No new notifications
+            </div>
+
+            <div
+              class="nd-item"
+              *ngFor="let n of notifications"
+            >
+
+              <div class="ndi-icon">
+                {{ n.icon }}
+              </div>
+
+              <div class="ndi-body">
+
+                <div class="ndi-text">
+                  {{ n.text }}
+                </div>
+
+                <div class="ndi-time">
+                  {{ n.time }}
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="showNewModal = true"
+        >
+          + New event
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==================== TABS ==================== -->
+    <div class="dash-tabs">
+
+      <button
+        type="button"
+        class="dt-tab"
+        [class.active]="dashTab === 'events'"
+        (click)="dashTab = 'events'"
+      >
+        My Events
+      </button>
+
+      <button
+        type="button"
+        class="dt-tab"
+        [class.active]="dashTab === 'moments'"
+        (click)="dashTab = 'moments'; loadMoments()"
+      >
+        Moments feed
+      </button>
+
+      <button
+        type="button"
+        class="dt-tab"
+        [class.active]="dashTab === 'vendors'"
+        (click)="dashTab = 'vendors'"
+      >
+        Vendors
+      </button>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- EVENTS TAB -->
+    <!-- ====================================================== -->
+    <div *ngIf="dashTab === 'events'">
+
+      <!-- Loading -->
+      <div
+        class="dash-loading"
+        *ngIf="loading"
+      >
+
+        <div
+          class="loading-card skeleton"
+          *ngFor="let s of loadingSkeletons"
+        ></div>
+
+      </div>
+
+
+      <!-- Empty -->
+      <div
+        class="dash-empty"
+        *ngIf="!loading && events.length === 0"
+      >
+
+        <div class="de-icon">
+          🎊
+        </div>
+
+        <h2 class="de-title serif">
+          No events yet
+        </h2>
+
+        <p class="de-sub">
+          Create your first event and start sending beautiful invitations.
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="showNewModal = true"
+        >
+          Create your first event
+        </button>
+
+      </div>
+
+
+      <!-- Upcoming events -->
+      <ng-container
+        *ngIf="!loading && upcomingEvents.length > 0"
+      >
+
+        <div class="section-label">
+          Upcoming
+        </div>
+
+        <div class="events-grid">
+
+          <div
+            class="event-card"
+            *ngFor="let e of upcomingEvents"
+            (click)="openEvent(e._id!)"
+          >
+
+            <!-- Preview -->
+            <div
+              class="ec-preview"
+              [style.background]="getThemeGradient(e)"
+              [style.color]="getThemeColor(e.theme)"
+            >
+
+              <div class="ecp-ornament">
+                ✦
+              </div>
+
+              <div class="ecp-type">
+                {{ e.type | titlecase }}
+              </div>
+
+              <div class="ecp-names serif">
+                {{ e.coupleNames || e.title }}
+              </div>
+
+              <div class="ecp-date">
+                {{ e.date | date:'MMM d, y' }}
+              </div>
+
+            </div>
+
+
+            <!-- Body -->
+            <div class="ec-body">
+
+              <div class="ecb-title">
+                {{ e.title }}
+              </div>
+
+              <div class="ecb-venue">
+                📍 {{ e.venue }}
+              </div>
+
+              <div class="ecb-meta">
+
+                <div
+                  class="ecb-days"
+                  [class.soon]="daysUntil(e.date) <= 7"
+                >
+                  {{
+                    daysUntil(e.date) === 0
+                      ? 'Today!'
+                      : daysUntil(e.date) + ' days away'
+                  }}
+                </div>
+
+                <div
+                  class="badge"
+                  [class.badge-gold]="!e.published"
+                  [class.badge-green]="e.published"
+                >
+                  {{ e.published ? 'Live' : 'Draft' }}
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="ec-actions">
+
+              <a
+                class="ec-action"
+                [routerLink]="['/event', e._id, 'builder']"
+                (click)="$event.stopPropagation()"
+              >
+                Builder
+              </a>
+
+              <a
+                class="ec-action"
+                [routerLink]="['/event', e._id, 'guests']"
+                (click)="$event.stopPropagation()"
+              >
+                Guests
+              </a>
+
+              <a
+                class="ec-action"
+                [routerLink]="['/event', e._id, 'seating']"
+                (click)="$event.stopPropagation()"
+              >
+                Seating
+              </a>
+
+              <a
+                class="ec-action"
+                [routerLink]="['/event', e._id, 'scan']"
+                (click)="$event.stopPropagation()"
+              >
+                Scan
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </ng-container>
+
+
+      <!-- Past events -->
+      <ng-container
+        *ngIf="!loading && pastEvents.length > 0"
+      >
+
+        <div
+          class="section-label past-label"
+        >
+          Past events
+        </div>
+
+        <div class="events-grid">
+
+          <div
+            class="event-card past-card"
+            *ngFor="let e of pastEvents"
+            (click)="openEvent(e._id!)"
+          >
+
+            <div
+              class="ec-preview"
+              [style.background]="getThemeGradient(e)"
+              [style.color]="getThemeColor(e.theme)"
+            >
+
+              <div class="ecp-names serif">
+                {{ e.coupleNames || e.title }}
+              </div>
+
+              <div class="ecp-date">
+                {{ e.date | date:'MMM d, y' }}
+              </div>
+
+            </div>
+
+            <div class="ec-body">
+
+              <div class="ecb-title">
+                {{ e.title }}
+              </div>
+
+              <div class="ecb-venue">
+                📍 {{ e.venue }}
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </ng-container>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- MOMENTS TAB -->
+    <!-- ====================================================== -->
+    <div *ngIf="dashTab === 'moments'">
+
+      <div class="moments-preview">
+
+        <div class="mp-header">
+
+          <h3 class="serif">
+            Event moments feed
+          </h3>
+
+          <a
+            class="btn btn-primary"
+            routerLink="/moments"
+          >
+            Open full feed →
+          </a>
+
+        </div>
+
+
+        <div class="mp-grid">
+
+          <!-- FIXED: *ngIf and *ngFor are no longer on same element -->
+          <ng-container *ngIf="momentsLoading">
+
+            <div
+              class="mp-card skeleton mp-skeleton"
+              *ngFor="let s of momentSkeletons"
+            ></div>
+
+          </ng-container>
+
+
+          <!-- Moments -->
+          <div
+            class="mp-card"
+            *ngFor="let m of recentMoments"
+            (click)="openMomentFull()"
+          >
+
+            <img
+              [src]="m.imageUrl"
+              [alt]="m.caption || 'Event moment'"
+            />
+
+            <div class="mp-overlay">
+
+              <div class="mpo-caption">
+                {{ m.caption }}
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Empty -->
+          <div
+            class="mp-empty"
+            *ngIf="!momentsLoading && recentMoments.length === 0"
+          >
+
+            <p>
+              No moments posted yet.
+              <a routerLink="/moments">
+                Explore the feed
+              </a>
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- VENDORS TAB -->
+    <!-- ====================================================== -->
+    <div *ngIf="dashTab === 'vendors'">
+
+      <div class="vendors-preview">
+
+        <div class="mp-header">
+
+          <h3 class="serif">
+            Featured vendors
+          </h3>
+
+          <a
+            class="btn btn-primary"
+            routerLink="/vendors"
+          >
+            Browse all →
+          </a>
+
+        </div>
+
+        <p class="vendor-description">
+          Find caterers, halls, photographers and more for your event.
+        </p>
+
+        <div class="vp-cats">
+
+          <a
+            *ngFor="let c of quickVendorCats"
+            [routerLink]="['/vendors']"
+            [queryParams]="{ category: c.id }"
+            class="vpc-btn"
+          >
+
+            <span>
+              {{ c.icon }}
+            </span>
+
+            {{ c.label }}
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- ========================================================== -->
+<!-- NEW EVENT MODAL -->
+<!-- ========================================================== -->
+
+<div
+  class="modal-overlay"
+  *ngIf="showNewModal"
+  (click)="closeNewModal()"
+>
+
+  <div
+    class="modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    <div class="modal-header">
+
+      <h2 class="modal-title serif">
+        Create new event
+      </h2>
+
+      <button
+        type="button"
+        class="modal-close"
+        (click)="closeNewModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <!-- Event type -->
+      <div class="form-group">
+
+        <label>
+          Event type
+        </label>
+
+        <div class="et-grid">
+
+          <div
+            *ngFor="let t of eventTypes"
+            class="et-opt"
+            [class.active]="newEvent.type === t.id"
+            (click)="selectType(t.id)"
+          >
+
+            <span>
+              {{ t.icon }}
+            </span>
+
+            <span class="et-label">
+              {{ t.label }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Title -->
+      <div class="form-group">
+
+        <label>
+          Event title *
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="newEvent.title"
+          placeholder="e.g. Amara & Emeka's Wedding"
+        />
+
+      </div>
+
+
+      <!-- Couple -->
+      <div class="form-group">
+
+        <label>
+          Couple / Host name(s)
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="newEvent.coupleNames"
+          placeholder="e.g. Amara & Emeka"
+        />
+
+      </div>
+
+
+      <!-- Date and time -->
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label>
+            Date *
+          </label>
+
+          <input
+            type="date"
+            [(ngModel)]="newEvent.date"
+          />
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Time
+          </label>
+
+          <input
+            type="time"
+            [(ngModel)]="newEvent.time"
+          />
+
+        </div>
+
+      </div>
+
+
+      <!-- Venue -->
+      <div class="form-group">
+
+        <label>
+          Venue name *
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="newEvent.venue"
+          placeholder="e.g. The Grand Ballroom"
+        />
+
+      </div>
+
+
+      <!-- Address -->
+      <div class="form-group">
+
+        <label>
+          Full address
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="newEvent.venueAddress"
+          placeholder="e.g. 12 Adeola Odeku, VI, Lagos"
+        />
+
+      </div>
+
+
+      <!-- Error -->
+      <div
+        class="create-error"
+        *ngIf="createError"
+      >
+        {{ createError }}
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="closeNewModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="createEvent()"
+        [disabled]="creating"
+      >
+        {{ creating ? 'Creating...' : 'Create & go to builder' }}
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

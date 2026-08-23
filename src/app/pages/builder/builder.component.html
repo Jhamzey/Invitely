@@ -1,0 +1,282 @@
+<div class="builder-page" *ngIf="!loading && event">
+
+  <div class="builder-topbar">
+    <div class="bt-left">
+      <a class="bt-back" routerLink="/dashboard">← Dashboard</a>
+      <div class="bt-title">{{ event.title }}</div>
+    </div>
+    <div class="bt-actions">
+      <button class="btn btn-outline bt-nav" (click)="goToGuests()">👥 Guests</button>
+      <button class="btn btn-outline bt-nav" (click)="goToSeating()">🪑 Seating</button>
+      <button class="btn btn-outline bt-nav" (click)="goToMoments()">📸 Moments</button>
+      <button class="btn btn-outline bt-nav" (click)="goToScan()">🔐 Scan</button>
+      <button class="btn btn-outline" (click)="save()" [disabled]="saving">
+        {{ saving ? 'Saving...' : saved ? '✓ Saved' : 'Save' }}
+      </button>
+      <button class="btn btn-gold" (click)="publish()" [disabled]="saving || event.published">
+        {{ event.published ? '✓ Live' : 'Publish & send' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="builder-layout">
+
+    <!-- LEFT CONTROLS -->
+    <div class="builder-controls">
+      <div class="bc-tabs">
+        <button *ngFor="let t of tabs" class="bc-tab" [class.active]="activeTab === t.id" (click)="activeTab = t.id">
+          {{ t.label }}
+        </button>
+      </div>
+
+      <!-- DESIGN TAB -->
+      <div class="bc-panel" *ngIf="activeTab === 'design'">
+
+        <div class="bc-section-title">Templates</div>
+        <div class="template-grid">
+          <div *ngFor="let t of templates"
+            class="template-opt"
+            [class.active]="event.theme === t.id"
+            [style.background]="t.bg"
+            [style.color]="t.color"
+            (click)="setTheme(t.id)">
+            <div class="to-check" *ngIf="event.theme === t.id">✓</div>
+            <div class="to-emoji">{{ t.preview }}</div>
+            <div class="to-label">{{ t.label }}</div>
+          </div>
+        </div>
+
+        <div class="bc-section-title">Accent colour</div>
+        <div class="color-presets">
+          <div *ngFor="let c of colorPresets"
+            class="cp-dot"
+            [style.background]="c"
+            [class.active]="event.accentColor === c"
+            (click)="event.accentColor = c">
+          </div>
+        </div>
+
+        <div class="bc-section-title">Mix your own colours</div>
+        <div class="color-mixer">
+          <div class="cm-row">
+            <label class="cm-label">Background</label>
+            <input type="color" [(ngModel)]="customBgColor" class="cm-picker" />
+            <span class="cm-val">{{ customBgColor }}</span>
+          </div>
+          <div class="cm-row">
+            <label class="cm-label">Text colour</label>
+            <input type="color" [(ngModel)]="customTextColor" class="cm-picker" />
+            <span class="cm-val">{{ customTextColor }}</span>
+          </div>
+          <div class="cm-row">
+            <label class="cm-label">Accent colour</label>
+            <input type="color" [(ngModel)]="customAccentColor" class="cm-picker" />
+            <span class="cm-val">{{ customAccentColor }}</span>
+          </div>
+          <button class="btn btn-primary cm-apply" (click)="applyCustomColors()">
+            Apply custom colours →
+          </button>
+          <div class="cm-active" *ngIf="event.theme === 'custom'">
+            ✓ Custom colours active — preview updated
+          </div>
+        </div>
+
+        <div class="bc-section-title">Font</div>
+        <div class="font-list">
+          <div *ngFor="let f of fonts"
+            class="font-opt"
+            [class.active]="event.font === f.id"
+            [style.font-family]="f.id"
+            (click)="event.font = f.id">
+            {{ f.label }}
+          </div>
+        </div>
+
+        <div class="bc-section-title">Language</div>
+        <div class="lang-row">
+          <div *ngFor="let l of languages"
+            class="lang-pill"
+            [class.active]="event.language === l"
+            (click)="event.language = l">
+            {{ l }}
+          </div>
+        </div>
+
+        <div class="bc-section-title">Cover image</div>
+        <div class="cover-upload" (click)="coverInput.click()">
+          <img *ngIf="coverPreview || event.coverImage" [src]="coverPreview || event.coverImage" class="cover-img" alt="cover" />
+          <div *ngIf="!coverPreview && !event.coverImage" class="cover-placeholder">
+            <span>📷</span><span>Click to upload cover</span>
+          </div>
+        </div>
+        <input #coverInput type="file" accept="image/*,video/*" style="display:none" (change)="onCoverSelected($event)" />
+
+      </div>
+
+      <!-- DETAILS TAB -->
+      <div class="bc-panel" *ngIf="activeTab === 'details'">
+        <div class="form-group">
+          <label>Couple / Host name(s)</label>
+          <input [(ngModel)]="event.coupleNames" placeholder="Amara & Emeka" />
+        </div>
+        <div class="form-group">
+          <label>Event title</label>
+          <input [(ngModel)]="event.title" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" [(ngModel)]="event.date" />
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="time" [(ngModel)]="event.time" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Venue name</label>
+          <input [(ngModel)]="event.venue" />
+        </div>
+        <div class="form-group">
+          <label>Full address</label>
+          <input [(ngModel)]="event.venueAddress" placeholder="Type address or pin on map below" />
+        </div>
+        <div class="map-toggle">
+          <button class="btn btn-outline" style="font-size:12px; padding:6px 14px;" (click)="showMapPicker = !showMapPicker">
+            {{ showMapPicker ? '🗺️ Hide map' : '📍 Pin exact location on map' }}
+          </button>
+        </div>
+        <app-map-picker *ngIf="showMapPicker" (locationSelected)="onLocationSelected($event)"></app-map-picker>
+        <div class="form-group">
+          <label>Dress code</label>
+          <input [(ngModel)]="event.dressCode" placeholder="e.g. Black Tie · Ivory & Gold" />
+        </div>
+
+        <!-- Gift support toggle -->
+        <div class="gift-toggle-section">
+          <div class="gts-header">
+            <div class="gts-info">
+              <div class="gts-title">Guest gift support</div>
+              <div class="gts-sub">Invitely will gently ask guests if they'd like to send a gift — not you, us.</div>
+            </div>
+            <div class="tr-toggle" [class.on]="event.giftEnabled" (click)="event.giftEnabled = !event.giftEnabled">
+              <div class="tt-knob"></div>
+            </div>
+          </div>
+          <div class="gts-preview" *ngIf="event.giftEnabled">
+            <div class="gtsp-label">How guests see it:</div>
+            <div class="gtsp-msg">"Invitely gives you the option to send a small gift to help celebrate this occasion. This is entirely optional and is not a request from the host."</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASOEBI TAB -->
+      <div class="bc-panel" *ngIf="activeTab === 'asoebi'">
+        <div class="bc-section-title">Asoebi options</div>
+        <div class="asoebi-list">
+          <div class="asoebi-item" *ngFor="let a of event.asoebi; let i = index">
+            <div class="ai-info">
+              <div class="ai-name">{{ a.name }}</div>
+              <div class="ai-price">₦{{ a.price | number }}</div>
+              <div class="ai-desc" *ngIf="a.description">{{ a.description }}</div>
+            </div>
+            <button class="ai-remove" (click)="removeAsoebi(i)">×</button>
+          </div>
+          <p *ngIf="!event.asoebi?.length" class="bc-empty">No asoebi options yet.</p>
+        </div>
+        <div class="bc-add-form">
+          <input [(ngModel)]="newAsoebi.name" placeholder="e.g. Women's set" />
+          <input [(ngModel)]="newAsoebi.price" type="number" placeholder="Price (₦)" />
+          <input [(ngModel)]="newAsoebi.description" placeholder="Description (optional)" />
+          <button class="btn btn-outline" (click)="addAsoebi()">+ Add option</button>
+        </div>
+      </div>
+
+      <!-- MEALS TAB -->
+      <div class="bc-panel" *ngIf="activeTab === 'meals'">
+        <div class="bc-section-title">Meal choices for guests</div>
+        <div class="meal-list">
+          <div class="meal-item" *ngFor="let m of event.meals; let i = index">
+            <span>{{ m.name }}</span>
+            <button (click)="removeMeal(i)">×</button>
+          </div>
+          <p *ngIf="!event.meals?.length" class="bc-empty">No meal options yet.</p>
+        </div>
+        <div class="bc-add-row">
+          <input [(ngModel)]="newMeal" placeholder="e.g. Jollof rice" (keyup.enter)="addMeal()" />
+          <button class="btn btn-outline" (click)="addMeal()">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PREVIEW -->
+    <div class="builder-preview">
+      <div class="bp-label">Live preview · updates as you design</div>
+      <div class="invite-preview"
+        [style.background]="previewBg"
+        [style.color]="previewColor"
+        [style.font-family]="event.font || 'Cormorant Garamond'"
+        [style.transition]="'background 0.4s ease, color 0.4s ease'">
+
+        <div class="ip-cover" *ngIf="coverPreview || event.coverImage">
+          <img [src]="coverPreview || event.coverImage" alt="cover" />
+        </div>
+
+        <div class="ip-body">
+          <div class="ip-ornament">✦</div>
+          <div class="ip-type">{{ event.type | titlecase }} Invitation</div>
+          <div class="ip-names">{{ event.coupleNames || event.title || 'Couple Name' }}</div>
+          <div class="ip-divider"></div>
+          <div class="ip-details">
+            {{ event.date ? (event.date | date:'EEEE, MMMM d, y') : 'Date TBD' }}<br>
+            {{ event.time || '—' }}<br>
+            {{ event.venue || 'Venue name' }}<br>
+            <span *ngIf="event.dressCode" style="opacity:0.7;">{{ event.dressCode }}</span>
+          </div>
+
+          <div class="ip-asoebi" *ngIf="event.asoebi?.length">
+            <div class="ipa-title">Asoebi available</div>
+            <div class="ipa-items">
+              <div class="ipa-item" *ngFor="let a of event.asoebi">
+                <span>{{ a.name }}</span>
+                <span>₦{{ a.price | number }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gift support line -->
+          <div class="ip-gift" *ngIf="event.giftEnabled">
+            <div class="ipg-line">"Invitely gives you the option to send a gift to celebrate this occasion."</div>
+          </div>
+
+          <div class="ip-footer">
+            <div>
+              <div class="ip-guest-label">You are invited</div>
+              <div class="ip-guest-name">Guest Name · Table — · Seat —</div>
+            </div>
+            <div class="ip-qr">
+              <div class="qr-mini">
+                <div class="qm filled"></div><div class="qm"></div><div class="qm filled"></div>
+                <div class="qm filled"></div><div class="qm filled"></div><div class="qm"></div>
+                <div class="qm"></div><div class="qm filled"></div><div class="qm filled"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bp-actions">
+        <button class="btn btn-outline bp-action" (click)="goToGuests()">Guests →</button>
+        <button class="btn btn-outline bp-action" (click)="goToSeating()">Seating →</button>
+        <button class="btn btn-outline bp-action" (click)="goToMoments()">Moments →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="builder-loading" *ngIf="loading">
+  <div style="display:grid; grid-template-columns:300px 1fr; gap:20px; height:80vh; padding:20px;">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</div>

@@ -1,0 +1,143 @@
+<div class="seating-page">
+
+  <div class="seating-topbar">
+    <div class="st-left">
+      <a class="st-back" [routerLink]="['/event', eventId, 'builder']">← Builder</a>
+      <div class="st-title">Seating plan</div>
+    </div>
+    <div class="st-actions">
+      <button class="btn btn-outline" (click)="save()" [disabled]="saving">
+        {{ saving ? 'Saving...' : saved ? '✓ Saved' : 'Save plan' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="seating-layout" *ngIf="!loading && event">
+
+    <div class="seating-sidebar">
+      <div class="ss-header">
+        <div class="ss-title">Unassigned guests</div>
+        <div class="ss-count badge badge-gray">{{ unassignedGuests.length }}</div>
+      </div>
+      <div class="ss-guests">
+        <div *ngFor="let g of unassignedGuests"
+          class="ss-guest"
+          draggable="true"
+          (dragstart)="onDragStart(g)">
+          <div class="ssg-avatar">{{ g.name.charAt(0) }}</div>
+          <div class="ssg-name">{{ g.name }}</div>
+          <div class="ssg-drag">⠿</div>
+        </div>
+        <div class="ss-empty" *ngIf="unassignedGuests.length === 0">
+          All guests assigned! 🎉
+        </div>
+      </div>
+
+      <div class="add-table-form">
+        <div class="atf-title">Add table</div>
+        <div class="form-group">
+          <label>Shape</label>
+          <select [(ngModel)]="newTable.shape">
+            <option value="round">Round</option>
+            <option value="rectangular">Rectangular</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Seats</label>
+          <input type="number" [(ngModel)]="newTable.capacity" min="2" max="30" />
+        </div>
+        <div class="form-group">
+          <label>Label (optional)</label>
+          <input [(ngModel)]="newTable.label" placeholder="e.g. VIP, Family" />
+        </div>
+        <button class="btn btn-outline" style="width:100%;" (click)="addTable()">+ Add table</button>
+      </div>
+    </div>
+
+    <div class="seating-canvas">
+      <div class="sc-stage">— Stage / Altar —</div>
+
+      <div class="sc-tables" *ngIf="tablesExist">
+        <div class="table-unit" *ngFor="let table of event.tables; let ti = index">
+
+          <!-- Round table -->
+          <ng-container *ngIf="table.shape === 'round'">
+            <div class="table-label-top">{{ table.label || 'Table ' + table.tableNumber }}</div>
+            <div class="round-table-wrap">
+              <svg width="160" height="160" viewBox="0 0 160 160" class="round-svg">
+                <circle cx="80" cy="80" r="32" class="tc-circle" />
+                <text x="80" y="85" text-anchor="middle" class="tc-label">T{{ table.tableNumber }}</text>
+                <g *ngFor="let seat of table.seats; let si = index">
+                  <circle
+                    [attr.cx]="getSeatX(si, table.seats.length, 56) + 24"
+                    [attr.cy]="getSeatY(si, table.seats.length, 56) + 24"
+                    r="13"
+                    [class]="seat.guestId ? 'seat-taken' : 'seat-free'"
+                    (click)="seat.guestId ? clearSeat(seat) : null"
+                    (dragover)="$event.preventDefault()"
+                    (drop)="onDropSeat(seat)"
+                    style="cursor:pointer"
+                  />
+                  <text
+                    [attr.x]="getSeatX(si, table.seats.length, 56) + 24"
+                    [attr.y]="getSeatY(si, table.seats.length, 56) + 28"
+                    text-anchor="middle"
+                    class="seat-text"
+                    *ngIf="!seat.guestId">{{ si + 1 }}</text>
+                  <text
+                    [attr.x]="getSeatX(si, table.seats.length, 56) + 24"
+                    [attr.y]="getSeatY(si, table.seats.length, 56) + 28"
+                    text-anchor="middle"
+                    class="seat-name-text"
+                    *ngIf="seat.guestId">{{ getGuestInitials(seat.guestName || '') }}</text>
+                </g>
+              </svg>
+            </div>
+          </ng-container>
+
+          <!-- Rectangular table — use helper methods, no Math in template -->
+          <ng-container *ngIf="table.shape === 'rectangular'">
+            <div class="table-label-top">{{ table.label || 'Table ' + table.tableNumber }}</div>
+            <div class="rect-table-wrap">
+              <div class="rect-seats-top">
+                <div *ngFor="let seat of getTopSeats(table)"
+                  class="seat-dot"
+                  [class.taken]="!!seat.guestId"
+                  (dragover)="$event.preventDefault()"
+                  (drop)="onDropSeat(seat)"
+                  (click)="seat.guestId ? clearSeat(seat) : null"
+                  [title]="seat.guestName || 'Seat ' + seat.seatNumber">
+                  {{ seat.guestId ? getGuestInitials(seat.guestName || '') : seat.seatNumber }}
+                </div>
+              </div>
+              <div class="rect-table-body">T{{ table.tableNumber }}</div>
+              <div class="rect-seats-bottom">
+                <div *ngFor="let seat of getBottomSeats(table)"
+                  class="seat-dot"
+                  [class.taken]="!!seat.guestId"
+                  (dragover)="$event.preventDefault()"
+                  (drop)="onDropSeat(seat)"
+                  (click)="seat.guestId ? clearSeat(seat) : null"
+                  [title]="seat.guestName || 'Seat ' + seat.seatNumber">
+                  {{ seat.guestId ? getGuestInitials(seat.guestName || '') : seat.seatNumber }}
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <button class="table-remove" (click)="removeTable(ti)">× Remove</button>
+        </div>
+      </div>
+
+      <div class="sc-empty" *ngIf="!tablesExist">
+        <div style="font-size:40px;">🪑</div>
+        <p>Add your first table using the panel on the left.</p>
+        <p style="font-size:13px; margin-top:4px;">Drag guests from the list to assign them seats.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="seating-loading" *ngIf="loading">
+    <div class="skeleton" style="height:100%;"></div>
+  </div>
+</div>

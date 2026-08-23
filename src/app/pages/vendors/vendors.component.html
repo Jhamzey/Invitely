@@ -1,0 +1,105 @@
+<div class="vendors-page">
+
+  <!-- Hero -->
+  <div class="vendors-hero">
+    <div class="vh-inner container">
+      <h1 class="vh-title serif">Find the perfect vendors</h1>
+      <p class="vh-sub">Vetted caterers, halls, photographers and more — all in one place.</p>
+      <div class="vh-search">
+        <input [(ngModel)]="search" placeholder="Search vendors..." (keyup.enter)="load()" class="vs-input" />
+        <button class="btn btn-primary" (click)="load()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="vendors-body container">
+
+    <!-- Categories -->
+    <div class="cat-scroll">
+      <button *ngFor="let c of categories"
+        class="cat-btn"
+        [class.active]="category === c.id"
+        (click)="setCategory(c.id)">
+        <span>{{ c.icon }}</span> {{ c.label }}
+      </button>
+    </div>
+
+    <!-- City filter -->
+    <div class="city-row">
+      <span class="city-label">City:</span>
+      <button *ngFor="let c of cities"
+        class="city-btn"
+        [class.active]="city === c"
+        (click)="setCity(c)">
+        {{ c }}
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="vendors-grid" *ngIf="loading">
+      <div class="vendor-card skeleton" *ngFor="let s of [1,2,3,4,5,6]" style="height:200px;"></div>
+    </div>
+
+    <!-- Results -->
+    <div class="vendors-grid" *ngIf="!loading">
+
+     <div class="vendor-card" *ngFor="let v of vendors" [routerLink]="['/vendors', v._id]">
+        <div class="vc-image">
+          <img *ngIf="v.images?.length" [src]="v.images[0]" [alt]="v.name" />
+          <div *ngIf="!v.images?.length" class="vc-img-placeholder">{{ getCategoryIcon(v.category) }}</div>
+          <div class="vc-verified" *ngIf="v.verified">✓ Verified</div>
+        </div>
+        <div class="vc-body">
+          <div class="vc-name">{{ v.name }}</div>
+          <div class="vc-meta">
+            <span class="vc-cat badge badge-gold">{{ getCategoryIcon(v.category) }} {{ v.category | titlecase }}</span>
+            <span class="vc-city">{{ v.city }}</span>
+          </div>
+          <div class="vc-rating">
+            <span class="stars">{{ getStars(v.rating) }}</span>
+            <span class="rc">({{ v.reviewCount }})</span>
+          </div>
+          <div class="vc-price">From ₦{{ v.priceFrom | number }}</div>
+        </div>
+      </div>
+
+      <div class="vendors-empty" *ngIf="vendors.length === 0">
+        <div style="font-size:40px;">🔍</div>
+        <p>No vendors found. Try a different category or city.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Vendor detail modal -->
+<div class="modal-overlay" *ngIf="selectedVendor" (click)="selectedVendor = null">
+  <div class="vendor-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="selectedVendor = null">×</button>
+
+    <div class="vm-image">
+      <img *ngIf="selectedVendor.images?.length" [src]="selectedVendor.images[0]" [alt]="selectedVendor.name" />
+      <div *ngIf="!selectedVendor.images?.length" class="vm-img-placeholder">{{ getCategoryIcon(selectedVendor.category) }}</div>
+    </div>
+
+    <div class="vm-body">
+      <div class="vm-badge badge badge-gold">{{ getCategoryIcon(selectedVendor.category) }} {{ selectedVendor.category | titlecase }}</div>
+      <div class="vm-name serif">{{ selectedVendor.name }}</div>
+      <div class="vm-rating">
+        <span class="stars">{{ getStars(selectedVendor.rating) }}</span>
+        <span>({{ selectedVendor.reviewCount }} reviews)</span>
+      </div>
+      <div class="vm-city">📍 {{ selectedVendor.city }}</div>
+      <div class="vm-price">From ₦{{ selectedVendor.priceFrom | number }}</div>
+      <p class="vm-desc" *ngIf="selectedVendor.description">{{ selectedVendor.description }}</p>
+
+      <div class="vm-actions">
+        <button class="btn btn-primary vm-btn" (click)="contact(selectedVendor!)">
+          📱 WhatsApp enquiry
+        </button>
+        <a *ngIf="selectedVendor.instagram" [href]="'https://instagram.com/' + selectedVendor.instagram" target="_blank" class="btn btn-outline vm-btn">
+          Instagram
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

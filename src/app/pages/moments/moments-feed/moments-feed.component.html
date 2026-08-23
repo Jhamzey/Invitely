@@ -1,0 +1,68 @@
+<div class="feed-page">
+  <div class="feed-topbar">
+    <h1 class="ft-title serif">Moments</h1>
+    <p class="ft-sub">Celebrations shared by the Invitely community</p>
+    <div class="ft-actions">
+      <div class="view-toggle">
+        <button [class.active]="view === 'grid'" (click)="view = 'grid'">Grid</button>
+        <button [class.active]="view === 'feed'" (click)="view = 'feed'">Feed</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="feed-body container">
+
+    <!-- Loading -->
+    <div class="feed-grid" *ngIf="loading">
+      <div class="skeleton" *ngFor="let s of [1,2,3,4,5,6,7,8,9]" style="aspect-ratio:1; border-radius:6px;"></div>
+    </div>
+
+    <!-- Empty -->
+    <div class="feed-empty" *ngIf="!loading && posts.length === 0">
+      <div style="font-size:60px;">📸</div>
+      <h2 class="serif">No moments yet</h2>
+      <p>Be the first to share your celebration with the Invitely community.</p>
+      <p class="fe-note" *ngIf="!auth.isLoggedIn()">
+        <a routerLink="/auth/register">Create an account</a> to start sharing moments.
+      </p>
+      <p class="fe-note" *ngIf="auth.isLoggedIn() && auth.user()?.plan === 'free'">
+        Upgrade to Standard or Premium to post moments.
+      </p>
+    </div>
+
+    <!-- Grid view -->
+    <div class="feed-grid" *ngIf="!loading && view === 'grid' && posts.length > 0">
+      <div class="fg-cell" *ngFor="let p of posts" (click)="selectedPost = p">
+        <img [src]="p.imageUrl" [alt]="p.caption" loading="lazy" />
+        <div class="fg-overlay">
+          <div class="fg-stat">❤️ {{ p.likes }}</div>
+          <div class="fg-stat">💬 {{ p.comments?.length || 0 }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed view -->
+    <div class="feed-posts" *ngIf="!loading && view === 'feed' && posts.length > 0">
+      <div class="fp-card" *ngFor="let p of posts">
+        <div class="fpc-header">
+          <div class="fpc-avatar">{{ p.postedBy?.charAt(0) }}</div>
+          <div>
+            <div class="fpc-name">{{ p.postedBy }}</div>
+            <div class="fpc-meta">{{ p.eventType }} · {{ p.createdAt | date:'MMM d' }}</div>
+          </div>
+        </div>
+        <img [src]="p.imageUrl" class="fpc-img" [alt]="p.caption" loading="lazy" />
+        <div class="fpc-body">
+          <div class="fpc-actions">
+            <button class="fpa-btn" (click)="like(p)" [class.liked]="p.liked">❤️ {{ p.likes }}</button>
+            <button class="fpa-btn">💬 {{ p.comments?.length || 0 }}</button>
+          </div>
+          <div class="fpc-caption" *ngIf="p.caption">{{ p.caption }}</div>
+          <div class="fpc-comment-input" *ngIf="auth.isLoggedIn()">
+            <input [(ngModel)]="comment" placeholder="Add a comment..." (keyup.enter)="addComment(p)" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

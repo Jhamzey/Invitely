@@ -1,0 +1,210 @@
+<!-- Loading -->
+<div class="invite-loading" *ngIf="loading">
+  <div class="il-spinner"></div>
+</div>
+
+<!-- Not found -->
+<div class="invite-notfound" *ngIf="!loading && notFound">
+  <div style="font-size:48px;">💌</div>
+  <h2 class="serif">Invitation not found</h2>
+  <p>This invitation link may be invalid or expired.</p>
+</div>
+
+<!-- Invite page -->
+<div class="invite-page" *ngIf="!loading && !notFound && event && guest">
+
+  <!-- Hero section -->
+  <div class="invite-hero"
+    [style.background]="currentTheme.bg"
+    [style.color]="currentTheme.color"
+    [style.font-family]="event.font || 'Cormorant Garamond'">
+
+    <div class="ih-ornament">✦</div>
+
+    <div class="ih-cover" *ngIf="event.coverImage">
+      <img [src]="event.coverImage" alt="event cover" />
+    </div>
+
+    <div class="ih-type">{{ event.type | titlecase }} Invitation</div>
+    <div class="ih-names serif">{{ event.coupleNames || event.title }}</div>
+    <div class="ih-divider"></div>
+    <div class="ih-details">
+      {{ event.date | date:'EEEE, MMMM d, y' }}<br>
+      {{ event.time }}<br>
+      {{ event.venue }}<br>
+      <span *ngIf="event.dressCode">{{ event.dressCode }}</span>
+    </div>
+
+    <div class="ih-welcome">
+      Dear <strong>{{ guest.name }}</strong>, you are warmly invited.
+    </div>
+
+    <!-- Countdown -->
+    <div class="ih-countdown">
+      <div class="icd-unit">
+        <div class="icd-num">{{ countdown.days }}</div>
+        <div class="icd-label">days</div>
+      </div>
+      <div class="icd-sep">:</div>
+      <div class="icd-unit">
+        <div class="icd-num">{{ countdown.hours }}</div>
+        <div class="icd-label">hrs</div>
+      </div>
+      <div class="icd-sep">:</div>
+      <div class="icd-unit">
+        <div class="icd-num">{{ countdown.minutes }}</div>
+        <div class="icd-label">min</div>
+      </div>
+      <div class="icd-sep">:</div>
+      <div class="icd-unit">
+        <div class="icd-num">{{ countdown.seconds }}</div>
+        <div class="icd-label">sec</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="invite-body">
+
+    <!-- Info tiles -->
+    <div class="info-tiles">
+      <div class="info-tile" *ngIf="guest.tableNumber">
+        <div class="it-icon">🪑</div>
+        <div class="it-label">Your table</div>
+        <div class="it-val">Table {{ guest.tableNumber }}</div>
+        <div class="it-sub">Seat {{ guest.seatNumber }}</div>
+      </div>
+      <div class="info-tile" *ngIf="guest.mealChoice">
+        <div class="it-icon">🍽️</div>
+        <div class="it-label">Meal</div>
+        <div class="it-val">{{ guest.mealChoice }}</div>
+        <div class="it-sub">Your selection</div>
+      </div>
+      <div class="info-tile" (click)="setReminder()">
+        <div class="it-icon">⏰</div>
+        <div class="it-label">Reminder</div>
+        <div class="it-val" style="font-size:14px; color:var(--success);">
+          {{ reminderSet ? '✓ Set!' : 'Add to calendar' }}
+        </div>
+        <div class="it-sub">Google / iOS</div>
+      </div>
+      <div class="info-tile" (click)="showQR = !showQR">
+        <div class="it-icon">🔐</div>
+        <div class="it-label">Entry QR</div>
+        <div class="it-val" style="font-size:14px; color:var(--success);">View code</div>
+        <div class="it-sub">Show at gate</div>
+      </div>
+    </div>
+
+    <!-- QR Code -->
+    <div class="qr-section" *ngIf="showQR">
+      <div class="qrs-title">Your entry QR code</div>
+      <div class="qrs-body">
+        <img *ngIf="guest.qrCodeImage" [src]="guest.qrCodeImage" class="qr-image" alt="QR code" />
+        <div class="qrs-info">
+          <p>Show this code at the entrance gate.</p>
+          <p class="qrs-code">{{ guest.qrCode }}</p>
+          <div class="qrs-warning">⚠️ This code is unique to you and non-transferable.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RSVP -->
+    <div class="rsvp-section" *ngIf="!rsvpDone">
+      <div class="section-title serif">Will you be attending?</div>
+      <div class="rsvp-options">
+        <button class="rsvp-btn"
+          [class.selected]="rsvpChoice === 'attending'"
+          (click)="rsvpChoice = 'attending'">
+          ✓ Yes, I'll be there!
+        </button>
+        <button class="rsvp-btn decline"
+          [class.selected]="rsvpChoice === 'declined'"
+          (click)="rsvpChoice = 'declined'">
+          ✗ Sorry, I can't make it
+        </button>
+      </div>
+      <div class="meal-select" *ngIf="rsvpChoice === 'attending' && event.meals?.length">
+        <label>Meal preference</label>
+        <div class="meal-opts">
+          <button *ngFor="let m of event.meals"
+            class="meal-opt"
+            [class.active]="mealChoice === m.name"
+            (click)="mealChoice = m.name">
+            {{ m.name }}
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary rsvp-submit"
+        *ngIf="rsvpChoice"
+        (click)="submitRsvp()"
+        [disabled]="submittingRsvp">
+        {{ submittingRsvp ? 'Submitting...' : 'Confirm RSVP' }}
+      </button>
+    </div>
+
+    <!-- RSVP done -->
+    <div class="rsvp-done" *ngIf="rsvpDone">
+      <div *ngIf="guest.rsvp === 'attending'" class="rsvp-yes">
+        ✓ You've confirmed attendance — see you there!
+      </div>
+      <div *ngIf="guest.rsvp === 'declined'" class="rsvp-no">
+        We're sorry you can't make it. You'll be missed! ❤️
+      </div>
+    </div>
+
+    <!-- Map / directions -->
+    <div class="map-section">
+      <div class="section-title serif">Getting there</div>
+      <div class="map-box">
+        <div class="map-visual">
+          <div class="map-pin-icon">📍</div>
+          <div class="map-venue-name">{{ event.venue }}</div>
+          <div class="map-address">{{ event.venueAddress }}</div>
+        </div>
+        <button class="btn btn-primary map-btn" (click)="openMaps()">
+          🗺️ Get directions from my location
+        </button>
+      </div>
+    </div>
+
+    <!-- Table mates -->
+    <div class="tablemates-section" *ngIf="getTableGuests().length > 0">
+      <div class="section-title serif">Your table</div>
+      <div class="tablemates-list">
+        <div class="tm-item" *ngFor="let name of getTableGuests()">
+          <div class="tm-avatar">{{ name.charAt(0) }}</div>
+          <div class="tm-name">{{ name }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asoebi -->
+    <div class="asoebi-section" *ngIf="event.asoebi?.length && guest.rsvp === 'attending'">
+      <div class="section-title serif">Asoebi</div>
+      <p class="as-intro">Show your support — order your asoebi directly here.</p>
+      <div class="asoebi-options">
+        <div *ngFor="let a of event.asoebi"
+          class="ao-card"
+          [class.selected]="asoebiSelected === a.name"
+          (click)="asoebiSelected = a.name">
+          <div class="ao-name">{{ a.name }}</div>
+          <div class="ao-price">₦{{ a.price | number }}</div>
+          <div class="ao-desc" *ngIf="a.description">{{ a.description }}</div>
+        </div>
+      </div>
+      <button class="btn btn-gold ao-btn" *ngIf="asoebiSelected && !asoebiDone" (click)="asoebiDone = true">
+        Order {{ asoebiSelected }} — proceed to payment
+      </button>
+      <div class="ao-done" *ngIf="asoebiDone">✓ Order received! The host will contact you for payment.</div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="invite-footer" [style.background]="currentTheme.bg" [style.color]="currentTheme.color">
+    <div class="if-text serif">With love &amp; joy</div>
+    <div class="if-names serif">{{ event.coupleNames || event.title }}</div>
+    <div class="if-brand">Powered by <strong>Invitely</strong></div>
+  </div>
+</div>

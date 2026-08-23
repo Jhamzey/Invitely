@@ -1,0 +1,45 @@
+<ng-container *ngIf="!hidden">
+  <nav class="navbar">
+    <a class="nav-logo serif" routerLink="/">Invitel<span>y</span></a>
+
+    <div class="nav-center">
+      <a class="nav-link" routerLink="/vendors" routerLinkActive="active">Vendors</a>
+      <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" *ngIf="auth.isLoggedIn() && auth.user()?.role === 'host'">My Events</a>
+      <a class="nav-link" routerLink="/vendor/dashboard" routerLinkActive="active" *ngIf="auth.isLoggedIn() && auth.user()?.role === 'vendor'">My Listing</a>
+    </div>
+
+    <div class="nav-actions">
+      <ng-container *ngIf="!auth.isLoggedIn()">
+        <a class="btn btn-ghost nav-btn" routerLink="/auth/login">Sign in</a>
+        <a class="btn btn-primary nav-btn" routerLink="/auth/register">Get started</a>
+      </ng-container>
+      <ng-container *ngIf="auth.isLoggedIn()">
+        <a class="btn btn-outline nav-btn" [routerLink]="auth.user()?.role === 'vendor' ? '/vendor/profile' : '/profile'">
+          <div class="nu-avatar">{{ auth.user()?.name?.charAt(0) }}</div>
+          {{ auth.user()?.name?.split(' ')[0] }}
+        </a>
+      </ng-container>
+    </div>
+
+    <button class="hamburger" (click)="mobileMenuOpen = !mobileMenuOpen" [class.open]="mobileMenuOpen" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="mob-backdrop" *ngIf="mobileMenuOpen" (click)="mobileMenuOpen = false"></div>
+
+    <div class="mob-menu" [class.open]="mobileMenuOpen">
+      <a class="mob-link serif" routerLink="/vendors" (click)="mobileMenuOpen = false">Vendors</a>
+      <a class="mob-link serif" routerLink="/dashboard" (click)="mobileMenuOpen = false" *ngIf="auth.isLoggedIn() && auth.user()?.role === 'host'">My Events</a>
+      <a class="mob-link serif" routerLink="/vendor/dashboard" (click)="mobileMenuOpen = false" *ngIf="auth.isLoggedIn() && auth.user()?.role === 'vendor'">My Listing</a>
+      <div class="mob-divider"></div>
+      <ng-container *ngIf="!auth.isLoggedIn()">
+        <a class="btn btn-outline mob-cta" routerLink="/auth/login" (click)="mobileMenuOpen = false">Sign in</a>
+        <a class="btn btn-primary mob-cta" routerLink="/auth/register" (click)="mobileMenuOpen = false">Get started</a>
+      </ng-container>
+      <ng-container *ngIf="auth.isLoggedIn()">
+        <a class="btn btn-outline mob-cta" [routerLink]="auth.user()?.role === 'vendor' ? '/vendor/profile' : '/profile'" (click)="mobileMenuOpen = false">Profile</a>
+        <button class="btn btn-ghost mob-cta" (click)="logout()">Sign out</button>
+      </ng-container>
+    </div>
+  </nav>
+</ng-container>

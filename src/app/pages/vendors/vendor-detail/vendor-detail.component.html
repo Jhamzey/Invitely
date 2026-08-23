@@ -1,0 +1,99 @@
+<div class="vd-page">
+
+  <!-- Loading -->
+  <div class="vd-loading" *ngIf="loading">
+    <div class="il-spinner"></div>
+  </div>
+
+  <ng-container *ngIf="!loading && vendor">
+
+    <!-- Top bar -->
+    <div class="vd-topbar">
+      <a class="vd-back" routerLink="/vendors">← All vendors</a>
+      <div class="vd-badge badge badge-gold">
+        {{ getCategoryIcon(vendor.category) }} {{ vendor.category | titlecase }}
+      </div>
+    </div>
+
+    <div class="vd-layout container">
+
+      <!-- Image gallery -->
+      <div class="vd-gallery">
+        <div class="vdg-main">
+          <img *ngIf="vendor.images.length"
+            [src]="vendor.images[selectedImage]"
+            [alt]="vendor.name"
+            class="vdg-main-img" />
+          <div *ngIf="!vendor.images.length" class="vdg-placeholder">
+            {{ getCategoryIcon(vendor.category) }}
+          </div>
+          <div class="vd-verified" *ngIf="vendor.verified">✓ Verified vendor</div>
+        </div>
+
+        <div class="vdg-thumbs" *ngIf="vendor.images.length > 1">
+          <div *ngFor="let img of vendor.images; let i = index"
+            class="vdg-thumb"
+            [class.active]="selectedImage === i"
+            (click)="selectedImage = i">
+            <img [src]="img" [alt]="'Image ' + (i+1)" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="vd-info">
+        <h1 class="vd-name serif">{{ vendor.name }}</h1>
+
+        <div class="vd-rating-row">
+          <span class="vd-stars">{{ getStars(vendor.rating) }}</span>
+          <span class="vd-rc">{{ vendor.rating }}/5 · {{ vendor.reviewCount }} reviews</span>
+        </div>
+
+        <div class="vd-meta-row">
+          <div class="vdm-item">
+            <div class="vdm-label">Location</div>
+            <div class="vdm-val">📍 {{ vendor.city }}</div>
+          </div>
+          <div class="vdm-item">
+            <div class="vdm-label">Starting from</div>
+            <div class="vdm-val price">₦{{ vendor.priceFrom | number }}</div>
+          </div>
+        </div>
+
+        <div class="vd-desc" *ngIf="vendor.description">
+          <h3 class="vd-sec-title">About</h3>
+          <p>{{ vendor.description }}</p>
+        </div>
+
+        <!-- Star breakdown (visual) -->
+        <div class="vd-stars-breakdown">
+          <h3 class="vd-sec-title">Rating breakdown</h3>
+          <div class="vsb-row" *ngFor="let s of [5,4,3,2,1]">
+            <span class="vsb-label">{{ s }}★</span>
+            <div class="vsb-bar">
+              <div class="vsb-fill" [style.width]="vendor.rating >= s - 0.5 && vendor.rating < s + 0.5 ? '70%' : s > vendor.rating ? '10%' : '40%'"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="vd-actions">
+          <button class="btn btn-primary vd-btn" (click)="contact()">
+            📱 WhatsApp enquiry
+          </button>
+          <a *ngIf="vendor.instagram"
+            [href]="'https://instagram.com/' + vendor.instagram"
+            target="_blank"
+            class="btn btn-outline vd-btn">
+            Instagram
+          </a>
+          <a *ngIf="vendor.email"
+            [href]="'mailto:' + vendor.email"
+            class="btn btn-outline vd-btn">
+            Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

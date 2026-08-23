@@ -1,0 +1,105 @@
+<!-- Invalid session -->
+<div class="ss-invalid" *ngIf="invalid">
+  <div class="ssi-icon">🔒</div>
+  <h2>Invalid access link</h2>
+  <p>This scan link is invalid or has never been activated.</p>
+</div>
+
+<!-- Expired -->
+<div class="ss-invalid" *ngIf="expired">
+  <div class="ssi-icon">⏰</div>
+  <h2>Scan session expired</h2>
+  <p>This temporary access link has expired. The host needs to generate a new one.</p>
+</div>
+
+<!-- Loading -->
+<div class="ss-loading" *ngIf="loading">
+  <div class="ss-spinner"></div>
+  <p>Validating access...</p>
+</div>
+
+<!-- Active scan page -->
+<div class="ss-page" *ngIf="!loading && !invalid && !expired && sessionInfo">
+
+  <!-- Offline banner -->
+  <div class="ss-offline" *ngIf="isOffline">
+    ⚠️ Offline mode — scans are queued ({{ offlineQueue.length }}) and will sync when connected
+  </div>
+
+  <!-- Header -->
+  <div class="ss-header">
+    <div class="ssh-left">
+      <div class="ssh-event">{{ sessionInfo.coupleNames || sessionInfo.eventTitle }}</div>
+      <div class="ssh-expiry">🔐 Temporary access · {{ timeLeft }}</div>
+    </div>
+    <div class="ssh-stats">
+      <div class="ss-stat">
+        <div class="ss-stat-num" style="color:var(--success)">{{ stats.arrivedCount }}</div>
+        <div class="ss-stat-label">In</div>
+      </div>
+      <div class="ss-stat">
+        <div class="ss-stat-num" style="color:var(--text-muted)">{{ stats.pending }}</div>
+        <div class="ss-stat-label">Pending</div>
+      </div>
+      <div class="ss-stat">
+        <div class="ss-stat-num">{{ stats.total }}</div>
+        <div class="ss-stat-label">Total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCAN INPUT — full focus for speed -->
+  <div class="ss-scan-area">
+    <div class="ssa-label">Enter or scan QR code</div>
+    <div class="ssa-input-row">
+      <input
+        class="ssa-input"
+        [(ngModel)]="manualCode"
+        (keyup.enter)="verify()"
+        placeholder="Scan or type code..."
+        autofocus
+        [disabled]="scanning"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+      />
+      <button class="ssa-btn" (click)="verify()" [disabled]="scanning || !manualCode">
+        {{ scanning ? '...' : '✓' }}
+      </button>
+    </div>
+
+    <!-- Result — big and clear for fast reading -->
+    <div class="ssa-result valid" *ngIf="scanResult?.valid">
+      <div class="sar-icon">✓</div>
+      <div class="sar-name">{{ scanResult.guest?.name }}</div>
+      <div class="sar-info">Table {{ scanResult.guest?.tableNumber }} · Seat {{ scanResult.guest?.seatNumber }}</div>
+      <div class="sar-meal" *ngIf="scanResult.guest?.mealChoice">{{ scanResult.guest?.mealChoice }}</div>
+    </div>
+
+    <div class="ssa-result invalid" *ngIf="scanResult && !scanResult.valid && !scanResult.offline">
+      <div class="sar-icon">✗</div>
+      <div class="sar-name">{{ scanResult.reason === 'duplicate' ? 'Already checked in' : scanResult.reason === 'declined' ? 'Declined' : 'Invalid code' }}</div>
+      <div class="sar-info">{{ scanResult.message }}</div>
+    </div>
+
+    <div class="ssa-result offline-q" *ngIf="scanResult?.offline">
+      <div class="sar-icon">📥</div>
+      <div class="sar-name">Queued offline</div>
+      <div class="sar-info">Will sync when internet returns</div>
+    </div>
+  </div>
+
+  <!-- Live arrivals list -->
+  <div class="ss-arrivals">
+    <div class="ssa-title">Recent arrivals</div>
+    <div class="ssa-list">
+      <div class="ssa-item" *ngFor="let a of arrivals">
+        <div class="ssai-dot"></div>
+        <div class="ssai-name">{{ a.name }}</div>
+        <div class="ssai-table">T{{ a.tableNumber }}</div>
+        <div class="ssai-time">{{ a.arrivedAt | date:'h:mm a' }}</div>
+      </div>
+      <div class="ssa-empty" *ngIf="arrivals.length === 0">No arrivals yet</div>
+    </div>
+  </div>
+</div>

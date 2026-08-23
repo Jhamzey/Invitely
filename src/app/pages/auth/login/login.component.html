@@ -1,0 +1,106 @@
+<div class="auth-page">
+
+  <!-- Left panel — decorative -->
+  <div class="auth-visual" [style.background]="themeService.current().previewBg">
+    <div class="av-inner" [style.color]="themeService.current().previewColor">
+      <div class="av-logo serif" routerLink="/">Invitel<span>y</span></div>
+      <div class="av-card">
+        <div class="avc-ornament">✦</div>
+        <div class="avc-type">Wedding Invitation</div>
+        <div class="avc-names serif">Amara<br>&amp; Emeka</div>
+        <div class="avc-divider"></div>
+        <div class="avc-details">
+          Saturday, 14 February 2026<br>
+          3:00 PM · Grand Ballroom, VI
+        </div>
+        <div class="avc-footer">
+          <div>
+            <div class="avc-guest">Zainab Okafor</div>
+            <div class="avc-table">Table 4 · Seat 2</div>
+          </div>
+          <div class="avc-qr">
+            <div class="qr-mini">
+              <div class="qm filled"></div><div class="qm"></div><div class="qm filled"></div>
+              <div class="qm filled"></div><div class="qm filled"></div><div class="qm"></div>
+              <div class="qm"></div><div class="qm filled"></div><div class="qm filled"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="av-quote serif">"The most beautiful<br>invitation our guests<br>had ever received."</div>
+      <div class="av-dots">
+        <div *ngFor="let t of themeService.themes"
+          class="av-dot"
+          [style.background]="t.accentColor"
+          [class.active]="themeService.current().id === t.id">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel — form -->
+  <div class="auth-form-panel">
+    <div class="auth-form-inner">
+
+      <div class="af-header">
+        <h1 class="af-title serif">Welcome back</h1>
+        <p class="af-sub">Sign in to continue planning your perfect event.</p>
+      </div>
+
+      <form (ngSubmit)="submit()" novalidate>
+
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="your@email.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <div class="pw-label-row">
+            <label for="password">Password</label>
+            <span class="forgot-link">Forgot password?</span>
+          </div>
+          <div class="pw-wrap">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            />
+            <button type="button" class="pw-toggle" (click)="showPassword = !showPassword">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-error" *ngIf="error">{{ error }}</div>
+
+        <button type="submit" class="btn btn-primary auth-btn" [disabled]="loading">
+          <span *ngIf="!loading">Sign in</span>
+          <span *ngIf="loading" class="btn-loading">
+            <span class="spinner"></span> Signing in...
+          </span>
+        </button>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <div class="auth-switch">
+          Don't have an account?
+          <a routerLink="/auth/register" class="auth-switch-link">Create one free</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
