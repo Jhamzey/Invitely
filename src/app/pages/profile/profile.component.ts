@@ -18,6 +18,7 @@ export class ProfileComponent implements OnInit {
   saving = false;
   saved = false;
   error = '';
+  showUpgradeModal = false;
 
   // Password change
   currentPassword = '';

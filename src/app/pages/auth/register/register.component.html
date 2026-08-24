@@ -1,172 +1,113 @@
 <div class="auth-page">
 
-  <!-- Left visual panel -->
   <div class="auth-visual" [style.background]="themeService.current().previewBg">
     <div class="av-inner" [style.color]="themeService.current().previewColor">
       <div class="av-logo serif" routerLink="/">Invitel<span>y</span></div>
-
       <div class="av-features">
         <div class="av-feat" *ngFor="let f of [
-          { icon: '🎨', text: 'Beautiful themed invitations' },
-          { icon: '🔐', text: 'Secure QR entry codes' },
-          { icon: '🪑', text: 'Visual seating plans' },
-          { icon: '💃', text: 'Asoebi payments built in' },
-          { icon: '📱', text: 'Send via WhatsApp in one click' },
-          { icon: '📊', text: 'Live RSVP dashboard' }
+          { text: 'Beautiful themed invitations' },
+          { text: 'Secure QR entry codes per guest' },
+          { text: 'Visual seating plans' },
+          { text: 'Asoebi payments built in' },
+          { text: 'Send via WhatsApp in one click' },
+          { text: 'Live RSVP dashboard' }
         ]">
-          <span class="avf-icon">{{ f.icon }}</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           <span class="avf-text">{{ f.text }}</span>
         </div>
       </div>
-
       <div class="av-stats">
-        <div class="avs-item">
-          <div class="avs-num serif">2,400+</div>
-          <div class="avs-label">Event hosts</div>
-        </div>
+        <div class="avs-item"><div class="avs-num serif">2,400+</div><div class="avs-label">Event hosts</div></div>
         <div class="avs-divider"></div>
-        <div class="avs-item">
-          <div class="avs-num serif">48k+</div>
-          <div class="avs-label">Invites sent</div>
-        </div>
+        <div class="avs-item"><div class="avs-num serif">48k+</div><div class="avs-label">Invites sent</div></div>
         <div class="avs-divider"></div>
-        <div class="avs-item">
-          <div class="avs-num serif">99%</div>
-          <div class="avs-label">Love it</div>
-        </div>
+        <div class="avs-item"><div class="avs-num serif">99%</div><div class="avs-label">Love it</div></div>
       </div>
-
       <div class="av-dots">
-        <div *ngFor="let t of themeService.themes"
-          class="av-dot"
-          [style.background]="t.accentColor"
-          [class.active]="themeService.current().id === t.id">
-        </div>
+        <div *ngFor="let t of themeService.themes" class="av-dot" [style.background]="t.accentColor" [class.active]="themeService.current().id === t.id"></div>
       </div>
     </div>
   </div>
 
-  <!-- Right form panel -->
   <div class="auth-form-panel">
     <div class="auth-form-inner">
+
+      <a class="auth-back" routerLink="/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to home
+      </a>
+
+      <!-- Role selector -->
+      <div class="role-selector">
+        <button class="rs-btn active">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <div>
+            <div class="rs-title">I'm hosting an event</div>
+            <div class="rs-sub">Weddings, birthdays and more</div>
+          </div>
+        </button>
+        <button class="rs-btn" (click)="selectRole('vendor')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <div>
+            <div class="rs-title">I'm a vendor</div>
+            <div class="rs-sub">List my services on Invitely</div>
+          </div>
+        </button>
+      </div>
 
       <div class="af-header">
         <h1 class="af-title serif">Create your account</h1>
         <p class="af-sub">Free to start. No credit card needed.</p>
       </div>
 
-      <!-- Event type selector -->
       <div class="event-type-row">
-        <div class="form-group" style="margin-bottom:0;">
-          <label>What are you planning?</label>
-        </div>
+        <label style="font-size:12px; color:var(--text-muted); font-family:var(--sans); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; display:block;">What are you planning?</label>
         <div class="et-options">
-          <div *ngFor="let t of eventTypes"
-            class="et-opt"
-            [class.active]="selectedType === t.id"
-            (click)="selectedType = t.id">
-            <span class="et-icon">{{ t.icon }}</span>
+          <div *ngFor="let t of eventTypes" class="et-opt" [class.active]="selectedType === t.id" (click)="selectedType = t.id">
             <span class="et-label">{{ t.label }}</span>
           </div>
         </div>
       </div>
 
       <form (ngSubmit)="submit()" novalidate>
-
         <div class="form-group">
           <label for="name">Full name</label>
-          <input
-            id="name"
-            type="text"
-            [(ngModel)]="name"
-            name="name"
-            placeholder="Your full name"
-            autocomplete="name"
-            required
-          />
+          <input id="name" type="text" [(ngModel)]="name" name="name" placeholder="Your full name" autocomplete="name" required />
         </div>
-
         <div class="form-group">
           <label for="email">Email address</label>
-          <input
-            id="email"
-            type="email"
-            [(ngModel)]="email"
-            name="email"
-            placeholder="your@email.com"
-            autocomplete="email"
-            required
-          />
+          <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="your@email.com" autocomplete="email" required />
         </div>
-
         <div class="form-group">
           <label for="password">Password</label>
           <div class="pw-wrap">
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="At least 8 characters"
-              autocomplete="new-password"
-              required
-            />
+            <input id="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" placeholder="At least 8 characters" autocomplete="new-password" required />
             <button type="button" class="pw-toggle" (click)="showPassword = !showPassword">
-              {{ showPassword ? '🙈' : '👁️' }}
+              <svg *ngIf="!showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg *ngIf="showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
           </div>
-          <!-- Password strength -->
           <div class="pw-strength" *ngIf="password.length > 0">
             <div class="pws-bars">
-              <div class="pws-bar" *ngFor="let i of [1,2,3,4]"
-                [style.background]="i <= passwordStrength ? strengthColor : 'var(--border)'">
-              </div>
+              <div class="pws-bar" *ngFor="let i of [1,2,3,4]" [style.background]="i <= passwordStrength ? strengthColor : 'var(--border)'"></div>
             </div>
             <span class="pws-label" [style.color]="strengthColor">{{ strengthLabel }}</span>
           </div>
         </div>
-
         <div class="form-group">
           <label for="confirm">Confirm password</label>
-          <input
-            id="confirm"
-            type="password"
-            [(ngModel)]="confirmPassword"
-            name="confirm"
-            placeholder="Repeat your password"
-            autocomplete="new-password"
-            required
-          />
-          <div class="pw-match-ok" *ngIf="confirmPassword && password === confirmPassword">
-            ✓ Passwords match
-          </div>
-          <div class="pw-match-err" *ngIf="confirmPassword && password !== confirmPassword">
-            ✗ Passwords do not match
-          </div>
+          <input id="confirm" type="password" [(ngModel)]="confirmPassword" name="confirm" placeholder="Repeat your password" autocomplete="new-password" required />
+          <div class="pw-match-ok" *ngIf="confirmPassword && password === confirmPassword">Password matches</div>
+          <div class="pw-match-err" *ngIf="confirmPassword && password !== confirmPassword">Passwords do not match</div>
         </div>
-
         <div class="auth-error" *ngIf="error">{{ error }}</div>
-
-        <div class="terms-line">
-          By creating an account you agree to our
-          <a class="terms-link">Terms of use</a> and
-          <a class="terms-link">Privacy policy</a>.
-        </div>
-
+        <div class="terms-line">By creating an account you agree to our <a class="terms-link">Terms of use</a> and <a class="terms-link">Privacy policy</a>.</div>
         <button type="submit" class="btn btn-primary auth-btn" [disabled]="loading">
           <span *ngIf="!loading">Create account — it's free</span>
-          <span *ngIf="loading" class="btn-loading">
-            <span class="spinner"></span> Creating account...
-          </span>
+          <span *ngIf="loading" class="btn-loading"><span class="spinner"></span> Creating account...</span>
         </button>
-
-        <div class="auth-switch">
-          Already have an account?
-          <a routerLink="/auth/login" class="auth-switch-link">Sign in</a>
-        </div>
-
+        <div class="auth-switch">Already have an account? <a routerLink="/auth/login" class="auth-switch-link">Sign in</a></div>
       </form>
     </div>
   </div>
-
 </div>

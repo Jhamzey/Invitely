@@ -1,95 +1,110 @@
-<!-- Invalid session -->
 <div class="ss-invalid" *ngIf="invalid">
-  <div class="ssi-icon">🔒</div>
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
   <h2>Invalid access link</h2>
   <p>This scan link is invalid or has never been activated.</p>
 </div>
 
-<!-- Expired -->
 <div class="ss-invalid" *ngIf="expired">
-  <div class="ssi-icon">⏰</div>
-  <h2>Scan session expired</h2>
-  <p>This temporary access link has expired. The host needs to generate a new one.</p>
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  <h2>Session expired</h2>
+  <p>This access link has expired. Ask the host to generate a new one.</p>
 </div>
 
-<!-- Loading -->
 <div class="ss-loading" *ngIf="loading">
   <div class="ss-spinner"></div>
   <p>Validating access...</p>
 </div>
 
-<!-- Active scan page -->
 <div class="ss-page" *ngIf="!loading && !invalid && !expired && sessionInfo">
 
-  <!-- Offline banner -->
   <div class="ss-offline" *ngIf="isOffline">
-    ⚠️ Offline mode — scans are queued ({{ offlineQueue.length }}) and will sync when connected
+    Offline — {{ offlineQueue.length }} scan(s) queued, will sync on reconnect
   </div>
 
-  <!-- Header -->
   <div class="ss-header">
     <div class="ssh-left">
       <div class="ssh-event">{{ sessionInfo.coupleNames || sessionInfo.eventTitle }}</div>
-      <div class="ssh-expiry">🔐 Temporary access · {{ timeLeft }}</div>
+      <div class="ssh-expiry">Temporary access · {{ timeLeft }}</div>
     </div>
     <div class="ssh-stats">
-      <div class="ss-stat">
-        <div class="ss-stat-num" style="color:var(--success)">{{ stats.arrivedCount }}</div>
-        <div class="ss-stat-label">In</div>
-      </div>
-      <div class="ss-stat">
-        <div class="ss-stat-num" style="color:var(--text-muted)">{{ stats.pending }}</div>
-        <div class="ss-stat-label">Pending</div>
-      </div>
-      <div class="ss-stat">
-        <div class="ss-stat-num">{{ stats.total }}</div>
-        <div class="ss-stat-label">Total</div>
-      </div>
+      <div class="ss-stat"><div class="ss-stat-num" style="color:#4ade80">{{ stats.arrivedCount }}</div><div class="ss-stat-label">In</div></div>
+      <div class="ss-stat"><div class="ss-stat-num" style="color:rgba(255,255,255,0.4)">{{ stats.pending }}</div><div class="ss-stat-label">Pending</div></div>
+      <div class="ss-stat"><div class="ss-stat-num">{{ stats.total }}</div><div class="ss-stat-label">Total</div></div>
     </div>
   </div>
 
-  <!-- SCAN INPUT — full focus for speed -->
   <div class="ss-scan-area">
-    <div class="ssa-label">Enter or scan QR code</div>
+
+    <!-- Camera view -->
+    <div class="camera-view" *ngIf="cameraActive">
+      <video #videoEl autoplay playsinline muted class="cv-video"></video>
+      <div class="cv-overlay">
+        <div class="cv-corners">
+          <div class="cv-corner tl"></div><div class="cv-corner tr"></div>
+          <div class="cv-corner bl"></div><div class="cv-corner br"></div>
+        </div>
+        <div class="cv-hint">Position QR code within the frame</div>
+      </div>
+      <button class="cv-stop" (click)="stopCamera()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Close camera
+      </button>
+    </div>
+
+    <!-- Camera launch button -->
+    <div class="camera-launch" *ngIf="!cameraActive">
+      <button class="cl-btn" (click)="startCamera()">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Tap to activate camera scanner
+      </button>
+      <div class="camera-error" *ngIf="cameraError">{{ cameraError }}</div>
+    </div>
+
+    <div class="ss-divider">— or enter code manually —</div>
+
+    <!-- Manual input -->
     <div class="ssa-input-row">
       <input
         class="ssa-input"
         [(ngModel)]="manualCode"
         (keyup.enter)="verify()"
-        placeholder="Scan or type code..."
-        autofocus
+        placeholder="Enter QR code..."
         [disabled]="scanning"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"
       />
       <button class="ssa-btn" (click)="verify()" [disabled]="scanning || !manualCode">
-        {{ scanning ? '...' : '✓' }}
+        <svg *ngIf="!scanning" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <div *ngIf="scanning" class="ssa-spinner"></div>
       </button>
     </div>
 
-    <!-- Result — big and clear for fast reading -->
+    <!-- Result -->
     <div class="ssa-result valid" *ngIf="scanResult?.valid">
-      <div class="sar-icon">✓</div>
+      <div class="sar-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
       <div class="sar-name">{{ scanResult.guest?.name }}</div>
       <div class="sar-info">Table {{ scanResult.guest?.tableNumber }} · Seat {{ scanResult.guest?.seatNumber }}</div>
       <div class="sar-meal" *ngIf="scanResult.guest?.mealChoice">{{ scanResult.guest?.mealChoice }}</div>
     </div>
 
     <div class="ssa-result invalid" *ngIf="scanResult && !scanResult.valid && !scanResult.offline">
-      <div class="sar-icon">✗</div>
+      <div class="sar-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
       <div class="sar-name">{{ scanResult.reason === 'duplicate' ? 'Already checked in' : scanResult.reason === 'declined' ? 'Declined' : 'Invalid code' }}</div>
       <div class="sar-info">{{ scanResult.message }}</div>
     </div>
 
     <div class="ssa-result offline-q" *ngIf="scanResult?.offline">
-      <div class="sar-icon">📥</div>
       <div class="sar-name">Queued offline</div>
       <div class="sar-info">Will sync when internet returns</div>
     </div>
   </div>
 
-  <!-- Live arrivals list -->
+  <!-- Arrivals -->
   <div class="ss-arrivals">
     <div class="ssa-title">Recent arrivals</div>
     <div class="ssa-list">

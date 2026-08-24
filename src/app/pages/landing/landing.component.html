@@ -11,20 +11,26 @@
     <a class="btn btn-ghost" routerLink="/auth/login">Sign in</a>
     <a class="btn btn-primary" routerLink="/auth/register">Create your event</a>
   </div>
-  <!-- Mobile hamburger -->
-  <input #menuToggle id="mobile-menu-toggle" class="mobile-menu-toggle" type="checkbox">
-  <label class="hamburger" for="mobile-menu-toggle" [class.open]="menuToggle.checked">
+  <button class="hamburger" (click)="mobileMenuOpen = !mobileMenuOpen" [class.open]="mobileMenuOpen" aria-label="Menu">
     <span></span><span></span><span></span>
-  </label>
+  </button>
 </nav>
 
+<!-- Mobile backdrop -->
+<div class="mob-backdrop" *ngIf="mobileMenuOpen" (click)="mobileMenuOpen = false"></div>
+
 <!-- Mobile menu -->
-<div class="mobile-menu" [class.open]="menuToggle.checked">
-  <a class="mob-link serif" (click)="scrollTo('how')">How it works</a>
-  <a class="mob-link serif" (click)="scrollTo('features')">Features</a>
-  <a class="mob-link serif" routerLink="/vendors">Vendors</a>
-  <a class="mob-link serif" (click)="scrollTo('pricing')">Pricing</a>
-  <a class="btn btn-primary mob-cta" routerLink="/auth/register">Create your event</a>
+<div class="mobile-menu" [class.open]="mobileMenuOpen">
+  <button class="mob-close" (click)="mobileMenuOpen = false" aria-label="Close">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <a class="mob-link serif" (click)="scrollTo('how'); mobileMenuOpen = false">How it works</a>
+  <a class="mob-link serif" (click)="scrollTo('features'); mobileMenuOpen = false">Features</a>
+  <a class="mob-link serif" routerLink="/vendors" (click)="mobileMenuOpen = false">Vendors</a>
+  <a class="mob-link serif" (click)="scrollTo('pricing'); mobileMenuOpen = false">Pricing</a>
+  <div style="border-top: 0.5px solid var(--border); margin: 10px 0;"></div>
+  <a class="btn btn-outline mob-cta" routerLink="/auth/login" (click)="mobileMenuOpen = false">Sign in</a>
+  <a class="btn btn-primary mob-cta" routerLink="/auth/register" (click)="mobileMenuOpen = false">Create your event</a>
 </div>
 
 <!-- HERO -->

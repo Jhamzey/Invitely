@@ -1,6 +1,6 @@
 <div class="auth-page">
 
-  <!-- Left panel — decorative -->
+  <!-- Left visual -->
   <div class="auth-visual" [style.background]="themeService.current().previewBg">
     <div class="av-inner" [style.color]="themeService.current().previewColor">
       <div class="av-logo serif" routerLink="/">Invitel<span>y</span></div>
@@ -9,15 +9,9 @@
         <div class="avc-type">Wedding Invitation</div>
         <div class="avc-names serif">Amara<br>&amp; Emeka</div>
         <div class="avc-divider"></div>
-        <div class="avc-details">
-          Saturday, 14 February 2026<br>
-          3:00 PM · Grand Ballroom, VI
-        </div>
+        <div class="avc-details">Saturday, 14 February 2026<br>3:00 PM · Grand Ballroom, VI</div>
         <div class="avc-footer">
-          <div>
-            <div class="avc-guest">Zainab Okafor</div>
-            <div class="avc-table">Table 4 · Seat 2</div>
-          </div>
+          <div><div class="avc-guest">Zainab Okafor</div><div class="avc-table">Table 4 · Seat 2</div></div>
           <div class="avc-qr">
             <div class="qr-mini">
               <div class="qm filled"></div><div class="qm"></div><div class="qm filled"></div>
@@ -27,80 +21,77 @@
           </div>
         </div>
       </div>
-      <div class="av-quote serif">"The most beautiful<br>invitation our guests<br>had ever received."</div>
+      <div class="av-quote serif">"The most beautiful invitation our guests had ever received."</div>
       <div class="av-dots">
-        <div *ngFor="let t of themeService.themes"
-          class="av-dot"
-          [style.background]="t.accentColor"
-          [class.active]="themeService.current().id === t.id">
-        </div>
+        <div *ngFor="let t of themeService.themes" class="av-dot" [style.background]="t.accentColor" [class.active]="themeService.current().id === t.id"></div>
       </div>
     </div>
   </div>
 
-  <!-- Right panel — form -->
+  <!-- Right form -->
   <div class="auth-form-panel">
     <div class="auth-form-inner">
 
+      <!-- Back to landing -->
+      <a class="auth-back" routerLink="/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to home
+      </a>
+
+      <!-- Role toggle -->
+      <div class="role-selector">
+        <button class="rs-btn" [class.active]="role === 'host'" (click)="role = 'host'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <div>
+            <div class="rs-title">Sign in as host</div>
+            <div class="rs-sub">Manage your events</div>
+          </div>
+        </button>
+        <button class="rs-btn" [class.active]="role === 'vendor'" (click)="role = 'vendor'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <div>
+            <div class="rs-title">Sign in as vendor</div>
+            <div class="rs-sub">Manage your listing</div>
+          </div>
+        </button>
+      </div>
+
       <div class="af-header">
         <h1 class="af-title serif">Welcome back</h1>
-        <p class="af-sub">Sign in to continue planning your perfect event.</p>
+        <p class="af-sub">{{ role === 'vendor' ? 'Sign in to your vendor account.' : 'Sign in to continue planning your event.' }}</p>
       </div>
 
       <form (ngSubmit)="submit()" novalidate>
-
         <div class="form-group">
           <label for="email">Email address</label>
-          <input
-            id="email"
-            type="email"
-            [(ngModel)]="email"
-            name="email"
-            placeholder="your@email.com"
-            autocomplete="email"
-            required
-          />
+          <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="your@email.com" autocomplete="email" required />
         </div>
-
         <div class="form-group">
           <div class="pw-label-row">
             <label for="password">Password</label>
             <span class="forgot-link">Forgot password?</span>
           </div>
           <div class="pw-wrap">
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="Enter your password"
-              autocomplete="current-password"
-              required
-            />
+            <input id="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" placeholder="Enter your password" autocomplete="current-password" required />
             <button type="button" class="pw-toggle" (click)="showPassword = !showPassword">
-              {{ showPassword ? '🙈' : '👁️' }}
+              <svg *ngIf="!showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg *ngIf="showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
           </div>
         </div>
-
         <div class="auth-error" *ngIf="error">{{ error }}</div>
-
         <button type="submit" class="btn btn-primary auth-btn" [disabled]="loading">
           <span *ngIf="!loading">Sign in</span>
-          <span *ngIf="loading" class="btn-loading">
-            <span class="spinner"></span> Signing in...
-          </span>
+          <span *ngIf="loading" class="btn-loading"><span class="spinner"></span> Signing in...</span>
         </button>
-
         <div class="auth-divider"><span>or</span></div>
-
         <div class="auth-switch">
           Don't have an account?
-          <a routerLink="/auth/register" class="auth-switch-link">Create one free</a>
+          <a [routerLink]="role === 'vendor' ? '/vendor/register' : '/auth/register'" class="auth-switch-link">
+            Create {{ role === 'vendor' ? 'vendor' : 'host' }} account
+          </a>
         </div>
-
       </form>
     </div>
   </div>
-
 </div>

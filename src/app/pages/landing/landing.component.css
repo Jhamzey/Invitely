@@ -48,6 +48,8 @@
 
 .nav-actions { display: flex; gap: 10px; align-items: center; }
 
+.mobile-menu-toggle { display: none; }
+
 .hamburger {
   display: none;
   flex-direction: column;
@@ -55,8 +57,9 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 5px;
   z-index: 1100;
+  position: relative;
 }
 
 .hamburger span {
@@ -69,34 +72,68 @@
 }
 
 .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-.mobile-menu {
-  display: none;
+.mob-backdrop {
   position: fixed;
   inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1050;
+  animation: fadeIn 0.2s ease;
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 78vw;
+  max-width: 300px;
+  height: 100vh;
   background: var(--bg);
+  display: flex;
   flex-direction: column;
+  gap: 4px;
+  padding: 60px 20px 40px;
+  z-index: 1060;
+  transform: translateX(100%);
+  transition: transform 0.28s ease;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+  overflow-y: auto;
+}
+
+.mobile-menu.open { transform: translateX(0); }
+
+.mob-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--surface-2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
-  z-index: 1050;
-  animation: fadeIn 0.25s ease;
+  cursor: pointer;
+  color: var(--text-primary);
 }
-
-.mobile-menu.open { display: flex; }
 
 .mob-link {
-  font-size: 2rem;
+  font-size: 1.2rem;
+  font-weight: 400;
   color: var(--text-primary);
   cursor: pointer;
+  padding: 10px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
   text-decoration: none;
-  transition: color 0.2s;
+  display: block;
 }
 
-.mob-link:hover { color: var(--accent); }
-.mob-cta { margin-top: 16px; font-size: 1rem; padding: 12px 32px; }
+.mob-link:hover { background: var(--surface-1); }
+.mob-cta { width: 100%; justify-content: center; margin-top: 4px; }
 
 /* ===== HERO ===== */
 .hero {
@@ -801,7 +838,6 @@
 }
 
 @media (max-width: 768px) {
-  .nav { padding: 12px 20px; }
   .nav-center, .nav-actions { display: none; }
   .hamburger { display: flex; }
 

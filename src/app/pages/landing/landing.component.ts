@@ -13,6 +13,7 @@ import { ThemeService } from '../../core/services/theme.service';
 export class LandingComponent implements OnInit, OnDestroy {
   showBackToTop = false;
   activeThemeId = 'ivory';
+  mobileMenuOpen = false;
 
   readonly features = [
     { icon: '🎨', title: 'Fully customisable', desc: 'Themes, fonts, languages, colours — every element matches your vision exactly.' },

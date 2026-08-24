@@ -1,78 +1,209 @@
 <div class="vd-page">
+  <!-- Sidebar -->
   <aside class="vd-sidebar">
     <div class="vds-logo serif" routerLink="/">Invitel<span>y</span></div>
+
     <nav class="vds-nav">
-      <a class="vds-link active" routerLink="/vendor/dashboard">📊 Dashboard</a>
-      <a class="vds-link" routerLink="/vendor/profile">✏️ Edit listing</a>
-      <a class="vds-link" routerLink="/moments">📸 Moments</a>
-      <a class="vds-link" routerLink="/vendors">🔍 Browse vendors</a>
+      <a class="vds-link" routerLink="/vendor/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="vds-link" routerLink="/vendor/profile" routerLinkActive="active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit listing
+      </a>
+      <a class="vds-link" routerLink="/moments" routerLinkActive="active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Moments
+      </a>
+      <a class="vds-link" routerLink="/vendors" routerLinkActive="active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Browse vendors
+      </a>
     </nav>
+
     <div class="vds-spacer"></div>
+
+    <!-- Plan status -->
     <div class="vds-plan" [class.pro]="isPro">
-      <div class="vdsp-badge">{{ isPro ? '⭐ Pro' : 'Free tier' }}</div>
-      <div class="vdsp-desc" *ngIf="!isPro">Upgrade to Pro for WhatsApp alerts, featured listing & more</div>
-      <button class="btn btn-gold vdsp-btn" *ngIf="!isPro">Upgrade — ₦5,000/mo</button>
+      <div class="vdsp-badge">
+        <svg *ngIf="isPro" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        {{ isPro ? 'Pro plan' : 'Free plan' }}
+      </div>
+      <div class="vdsp-desc" *ngIf="!isPro">Upgrade for WhatsApp alerts, featured listing & more</div>
+      <button class="btn btn-gold vdsp-btn" *ngIf="!isPro" (click)="showUpgradeModal = true">Upgrade to Pro</button>
     </div>
+
+    <!-- Sign out -->
+    <button class="vds-logout" (click)="logout()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
   </aside>
 
-  <main class="vd-main">
+  <!-- Main content -->
+  <main class="vd-main" *ngIf="!loading && vendor">
     <div class="vdm-header">
       <div>
-        <h1 class="serif">{{ vendor?.businessName || vendor?.name }}</h1>
-        <div class="vdm-cat">{{ vendor?.businessCategory | titlecase }} · {{ vendor?.businessCity }}</div>
+        <h1 class="serif">{{ vendor.businessName || vendor.name }}</h1>
+        <div class="vdm-cats">
+          <span class="vdm-cat badge badge-gold" *ngFor="let c of categories">{{ c | titlecase }}</span>
+          <span class="vdm-cat">{{ vendor.businessCity }}</span>
+        </div>
       </div>
-      <a class="btn btn-outline" routerLink="/vendor/profile">Edit listing</a>
+      <div class="vdm-actions">
+        <a class="btn btn-outline" routerLink="/vendor/profile">Edit listing</a>
+        <a class="btn btn-outline" [routerLink]="['/vendors', vendor.vendorId || vendor._id]">View public page</a>
+      </div>
     </div>
 
     <!-- Stats -->
     <div class="vd-stats">
       <div class="vds-card">
+        <div class="vdsc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
         <div class="vdsc-num">{{ stats.views }}</div>
         <div class="vdsc-label">Profile views</div>
-        <div class="vdsc-sub">This month</div>
       </div>
       <div class="vds-card">
+        <div class="vdsc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 5.59 5.59l1.27-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
         <div class="vdsc-num">{{ stats.enquiries }}</div>
         <div class="vdsc-label">Enquiries</div>
-        <div class="vdsc-sub">WhatsApp & email</div>
       </div>
       <div class="vds-card">
-        <div class="vdsc-num">{{ stats.rating }}</div>
+        <div class="vdsc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="vdsc-num">{{ stats.rating || '—' }}</div>
         <div class="vdsc-label">Rating</div>
-        <div class="vdsc-sub">★★★★★</div>
       </div>
     </div>
 
-    <!-- Pro features locked -->
+    <!-- Verification banner -->
+    <div class="vd-verification" *ngIf="vendor.verified === false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="vdv-info">
+        <div class="vdv-title">Verification pending</div>
+        <div class="vdv-sub">Our team is reviewing your application. You'll receive an email within 48 hours.</div>
+      </div>
+    </div>
+
+    <!-- Certificates showcase (optional) -->
+    <div class="vd-certs">
+      <div class="vdc-header">
+        <div>
+          <div class="vdc-title">Certificates &amp; Awards</div>
+          <div class="vdc-sub">Optionally showcase your accreditations to build trust with hosts</div>
+        </div>
+        <button class="btn btn-outline vdc-add" (click)="showCertModal = true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add certificate
+        </button>
+      </div>
+      <div class="vdc-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        <p>No certificates added yet. Add awards, accreditations or professional certificates to stand out.</p>
+      </div>
+    </div>
+
+    <!-- Pro features wall -->
     <div class="vd-locked" *ngIf="!isPro">
       <div class="vdl-header">
-        <h3 class="serif">Unlock Pro features</h3>
-        <button class="btn btn-gold">Upgrade to Pro</button>
+        <div>
+          <h3 class="serif">Unlock Pro features</h3>
+          <p class="vdl-sub">Everything you need to grow your bookings on Invitely</p>
+        </div>
+        <button class="btn btn-gold" (click)="showUpgradeModal = true">Upgrade — ₦5,000/mo</button>
       </div>
       <div class="vdl-features">
         <div class="vdlf-item" *ngFor="let f of [
-          { icon: '📱', title: 'WhatsApp alerts', desc: 'Get instant WhatsApp messages when hosts enquire' },
-          { icon: '⭐', title: 'Featured listing', desc: 'Appear at the top of vendor search results' },
-          { icon: '💬', title: 'Blog & Moments', desc: 'Comment on moments and build your brand presence' },
-          { icon: '📊', title: 'Full analytics', desc: 'See detailed views, clicks and conversion rates' }
+          { title: 'WhatsApp alerts', desc: 'Instant WhatsApp messages when hosts enquire' },
+          { title: 'Featured listing', desc: 'Appear at the top of vendor search results' },
+          { title: 'Moments access', desc: 'Comment on moments and build your brand' },
+          { title: 'Full analytics', desc: 'Detailed views, clicks and conversion rates' }
         ]">
-          <div class="vdlfi-icon">{{ f.icon }}</div>
+          <div class="vdlfi-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
           <div>
             <div class="vdlfi-title">{{ f.title }}</div>
             <div class="vdlfi-desc">{{ f.desc }}</div>
           </div>
-          <div class="vdlfi-lock">🔒</div>
+          <div class="vdlfi-lock">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
         </div>
       </div>
     </div>
+  </main>
+</div>
 
-    <!-- Verification status -->
-    <div class="vd-verification">
-      <div class="vdv-icon">⏳</div>
-      <div class="vdv-info">
-        <div class="vdv-title">Verification pending</div>
-        <div class="vdv-sub">Our team is reviewing your application. You'll receive an email within 48 hours. Your listing is live but marked as "Pending verification".</div>
+<!-- Upgrade modal -->
+<div class="modal-overlay" *ngIf="showUpgradeModal" (click)="showUpgradeModal = false">
+  <div class="modal upgrade-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="showUpgradeModal = false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="um-header">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <h2 class="serif">Upgrade to Pro</h2>
+      <p>Everything you need to grow your event bookings</p>
+    </div>
+    <div class="um-price">
+      <span class="ump-amount">₦5,000</span>
+      <span class="ump-per">/month</span>
+    </div>
+    <div class="um-features">
+      <div class="umf-item" *ngFor="let f of [
+        'WhatsApp alerts for every new enquiry',
+        'Featured placement in search results',
+        'Full analytics dashboard',
+        'Comment on Moments & build your brand',
+        'Priority support from Invitely team',
+        'Unlimited portfolio photos & videos'
+      ]">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ f }}
       </div>
     </div>
-  </main>
+    <button class="btn btn-gold um-pay-btn" (click)="openPaystack()">
+      Pay ₦5,000 via Paystack — secure
+    </button>
+    <p class="um-note">Payments are processed securely by Paystack. Cancel anytime.</p>
+  </div>
+</div>
+
+<!-- Certificate upload modal -->
+<div class="modal-overlay" *ngIf="showCertModal" (click)="showCertModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title serif">Add certificate or award</h2>
+      <button class="modal-close" (click)="showCertModal = false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-box" (click)="certUploadInput.click()">
+        <input #certUploadInput type="file" accept="image/*,.pdf" multiple style="display:none" (change)="onCertSelected($event)" />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        <span>Upload certificate, award or licence</span>
+        <span class="ub-hint">JPG, PNG or PDF accepted</span>
+      </div>
+      <div class="portfolio-previews" *ngIf="certFiles.length > 0">
+        <div class="pp-item" *ngFor="let f of certFiles; let i = index">
+          <div class="pp-name">{{ f.name }}</div>
+          <button class="pp-remove" (click)="removeCert(i)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="showCertModal = false">Cancel</button>
+      <button class="btn btn-primary" (click)="showCertModal = false" [disabled]="certFiles.length === 0">Upload</button>
+    </div>
+  </div>
 </div>
