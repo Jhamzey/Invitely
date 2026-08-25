@@ -1,0 +1,118 @@
+<div class="collab-page">
+
+  <div class="collab-topbar">
+    <a class="ct-back" [routerLink]="['/event', eventId, 'builder']">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Builder
+    </a>
+    <div class="ct-title">Collaborate</div>
+    <div class="ct-event" *ngIf="event">{{ event.title }}</div>
+  </div>
+
+  <div class="collab-layout">
+
+    <!-- Invite panel -->
+    <div class="collab-invite">
+      <h2 class="serif ci-title">Invite a collaborator</h2>
+      <p class="ci-sub">Give someone else access to help plan this event. You remain the account owner and can revoke access at any time.</p>
+
+      <div class="form-group">
+        <label>Email address</label>
+        <input [(ngModel)]="inviteEmail" type="email" placeholder="collaborator@email.com" />
+      </div>
+
+      <div class="ci-permissions">
+        <label style="margin-bottom:10px;">What can they do?</label>
+        <div class="perm-row">
+          <div class="perm-info">
+            <div class="perm-title">Manage guests</div>
+            <div class="perm-sub">Add, edit and remove guests</div>
+          </div>
+          <div class="tr-toggle" [class.on]="permissions.guests" (click)="permissions.guests = !permissions.guests">
+            <div class="tt-knob"></div>
+          </div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-info">
+            <div class="perm-title">Seating plan</div>
+            <div class="perm-sub">Arrange tables and assign seats</div>
+          </div>
+          <div class="tr-toggle" [class.on]="permissions.seating" (click)="permissions.seating = !permissions.seating">
+            <div class="tt-knob"></div>
+          </div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-info">
+            <div class="perm-title">Edit invitation card</div>
+            <div class="perm-sub">Change themes, fonts and design</div>
+          </div>
+          <div class="tr-toggle" [class.on]="permissions.builder" (click)="permissions.builder = !permissions.builder">
+            <div class="tt-knob"></div>
+          </div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-info">
+            <div class="perm-title">Moments feed</div>
+            <div class="perm-sub">Post photos and videos</div>
+          </div>
+          <div class="tr-toggle" [class.on]="permissions.moments" (click)="permissions.moments = !permissions.moments">
+            <div class="tt-knob"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-error" *ngIf="inviteError">{{ inviteError }}</div>
+      <div class="ci-success" *ngIf="inviteSuccess">{{ inviteSuccess }}</div>
+
+      <button class="btn btn-primary" (click)="invite()" [disabled]="inviting">
+        {{ inviting ? 'Sending invite...' : 'Send invite' }}
+      </button>
+
+      <div class="ci-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        They'll receive an email with a link to access this event's dashboard. They cannot see your billing, account settings or other events.
+      </div>
+    </div>
+
+    <!-- Right: collaborators + activity -->
+    <div class="collab-right">
+
+      <!-- Active collaborators -->
+      <div class="collab-section">
+        <div class="cs-title">Active collaborators</div>
+        <div class="cs-empty" *ngIf="collaborators.length === 0">No collaborators yet</div>
+        <div class="collaborator-row" *ngFor="let c of collaborators">
+          <div class="cr-avatar">{{ c.name?.charAt(0) || c.email?.charAt(0) }}</div>
+          <div class="cr-info">
+            <div class="cr-name">{{ c.name || c.email }}</div>
+            <div class="cr-email">{{ c.email }}</div>
+            <div class="cr-perms">
+              <span *ngIf="c.permissions?.guests" class="cp-tag">Guests</span>
+              <span *ngIf="c.permissions?.seating" class="cp-tag">Seating</span>
+              <span *ngIf="c.permissions?.builder" class="cp-tag">Builder</span>
+              <span *ngIf="c.permissions?.moments" class="cp-tag">Moments</span>
+            </div>
+          </div>
+          <button class="cr-remove" (click)="removeCollaborator(c.userId)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <!-- Activity log -->
+      <div class="collab-section">
+        <div class="cs-title">Activity log</div>
+        <div class="cs-empty" *ngIf="activityLog.length === 0">No activity yet</div>
+        <div class="activity-row" *ngFor="let a of activityLog">
+          <div class="ar-avatar">{{ a.userName?.charAt(0) }}</div>
+          <div class="ar-info">
+            <div class="ar-action"><strong>{{ a.userName }}</strong> {{ a.action }}</div>
+            <div class="ar-detail" *ngIf="a.detail">{{ a.detail }}</div>
+            <div class="ar-time">{{ a.timestamp | date:'MMM d, h:mm a' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

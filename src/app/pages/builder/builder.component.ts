@@ -195,4 +195,5 @@ export class BuilderComponent implements OnInit {
   goToSeating() { this.router.navigate(['/event', this.eventId, 'seating']); }
   goToMoments() { this.router.navigate(['/event', this.eventId, 'moments']); }
   goToScan() { this.router.navigate(['/event', this.eventId, 'scan']); }
+  goToCollaborate() { this.router.navigate(['/event', this.eventId, 'collaborate']); }
 }

@@ -19,6 +19,10 @@
         Dashboard
       </a>
 
+      <a class="sb-link" [routerLink]="['/event', selectedEventId, 'collaborate']" *ngIf="selectedEventId">
+        Collaborate
+      </a>
+
       <a
         class="sb-link"
         routerLink="/moments"

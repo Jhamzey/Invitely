@@ -17,8 +17,6 @@
 .ss-label { font-size: 11px; color: var(--text-muted); font-family: var(--sans); margin-top: 3px; }
 
 /* Camera */
-.camera-section { }
-
 .camera-view {
   position: relative;
   border-radius: 12px;
@@ -82,8 +80,6 @@
   border-color: rgba(255,255,255,0.3) !important;
   color: #fff !important;
 }
-
-.camera-launch { }
 
 .cl-btn {
   width: 100%;

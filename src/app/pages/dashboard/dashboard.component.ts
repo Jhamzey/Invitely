@@ -45,6 +45,8 @@ export class DashboardComponent implements OnInit {
 
   events: Event[] = [];
 
+  selectedEventId = '';
+
   loading = true;
 
   showNewModal = false;
