@@ -303,42 +303,46 @@
         <div class="footer-logo serif">Invitel<span>y</span></div>
         <p class="footer-tagline">Beautiful digital invitations for every celebration.</p>
         <div class="footer-socials">
-          <a href="https://instagram.com" target="_blank" aria-label="Instagram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <a href="https://instagram.com/invitely" target="_blank" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
           </a>
-          <a href="https://twitter.com" target="_blank" aria-label="X">
+          <a href="https://twitter.com/invitely" target="_blank" aria-label="X">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
-          <a href="https://tiktok.com" target="_blank" aria-label="TikTok">
+          <a href="https://tiktok.com/@invitely" target="_blank" aria-label="TikTok">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-6.13 6.33 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
           </a>
         </div>
       </div>
+
       <div class="footer-col">
         <div class="footer-col-title">Product</div>
         <a class="footer-link" (click)="scrollTo('features')">Features</a>
         <a class="footer-link" (click)="scrollTo('pricing')">Pricing</a>
-        <a class="footer-link" routerLink="/vendors">Vendors</a>
-        <a class="footer-link" routerLink="/auth/register">Create event</a>
+        <!-- These require auth -->
+        <a class="footer-link" (click)="goToVendors()">Vendors</a>
+        <a class="footer-link" (click)="goToCreateEvent()">Create event</a>
       </div>
+
       <div class="footer-col">
         <div class="footer-col-title">Events</div>
-        <a class="footer-link">Weddings</a>
-        <a class="footer-link">Birthdays</a>
-        <a class="footer-link">Conferences</a>
-        <a class="footer-link">Owambe</a>
-        <a class="footer-link">Traditional</a>
+        <!-- Each requires auth and routes to moments with category filter -->
+        <a class="footer-link" *ngFor="let e of eventCategories" (click)="goToEventCategory(e.slug)">
+          {{ e.label }}
+        </a>
       </div>
+
       <div class="footer-col">
         <div class="footer-col-title">Support</div>
-        <a class="footer-link">Help centre</a>
-        <a class="footer-link">WhatsApp support</a>
-        <a class="footer-link">Privacy policy</a>
-        <a class="footer-link">Terms of use</a>
+        <a class="footer-link" routerLink="/support/help">Help centre</a>
+        <a class="footer-link" href="https://wa.me/2349000000000" target="_blank">WhatsApp support</a>
+        <a class="footer-link" routerLink="/support/privacy">Privacy policy</a>
+        <a class="footer-link" routerLink="/support/terms">Terms of use</a>
       </div>
     </div>
+
     <div class="footer-bottom">
-      <span>© 2026 Invitely · All rights reserved</span>
+      <span>© {{ currentYear }} Invitely · All rights reserved</span>
       <span class="footer-dev">Built by <a href="mailto:bellowjamiu.f@gmail.com">Jamiu Bellow</a></span>
     </div>
   </div>

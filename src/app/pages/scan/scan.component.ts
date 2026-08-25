@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -14,7 +14,9 @@ import { Event } from '../../core/models/event.model';
   templateUrl: './scan.component.html',
   styleUrls: ['./scan.component.css']
 })
-export class ScanComponent implements OnInit {
+export class ScanComponent implements OnInit, OnDestroy {
+  @ViewChild('videoEl') videoEl!: ElementRef<HTMLVideoElement>;
+
   eventId = '';
   event!: Event;
   manualCode = '';
@@ -22,6 +24,12 @@ export class ScanComponent implements OnInit {
   scanning = false;
   history: any[] = [];
   stats = { total: 0, arrivedCount: 0, pending: 0 };
+
+  // Camera
+  cameraActive = false;
+  cameraError = '';
+  private cameraStream: MediaStream | null = null;
+  private barcodeInterval: any;
 
   // Session management
   activeSession: any = null;
@@ -47,13 +55,87 @@ export class ScanComponent implements OnInit {
     this.checkActiveSession();
   }
 
+  ngOnDestroy() {
+    this.stopCamera();
+    clearInterval(this.barcodeInterval);
+  }
+
   private headers() {
     return new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken()}` });
   }
 
+  async startCamera() {
+    this.cameraError = '';
+    try {
+      this.cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      this.cameraActive = true;
+      setTimeout(() => {
+        if (this.videoEl?.nativeElement) {
+          this.videoEl.nativeElement.srcObject = this.cameraStream!;
+          this.videoEl.nativeElement.play();
+          this.startBarcodeDetection();
+        }
+      }, 200);
+    } catch (err: any) {
+      this.cameraError = err.name === 'NotAllowedError'
+        ? 'Camera permission denied. Please allow camera access.'
+        : 'Unable to open camera. Use the manual input below.';
+    }
+  }
+
+  stopCamera() {
+    this.cameraActive = false;
+    clearInterval(this.barcodeInterval);
+    if (this.cameraStream) {
+      this.cameraStream.getTracks().forEach(t => t.stop());
+      this.cameraStream = null;
+    }
+  }
+
+  private startBarcodeDetection() {
+    if (!('BarcodeDetector' in window)) return;
+    const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+    const video = this.videoEl.nativeElement;
+    this.barcodeInterval = setInterval(async () => {
+      if (!video.videoWidth || this.scanning) return;
+      try {
+        const codes = await detector.detect(video);
+        if (codes.length > 0) this.verify(codes[0].rawValue);
+      } catch {}
+    }, 400);
+  }
+
+  verify(code?: string) {
+    const qrCode = (code || this.manualCode).trim();
+    if (!qrCode || this.scanning) return;
+    this.scanning = true;
+    this.scanResult = null;
+
+    this.http.post<any>(`${this.API}/scan/verify`, {
+      qrCode, eventId: this.eventId
+    }, { headers: this.headers() }).subscribe({
+      next: result => {
+        this.scanResult = result;
+        this.scanning = false;
+        this.manualCode = '';
+        if (result.valid) { this.loadHistory(); }
+        setTimeout(() => this.scanResult = null, 5000);
+      },
+      error: () => {
+        this.scanning = false;
+        this.scanResult = { valid: false, reason: 'error', message: 'Network error. Try again.' };
+      }
+    });
+  }
+
   checkActiveSession() {
     this.http.get<any>(`${this.API}/scan/session/event/${this.eventId}`, { headers: this.headers() }).subscribe({
-      next: session => { this.activeSession = session; if (session) { this.sessionUrl = `${window.location.origin}/scan/session/${session.sessionToken}`; } },
+      next: session => {
+        this.activeSession = session;
+        if (session) this.sessionUrl = `${window.location.origin}/scan/session/${session.sessionToken}`;
+      },
       error: () => {}
     });
   }
@@ -61,8 +143,7 @@ export class ScanComponent implements OnInit {
   createSession() {
     this.creatingSession = true;
     this.http.post<any>(`${this.API}/scan/session/create`, {
-      eventId: this.eventId,
-      durationHours: this.sessionDuration
+      eventId: this.eventId, durationHours: this.sessionDuration
     }, { headers: this.headers() }).subscribe({
       next: data => {
         this.activeSession = data.session;
@@ -76,30 +157,13 @@ export class ScanComponent implements OnInit {
   }
 
   terminateSession() {
-    if (!this.activeSession || !confirm('Terminate this scan session? The security device will lose access.')) return;
+    if (!this.activeSession || !confirm('Terminate this scan session?')) return;
     this.http.delete(`${this.API}/scan/session/${this.activeSession._id}`, { headers: this.headers() }).subscribe({
       next: () => { this.activeSession = null; this.sessionUrl = ''; this.sessionQR = ''; this.showSessionPanel = false; }
     });
   }
 
-  copySessionLink() {
-    navigator.clipboard.writeText(this.sessionUrl);
-  }
-
-  verify(code: string) {
-    if (!code.trim()) return;
-    this.scanning = true;
-    this.scanResult = null;
-    this.http.post<any>(`${this.API}/scan/verify`, { qrCode: code.trim(), eventId: this.eventId }, { headers: this.headers() }).subscribe({
-      next: result => {
-        this.scanResult = result;
-        this.scanning = false;
-        if (result.valid) { this.loadHistory(); this.manualCode = ''; }
-        setTimeout(() => this.scanResult = null, 4000);
-      },
-      error: () => { this.scanning = false; this.scanResult = { valid: false, reason: 'error', message: 'Scan failed.' }; }
-    });
-  }
+  copySessionLink() { navigator.clipboard.writeText(this.sessionUrl); }
 
   loadHistory() {
     this.http.get<any>(`${this.API}/scan/live/${this.eventId}`, { headers: this.headers() }).subscribe({

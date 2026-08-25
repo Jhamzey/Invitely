@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-landing',
@@ -16,15 +17,15 @@ export class LandingComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
 
   readonly features = [
-    { icon: '🎨', title: 'Fully customisable', desc: 'Themes, fonts, languages, colours — every element matches your vision exactly.' },
-    { icon: '🔐', title: 'Secure QR entry', desc: 'Each guest gets a unique, non-transferable QR code. Scanned at the door — no duplicates possible.' },
-    { icon: '📍', title: 'Route to venue', desc: "Auto-generates turn-by-turn directions from each guest's live location via Google Map." },
-    { icon: '💃', title: 'Asoebi payments', desc: 'Guests order and pay for asoebi directly from their personal invite — no chasing.' },
-    { icon: '🪑', title: 'Visual seating', desc: 'Drag-and-drop tables and seats. Guests see their exact position, like an O2 Arena ticket.' },
-    { icon: '📱', title: 'WhatsApp delivery', desc: 'Send invitations directly to guests via WhatsApp, SMS, or email in one click.' },
-    { icon: '⏰', title: 'Countdown & reminders', desc: 'Live countdown on every invite plus guest-set alarm reminders so no one forgets.' },
-    { icon: '🍽️', title: 'Vendor marketplace', desc: 'Discover and book caterers, halls, photographers and more — all in one place.' },
-    { icon: '📸', title: 'Moments feed', desc: 'Couples share photos from their journey — guests follow along in a private Instagram-style feed.' },
+    { icon: '✦', title: 'Fully customisable', desc: 'Themes, fonts, languages, colours — every element matches your vision exactly.' },
+    { icon: '◈', title: 'Secure QR entry', desc: 'Each guest gets a unique, non-transferable QR code. Scanned at the door — no duplicates possible.' },
+    { icon: '◎', title: 'Route to venue', desc: "Auto-generates turn-by-turn directions from each guest's live location via Google Maps." },
+    { icon: '◇', title: 'Asoebi payments', desc: 'Guests order and pay for asoebi directly from their personal invite — no chasing.' },
+    { icon: '▣', title: 'Visual seating', desc: 'Drag-and-drop tables and seats. Guests see their exact position, like an O2 Arena ticket.' },
+    { icon: '◉', title: 'WhatsApp delivery', desc: 'Send invitations directly to guests via WhatsApp, SMS, or email in one click.' },
+    { icon: '◷', title: 'Countdown & reminders', desc: 'Live countdown on every invite plus guest-set alarm reminders so no one forgets.' },
+    { icon: '◈', title: 'Vendor marketplace', desc: 'Discover and book caterers, halls, photographers and more — all in one place.' },
+    { icon: '◎', title: 'Moments feed', desc: 'Couples share photos from their journey — guests follow along in an Instagram-style feed.' },
   ];
 
   readonly plans = [
@@ -51,25 +52,52 @@ export class LandingComponent implements OnInit, OnDestroy {
     { name: 'TechFest Nigeria', event: 'Conference · Lagos', quote: 'The scan-at-entry feature alone was worth every kobo. Zero queue issues, zero gate crashers.', avatar: 'T' },
   ];
 
-  constructor(public themeService: ThemeService) {}
+  readonly eventCategories = [
+    { label: 'Weddings', slug: 'wedding' },
+    { label: 'Birthdays', slug: 'birthday' },
+    { label: 'Conferences', slug: 'conference' },
+    { label: 'Owambe', slug: 'owambe' },
+    { label: 'Traditional', slug: 'traditional' },
+  ];
+
+  get currentYear(): number { return new Date().getFullYear(); }
+
+  constructor(
+    public themeService: ThemeService,
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.themeService.startRotation();
-    setInterval(() => {
+    const interval = setInterval(() => {
       this.activeThemeId = this.themeService.current().id;
     }, 500);
+    (this as any)._interval = interval;
   }
 
   ngOnDestroy() {
+    clearInterval((this as any)._interval);
     this.themeService.stopRotation();
-    // Reset to default
-    this.themeService.applyTheme(this.themeService.themes[0]);
   }
 
   setTheme(id: string) {
     this.activeThemeId = id;
     this.themeService.setTheme(id);
   }
+
+  navWithAuth(path: string) {
+    if (this.auth.isLoggedIn()) {
+      this.router.navigate([path]);
+    } else {
+      const returnUrl = path.startsWith('/') ? path.slice(1) : path;
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl } });
+    }
+  }
+
+  goToEventCategory(slug: string) { this.navWithAuth('/moments/' + slug); }
+  goToCreateEvent() { this.navWithAuth('/dashboard'); }
+  goToVendors() { this.navWithAuth('/vendors'); }
 
   @HostListener('window:scroll')
   onScroll() { this.showBackToTop = window.scrollY > 500; }

@@ -21,10 +21,13 @@ export class MomentsComponent implements OnInit {
   uploading = false;
   showUpload = false;
   uploadCaption = '';
-  uploadFile: File | null = null;
-  uploadPreview = '';
+  uploadFiles: File[] = [];
+  uploadPreviews: string[] = [];
   selectedMoment: Moment | null = null;
   selectedIdx = 0;
+  tagInput = '';
+  uploadProgress = 0;
+  uploadError = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -47,54 +50,59 @@ export class MomentsComponent implements OnInit {
 
   get moments(): Moment[] { return this.event?.moments || []; }
 
-  onFileSelected(e: any) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    this.uploadFile = file;
-    const reader = new FileReader();
-    reader.onload = r => this.uploadPreview = r.target?.result as string;
-    reader.readAsDataURL(file);
-  }
-
-  upload() {
-    if (!this.uploadFile) return;
-    this.uploading = true;
-    this.eventService.uploadMoment(
-      this.eventId,
-      this.uploadFile,
-      this.uploadCaption,
-      this.auth.user()?.name || 'Host'
-    ).subscribe({
-      next: e => {
-        this.event = e;
-        this.showUpload = false;
-        this.uploadFile = null;
-        this.uploadPreview = '';
-        this.uploadCaption = '';
-        this.uploading = false;
-      },
-      error: () => this.uploading = false
+  // Multiple file selection — all formats accepted
+  onFilesSelected(e: any) {
+    const files = Array.from(e.target.files || []) as File[];
+    if (!files.length) return;
+    this.uploadFiles = [...this.uploadFiles, ...files];
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = r => this.uploadPreviews.push(r.target?.result as string);
+      reader.readAsDataURL(file);
     });
   }
 
-  openMoment(m: Moment, i: number) {
-    this.selectedMoment = m;
-    this.selectedIdx = i;
+  removeFile(i: number) {
+    this.uploadFiles.splice(i, 1);
+    this.uploadPreviews.splice(i, 1);
   }
 
+  async upload() {
+    if (!this.uploadFiles.length) return;
+    this.uploading = true;
+    this.uploadError = '';
+    this.uploadProgress = 0;
+
+    try {
+      for (let i = 0; i < this.uploadFiles.length; i++) {
+        this.uploadProgress = Math.round(((i + 1) / this.uploadFiles.length) * 100);
+        await new Promise<void>((resolve, reject) => {
+          this.eventService.uploadMoment(
+            this.eventId,
+            this.uploadFiles[i],
+            i === 0 ? this.uploadCaption : '',
+            this.auth.user()?.name || 'Host'
+          ).subscribe({
+            next: e => { this.event = e; resolve(); },
+            error: err => reject(err)
+          });
+        });
+      }
+      // All uploaded
+      this.showUpload = false;
+      this.uploadFiles = [];
+      this.uploadPreviews = [];
+      this.uploadCaption = '';
+      this.uploadProgress = 0;
+    } catch {
+      this.uploadError = 'Some files failed to upload. Please try again.';
+    } finally {
+      this.uploading = false;
+    }
+  }
+
+  openMoment(m: Moment, i: number) { this.selectedMoment = m; this.selectedIdx = i; }
   closeMoment() { this.selectedMoment = null; }
-
-  prevMoment() {
-    if (this.selectedIdx > 0) {
-      this.selectedIdx--;
-      this.selectedMoment = this.moments[this.selectedIdx];
-    }
-  }
-
-  nextMoment() {
-    if (this.selectedIdx < this.moments.length - 1) {
-      this.selectedIdx++;
-      this.selectedMoment = this.moments[this.selectedIdx];
-    }
-  }
+  prevMoment() { if (this.selectedIdx > 0) { this.selectedIdx--; this.selectedMoment = this.moments[this.selectedIdx]; } }
+  nextMoment() { if (this.selectedIdx < this.moments.length - 1) { this.selectedIdx++; this.selectedMoment = this.moments[this.selectedIdx]; } }
 }

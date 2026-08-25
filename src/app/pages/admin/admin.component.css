@@ -1,0 +1,136 @@
+.admin-page { display: grid; grid-template-columns: 200px 1fr; min-height: 100vh; background: var(--bg); }
+
+.admin-sidebar {
+  background: var(--surface-1);
+  border-right: 0.5px solid var(--border);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.as-logo { font-size: 16px; font-weight: 500; color: var(--text-primary); margin-bottom: 28px; padding: 0 4px; }
+.as-logo span { color: var(--accent); }
+
+.as-nav { display: flex; flex-direction: column; gap: 2px; }
+
+.as-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: var(--sans);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+
+.as-link:hover, .as-link.active { background: var(--surface-2); color: var(--text-primary); }
+
+.as-spacer { flex: 1; }
+
+.as-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: var(--sans);
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+}
+
+.as-logout:hover { background: rgba(190,18,60,0.06); color: var(--error); }
+
+.admin-main { padding: 28px 32px; overflow-y: auto; }
+
+.admin-title { font-size: 1.6rem; font-weight: 400; color: var(--text-primary); margin-bottom: 20px; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+
+.stat-card {
+  background: var(--surface-1);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.stat-card.highlight { border-color: var(--accent); }
+.sc-num { font-size: 26px; font-weight: 600; font-family: var(--sans); color: var(--text-primary); margin-bottom: 4px; }
+.sc-label { font-size: 13px; color: var(--text-muted); font-family: var(--sans); }
+
+.admin-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+.admin-toolbar .admin-title { margin-bottom: 0; }
+.admin-search { width: 220px; font-size: 13px; padding: 7px 12px; }
+.at-filters { display: flex; gap: 8px; }
+.admin-filter { padding: 7px 12px; font-size: 13px; border-radius: 8px; border: 0.5px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+
+.admin-table { background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+.at-header {
+  display: grid;
+  grid-template-columns: 1.5fr 1.5fr 1fr 0.8fr 1fr 1fr;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface-2);
+  font-size: 11px;
+  font-family: var(--sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.at-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1.5fr 1fr 0.8fr 1fr 1fr;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--border);
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.at-row:last-child { border-bottom: none; }
+.at-row:hover { background: var(--surface-2); }
+
+.at-name { font-size: 13px; font-weight: 500; color: var(--text-primary); font-family: var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.at-email { font-size: 12px; color: var(--text-muted); font-family: var(--sans); overflow: hidden; text-overflow: ellipsis; }
+.at-date, .at-num { font-size: 12px; color: var(--text-muted); font-family: var(--sans); }
+.at-actions { display: flex; gap: 5px; }
+
+.at-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.at-btn:disabled { opacity: 0.4; cursor: default; }
+.at-btn.primary { background: var(--success); color: #fff; }
+.at-btn.warn { background: rgba(190,18,60,0.1); color: var(--error); }
+
+.at-empty { padding: 40px 16px; text-align: center; font-size: 13px; color: var(--text-muted); font-family: var(--sans); }
+
+@media (max-width: 768px) {
+  .admin-page { grid-template-columns: 1fr; }
+  .admin-sidebar { display: none; }
+  .stat-grid { grid-template-columns: repeat(2,1fr); }
+}

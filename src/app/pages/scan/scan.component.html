@@ -1,6 +1,9 @@
 <div class="scan-page">
   <div class="scan-topbar">
-    <a class="st-back" [routerLink]="['/event', eventId, 'builder']">← Builder</a>
+    <a class="st-back" [routerLink]="['/event', eventId, 'builder']">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Builder
+    </a>
     <div class="st-title">Entry scanner</div>
     <div class="st-event" *ngIf="event">{{ event.title }}</div>
   </div>
@@ -10,100 +13,140 @@
 
       <!-- Stats -->
       <div class="scan-stats">
-        <div class="ss-card"><div class="ss-num" style="color:var(--success)">{{ stats.arrivedCount }}</div><div class="ss-label">Arrived</div></div>
-        <div class="ss-card"><div class="ss-num" style="color:var(--text-muted)">{{ stats.pending }}</div><div class="ss-label">Pending</div></div>
-        <div class="ss-card"><div class="ss-num">{{ stats.total }}</div><div class="ss-label">Total</div></div>
-      </div>
-
-      <!-- TEMPORARY ACCESS PANEL -->
-      <div class="session-panel">
-        <div class="sp-header">
-          <div class="sp-info">
-            <div class="sp-title">🔐 Security device access</div>
-            <div class="sp-sub">Give a security team member a temporary link to scan — without sharing your account</div>
-          </div>
-          <div class="sp-status" *ngIf="activeSession">
-            <div class="sp-active-badge">● Active — {{ sessionTimeLeft }}</div>
-            <button class="btn btn-outline sp-terminate" (click)="terminateSession()">Terminate</button>
-          </div>
+        <div class="ss-card">
+          <div class="ss-num" style="color:var(--success)">{{ stats.arrivedCount }}</div>
+          <div class="ss-label">Arrived</div>
         </div>
-
-        <div class="sp-active" *ngIf="activeSession && showSessionPanel">
-          <div class="spa-qr">
-            <img [src]="sessionQR" alt="Scan session QR" />
-          </div>
-          <div class="spa-info">
-            <div class="spa-label">Share this link with your security team:</div>
-            <div class="spa-url">{{ sessionUrl }}</div>
-            <button class="btn btn-outline spa-copy" (click)="copySessionLink()">Copy link</button>
-            <div class="spa-note">⚠️ Only 1 device can use this link at a time. Expires in {{ sessionTimeLeft }}. No data is stored on the security device.</div>
-          </div>
+        <div class="ss-card">
+          <div class="ss-num" style="color:var(--text-muted)">{{ stats.pending }}</div>
+          <div class="ss-label">Pending</div>
         </div>
-
-        <div class="sp-create" *ngIf="!activeSession">
-          <div class="spc-row">
-            <label>Access duration:</label>
-            <select [(ngModel)]="sessionDuration" class="spc-select">
-              <option [value]="12">12 hours</option>
-              <option [value]="24">24 hours</option>
-              <option [value]="48">48 hours</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" (click)="createSession()" [disabled]="creatingSession">
-            {{ creatingSession ? 'Generating...' : '🔗 Generate security access link' }}
-          </button>
-        </div>
-
-        <div class="sp-view-existing" *ngIf="activeSession && !showSessionPanel">
-          <button class="btn btn-outline" (click)="showSessionPanel = true; checkActiveSession()">
-            View active session QR & link
-          </button>
+        <div class="ss-card">
+          <div class="ss-num">{{ stats.total }}</div>
+          <div class="ss-label">Total</div>
         </div>
       </div>
 
-      <!-- Manual verify (host use) -->
-      <div class="scan-or">— or scan directly here —</div>
+      <!-- CAMERA SCANNER — primary scan method -->
+      <div class="camera-section">
+        <div class="camera-view" *ngIf="cameraActive">
+          <video #videoEl autoplay playsinline muted class="cv-video"></video>
+          <div class="cv-frame">
+            <div class="cvf-corner tl"></div><div class="cvf-corner tr"></div>
+            <div class="cvf-corner bl"></div><div class="cvf-corner br"></div>
+          </div>
+          <div class="cv-status">
+            <div class="cvs-dot"></div>
+            Scanning for QR codes...
+          </div>
+          <button class="cv-stop btn btn-outline" (click)="stopCamera()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Close camera
+          </button>
+        </div>
+
+        <div class="camera-launch" *ngIf="!cameraActive">
+          <button class="cl-btn" (click)="startCamera()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <div class="cl-title">Open camera to scan QR</div>
+            <div class="cl-sub">Point camera at guest's QR code for instant entry</div>
+          </button>
+          <div class="camera-error" *ngIf="cameraError">{{ cameraError }}</div>
+        </div>
+      </div>
+
+      <div class="scan-divider">— or type code manually —</div>
+
       <div class="manual-row">
-        <input class="manual-input" [(ngModel)]="manualCode" placeholder="Enter guest QR code..." (keyup.enter)="verify(manualCode)" [disabled]="scanning" />
-        <button class="btn btn-primary" (click)="verify(manualCode)" [disabled]="scanning || !manualCode">
-          {{ scanning ? '...' : 'Verify' }}
+        <input class="manual-input" [(ngModel)]="manualCode" placeholder="Enter QR code..." (keyup.enter)="verify()" [disabled]="scanning" autocomplete="off" />
+        <button class="btn btn-primary" (click)="verify()" [disabled]="scanning || !manualCode">
+          <svg *ngIf="!scanning" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span *ngIf="scanning" class="spin-sm"></span>
         </button>
       </div>
 
-      <div class="scan-result" *ngIf="scanResult">
+      <!-- Scan result -->
+      <div class="scan-result fade-up" *ngIf="scanResult">
         <div class="sr-valid" *ngIf="scanResult.valid">
-          <div class="srv-icon">✓</div>
+          <div class="srv-check">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
           <div class="srv-content">
-            <div class="srv-status">Valid — Welcome!</div>
+            <div class="srv-status">Welcome!</div>
             <div class="srv-name">{{ scanResult.guest?.name }}</div>
-            <div class="srv-details">Table {{ scanResult.guest?.tableNumber }} · Seat {{ scanResult.guest?.seatNumber }}<br>{{ scanResult.guest?.mealChoice }}</div>
+            <div class="srv-details">Table {{ scanResult.guest?.tableNumber }} · Seat {{ scanResult.guest?.seatNumber }}</div>
+            <div class="srv-meal" *ngIf="scanResult.guest?.mealChoice">{{ scanResult.guest?.mealChoice }}</div>
           </div>
         </div>
         <div class="sr-invalid" *ngIf="!scanResult.valid">
-          <div class="sri-icon">✗</div>
-          <div class="sri-content">
-            <div class="sri-status">{{ scanResult.reason === 'duplicate' ? 'Already scanned' : scanResult.reason === 'declined' ? 'Declined' : 'Invalid' }}</div>
-            <div class="sri-message">{{ scanResult.message }}</div>
+          <div class="sri-x">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div>
+            <div class="sri-title">
+              {{ scanResult.reason === 'duplicate' ? 'Already scanned' : scanResult.reason === 'declined' ? 'Declined' : 'Invalid code' }}
+            </div>
+            <div class="sri-msg">{{ scanResult.message }}</div>
           </div>
         </div>
       </div>
+
+      <!-- Security session panel -->
+      <div class="session-panel">
+        <div class="sp-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Security device access
+        </div>
+        <div class="sp-sub">Give a security device a temporary scan-only link — without sharing your account</div>
+
+        <div class="sp-active-info" *ngIf="activeSession">
+          <div class="sp-active-badge">Active · {{ sessionTimeLeft }}</div>
+          <button class="btn btn-outline sp-term" (click)="terminateSession()">Terminate</button>
+        </div>
+
+        <div class="sp-body" *ngIf="activeSession && showSessionPanel">
+          <img [src]="sessionQR" class="sp-qr" alt="Session QR" />
+          <div class="sp-url">{{ sessionUrl }}</div>
+          <button class="btn btn-outline" style="font-size:12px; padding:6px 14px;" (click)="copySessionLink()">Copy link</button>
+          <div class="sp-note">Max 1 device · No data stored · Auto-expires</div>
+        </div>
+
+        <div class="sp-create" *ngIf="!activeSession">
+          <select [(ngModel)]="sessionDuration" class="sp-select">
+            <option [value]="12">12 hours</option>
+            <option [value]="24">24 hours</option>
+            <option [value]="48">48 hours</option>
+          </select>
+          <button class="btn btn-outline" (click)="createSession()" [disabled]="creatingSession">
+            {{ creatingSession ? 'Generating...' : 'Generate security link' }}
+          </button>
+        </div>
+
+        <button class="btn btn-outline" *ngIf="activeSession && !showSessionPanel" (click)="showSessionPanel = true" style="font-size:12px; padding:6px 14px; margin-top:6px;">
+          View QR & link
+        </button>
+      </div>
     </div>
 
-    <!-- History -->
+    <!-- Arrivals list -->
     <div class="scan-history">
       <div class="sh-header">
         <div class="sh-title">Arrivals ({{ stats.arrivedCount }})</div>
-        <button class="sh-refresh" (click)="loadHistory()">↻</button>
+        <button class="sh-refresh" (click)="loadHistory()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
       </div>
       <div class="sh-list">
-        <div class="sh-empty" *ngIf="history.length === 0">No arrivals yet.</div>
+        <div class="sh-empty" *ngIf="history.length === 0">No arrivals yet</div>
         <div class="sh-row" *ngFor="let h of history">
           <div class="shr-dot"></div>
           <div class="shr-info">
             <div class="shr-name">{{ h.name }}</div>
             <div class="shr-meta">Table {{ h.tableNumber }} · {{ h.arrivedAt | date:'h:mm a' }}</div>
           </div>
-          <div class="shr-valid">✓</div>
+          <div class="shr-ok">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
         </div>
       </div>
     </div>

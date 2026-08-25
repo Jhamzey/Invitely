@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule], // ← ThemeService NOT here
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -18,17 +19,15 @@ export class ProfileComponent implements OnInit {
   saving = false;
   saved = false;
   error = '';
+  activeTab = 'profile';
   showUpgradeModal = false;
 
-  // Password change
   currentPassword = '';
   newPassword = '';
   confirmPassword = '';
   changingPassword = false;
   passwordSaved = false;
   passwordError = '';
-
-  activeTab = 'profile';
 
   readonly languages = [
     { code: 'EN', label: 'English' },
@@ -41,7 +40,11 @@ export class ProfileComponent implements OnInit {
 
   private API = 'http://localhost:4000/api';
 
-  constructor(public auth: AuthService, private http: HttpClient) {}
+  constructor(
+    public auth: AuthService,
+    private http: HttpClient,
+    public themeService: ThemeService  // ← inject here, not in imports[]
+  ) {}
 
   private headers() {
     return new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken()}` });
@@ -80,7 +83,7 @@ export class ProfileComponent implements OnInit {
   changePassword() {
     if (!this.currentPassword || !this.newPassword) { this.passwordError = 'Fill all fields.'; return; }
     if (this.newPassword !== this.confirmPassword) { this.passwordError = 'Passwords do not match.'; return; }
-    if (this.newPassword.length < 8) { this.passwordError = 'Password must be at least 8 characters.'; return; }
+    if (this.newPassword.length < 8) { this.passwordError = 'At least 8 characters.'; return; }
     this.changingPassword = true;
     this.passwordError = '';
     this.http.post(`${this.API}/users/change-password`, {

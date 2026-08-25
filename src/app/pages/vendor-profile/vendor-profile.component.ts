@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-vendor-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule], // ← ThemeService NOT here
   templateUrl: './vendor-profile.component.html',
   styleUrls: ['./vendor-profile.component.css']
 })
@@ -28,23 +29,27 @@ export class VendorProfileComponent implements OnInit {
   passwordError = '';
 
   readonly categories = [
-    { id: 'catering', icon: '🍽️', label: 'Catering' },
-    { id: 'hall', icon: '🏛️', label: 'Event hall' },
-    { id: 'photography', icon: '📸', label: 'Photography' },
-    { id: 'decoration', icon: '🎀', label: 'Decoration' },
-    { id: 'dj', icon: '🎵', label: 'DJ / Band' },
-    { id: 'mc', icon: '🎤', label: 'MC' },
-    { id: 'makeup', icon: '💄', label: 'Makeup artist' },
-    { id: 'fashion', icon: '👗', label: 'Fashion designer' },
-    { id: 'cake', icon: '🎂', label: 'Cake maker' },
-    { id: 'other', icon: '🔗', label: 'Other' },
+    { id: 'catering', label: 'Catering' },
+    { id: 'hall', label: 'Event hall' },
+    { id: 'photography', label: 'Photography' },
+    { id: 'decoration', label: 'Decoration' },
+    { id: 'dj', label: 'DJ / Band' },
+    { id: 'mc', label: 'MC' },
+    { id: 'makeup', label: 'Makeup artist' },
+    { id: 'fashion', label: 'Fashion designer' },
+    { id: 'cake', label: 'Cake maker' },
+    { id: 'other', label: 'Other' },
   ];
 
-  readonly cities = ['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu', 'Kaduna', 'Benin City', 'Other'];
+  readonly cities = ['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu', 'Kaduna', 'Benin City', 'Owerri', 'Uyo', 'Other'];
 
   private API = 'http://localhost:4000/api';
 
-  constructor(public auth: AuthService, private http: HttpClient) {}
+  constructor(
+    public auth: AuthService,
+    private http: HttpClient,
+    public themeService: ThemeService  // ← inject here
+  ) {}
 
   private headers() {
     return new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken()}` });
@@ -55,6 +60,19 @@ export class VendorProfileComponent implements OnInit {
       next: u => { this.profile = { ...u }; this.loading = false; },
       error: () => this.loading = false
     });
+  }
+
+  get selectedCategories(): string[] {
+    if (!this.profile.businessCategory) return [];
+    return this.profile.businessCategory.split(',').map((c: string) => c.trim()).filter(Boolean);
+  }
+
+  toggleCategory(id: string) {
+    const current = this.selectedCategories;
+    const idx = current.indexOf(id);
+    if (idx > -1) current.splice(idx, 1);
+    else current.push(id);
+    this.profile.businessCategory = current.join(',');
   }
 
   save() {
@@ -80,7 +98,10 @@ export class VendorProfileComponent implements OnInit {
     if (this.newPassword !== this.confirmPassword) { this.passwordError = 'Passwords do not match.'; return; }
     this.changingPassword = true;
     this.passwordError = '';
-    this.http.post(`${this.API}/users/change-password`, { currentPassword: this.currentPassword, newPassword: this.newPassword }, { headers: this.headers() }).subscribe({
+    this.http.post(`${this.API}/users/change-password`, {
+      currentPassword: this.currentPassword,
+      newPassword: this.newPassword
+    }, { headers: this.headers() }).subscribe({
       next: () => { this.passwordSaved = true; this.changingPassword = false; this.currentPassword = ''; this.newPassword = ''; this.confirmPassword = ''; setTimeout(() => this.passwordSaved = false, 3000); },
       error: err => { this.passwordError = err.error?.error || 'Failed.'; this.changingPassword = false; }
     });

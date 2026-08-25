@@ -1,9 +1,11 @@
 <div class="moments-page">
 
-  <!-- Top bar -->
   <div class="moments-topbar">
     <div class="mt-left">
-      <a class="mt-back" [routerLink]="['/event', eventId, 'builder']">← Builder</a>
+      <a class="mt-back" [routerLink]="['/event', eventId, 'builder']">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Builder
+      </a>
       <div class="mt-title serif">Moments</div>
     </div>
     <div class="mt-actions">
@@ -11,27 +13,26 @@
         <button [class.active]="view === 'grid'" (click)="view = 'grid'">Grid</button>
         <button [class.active]="view === 'feed'" (click)="view = 'feed'">Feed</button>
       </div>
-      <button class="btn btn-primary" (click)="showUpload = true">+ Add moment</button>
+      <button class="btn btn-primary" (click)="showUpload = true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add moments
+      </button>
     </div>
   </div>
 
-  <!-- Loading -->
-  <div class="moments-loading" *ngIf="loading">
+  <div class="loading-grid" *ngIf="loading">
     <div class="skeleton" *ngFor="let s of [1,2,3,4,5,6]" style="height:160px; border-radius:8px;"></div>
   </div>
 
   <ng-container *ngIf="!loading && event">
-
-    <!-- Header -->
     <div class="moments-header">
       <h1 class="mh-title serif">{{ event.coupleNames || event.title }}</h1>
       <p class="mh-sub">{{ moments.length }} moment{{ moments.length !== 1 ? 's' : '' }} shared</p>
     </div>
 
-    <!-- GRID VIEW -->
+    <!-- GRID -->
     <div class="moments-grid" *ngIf="view === 'grid' && moments.length > 0">
-      <div class="moment-cell"
-        *ngFor="let m of moments; let i = index"
+      <div class="moment-cell" *ngFor="let m of moments; let i = index"
         [class.featured]="i === 0"
         (click)="openMoment(m, i)">
         <img [src]="m.imageUrl" [alt]="m.caption" loading="lazy" class="mc-img" />
@@ -41,7 +42,7 @@
       </div>
     </div>
 
-    <!-- FEED VIEW -->
+    <!-- FEED -->
     <div class="moments-feed" *ngIf="view === 'feed' && moments.length > 0">
       <div class="feed-post" *ngFor="let m of moments">
         <div class="fp-header">
@@ -58,11 +59,10 @@
       </div>
     </div>
 
-    <!-- Empty -->
     <div class="moments-empty" *ngIf="moments.length === 0">
-      <div style="font-size:48px;">📸</div>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       <h3 class="serif">No moments yet</h3>
-      <p>Share your journey — from the engagement to the big day.</p>
+      <p>Share your journey — from engagement to the big day.</p>
       <button class="btn btn-primary" (click)="showUpload = true">Add first moment</button>
     </div>
   </ng-container>
@@ -71,27 +71,58 @@
   <div class="modal-overlay" *ngIf="showUpload" (click)="showUpload = false">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2 class="modal-title serif">Share a moment</h2>
-        <button class="modal-close" (click)="showUpload = false">×</button>
+        <h2 class="modal-title serif">Share moments</h2>
+        <button class="modal-close" (click)="showUpload = false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
       <div class="modal-body">
+        <!-- File drop zone -->
         <div class="upload-drop" (click)="fileInput.click()">
-          <img *ngIf="uploadPreview" [src]="uploadPreview" class="up-preview" alt="preview" />
-          <div *ngIf="!uploadPreview" class="up-placeholder">
-            <span style="font-size:32px;">📷</span>
-            <span>Click to choose photo</span>
+          <input #fileInput type="file"
+            accept="image/*,video/*,.heic,.heif"
+            multiple
+            style="display:none"
+            (change)="onFilesSelected($event)" />
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          <div class="ud-title">Click to add photos & videos</div>
+          <div class="ud-hint">All formats — JPG, PNG, HEIC, MP4, MOV · HD & 4K · Multiple files</div>
+        </div>
+
+        <!-- Previews -->
+        <div class="upload-previews" *ngIf="uploadPreviews.length > 0">
+          <div class="up-item" *ngFor="let p of uploadPreviews; let i = index">
+            <img [src]="p" class="up-thumb" alt="preview" />
+            <div class="up-name">{{ uploadFiles[i] ? uploadFiles[i].name : '' }}</div>
+            <button class="up-remove" (click)="removeFile(i)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
         </div>
-        <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)" />
-        <div class="form-group" style="margin-top:14px;">
+
+        <div class="form-group" style="margin-top:12px;">
           <label>Caption (optional)</label>
-          <textarea [(ngModel)]="uploadCaption" rows="3" placeholder="Write something..."></textarea>
+          <textarea [(ngModel)]="uploadCaption" rows="2" placeholder="Write something about this moment..."></textarea>
         </div>
+
+        <!-- Tag vendors / locations -->
+        <div class="tag-section">
+          <div class="tag-label">Tag vendors or locations (optional)</div>
+          <input [(ngModel)]="tagInput" placeholder="e.g. @Lenses by Seun, Grand Ballroom VI" />
+        </div>
+
+        <!-- Upload progress -->
+        <div class="upload-progress" *ngIf="uploading">
+          <div class="up-bar"><div class="up-fill" [style.width]="uploadProgress + '%'"></div></div>
+          <div class="up-pct">{{ uploadProgress }}% — uploading {{ uploadFiles.length }} file{{ uploadFiles.length !== 1 ? 's' : '' }}</div>
+        </div>
+
+        <div class="upload-error" *ngIf="uploadError">{{ uploadError }}</div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" (click)="showUpload = false">Cancel</button>
-        <button class="btn btn-primary" (click)="upload()" [disabled]="!uploadFile || uploading">
-          {{ uploading ? 'Uploading...' : 'Share moment' }}
+        <button class="btn btn-primary" (click)="upload()" [disabled]="!uploadFiles.length || uploading">
+          {{ uploading ? 'Uploading...' : 'Share ' + uploadFiles.length + ' moment' + (uploadFiles.length !== 1 ? 's' : '') }}
         </button>
       </div>
     </div>
@@ -100,10 +131,16 @@
   <!-- Lightbox -->
   <div class="lightbox-overlay" *ngIf="selectedMoment" (click)="closeMoment()">
     <div class="lb-content" (click)="$event.stopPropagation()">
-      <button class="lb-close" (click)="closeMoment()">×</button>
-      <button class="lb-nav lb-prev" (click)="prevMoment()" [disabled]="selectedIdx === 0">‹</button>
+      <button class="lb-close" (click)="closeMoment()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <button class="lb-nav lb-prev" (click)="prevMoment()" [disabled]="selectedIdx === 0">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
       <img [src]="selectedMoment.imageUrl" [alt]="selectedMoment.caption" class="lb-img" />
-      <button class="lb-nav lb-next" (click)="nextMoment()" [disabled]="selectedIdx === moments.length - 1">›</button>
+      <button class="lb-nav lb-next" (click)="nextMoment()" [disabled]="selectedIdx === moments.length - 1">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
       <div class="lb-caption" *ngIf="selectedMoment.caption">{{ selectedMoment.caption }}</div>
     </div>
   </div>
