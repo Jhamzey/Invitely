@@ -23,12 +23,7 @@ export class CollaborateComponent implements OnInit {
   inviteError = '';
   inviteSuccess = '';
 
-  permissions = {
-    guests: true,
-    seating: true,
-    builder: false,
-    moments: true
-  };
+  permissions = { guests: true, seating: true, builder: false, moments: true };
 
   private API = 'http://localhost:4000/api';
 
@@ -57,7 +52,30 @@ export class CollaborateComponent implements OnInit {
     });
   }
 
+  get isPaidPlan(): boolean {
+    const plan = this.auth.user()?.plan;
+    return plan === 'standard' || plan === 'premium';
+  }
+
+  get maxCollaborators(): number {
+    return this.auth.user()?.plan === 'premium' ? 999 : 2;
+  }
+
+  get collaborators(): any[] {
+    return this.collaboration?.collaborators?.filter((c: any) => c.active) || [];
+  }
+
+  get canAddMore(): boolean {
+    return this.collaborators.length < this.maxCollaborators;
+  }
+
+  get activityLog(): any[] {
+    return this.collaboration?.activityLog?.slice().reverse().slice(0, 20) || [];
+  }
+
   invite() {
+    if (!this.isPaidPlan) { this.inviteError = 'Collaboration requires Standard or Premium plan.'; return; }
+    if (!this.canAddMore) { this.inviteError = `Maximum ${this.maxCollaborators} collaborators allowed on your plan.`; return; }
     if (!this.inviteEmail.trim()) { this.inviteError = 'Enter an email address.'; return; }
     this.inviting = true;
     this.inviteError = '';
@@ -80,18 +98,15 @@ export class CollaborateComponent implements OnInit {
     });
   }
 
-  removeCollaborator(userId: string) {
-    if (!confirm('Remove this collaborator?')) return;
-    this.http.delete(`${this.API}/collaborate/${this.eventId}/collaborator/${userId}`, { headers: this.headers() }).subscribe({
-      next: (c: any) => this.collaboration = c
+  // FIX: remove by email (works whether userId is set or not)
+  removeCollaborator(collaboratorEmail: string) {
+    if (!confirm('Remove this collaborator? They will lose access immediately.')) return;
+    this.http.delete<any>(
+      `${this.API}/collaborate/${this.eventId}/collaborator`,
+      { headers: this.headers(), body: { email: collaboratorEmail } }
+    ).subscribe({
+      next: (c: any) => this.collaboration = c,
+      error: err => alert(err.error?.error || 'Failed to remove collaborator.')
     });
-  }
-
-  get collaborators(): any[] {
-    return this.collaboration?.collaborators?.filter((c: any) => c.active) || [];
-  }
-
-  get activityLog(): any[] {
-    return this.collaboration?.activityLog?.slice().reverse().slice(0, 20) || [];
   }
 }

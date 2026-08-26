@@ -9,7 +9,7 @@ import { ThemeService } from '../../core/services/theme.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule], // ← ThemeService NOT here
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -30,12 +30,9 @@ export class ProfileComponent implements OnInit {
   passwordError = '';
 
   readonly languages = [
-    { code: 'EN', label: 'English' },
-    { code: 'YO', label: 'Yoruba' },
-    { code: 'IG', label: 'Igbo' },
-    { code: 'HA', label: 'Hausa' },
-    { code: 'FR', label: 'French' },
-    { code: 'PID', label: 'Nigerian Pidgin' },
+    { code: 'EN', label: 'English' }, { code: 'YO', label: 'Yoruba' },
+    { code: 'IG', label: 'Igbo' }, { code: 'HA', label: 'Hausa' },
+    { code: 'FR', label: 'French' }, { code: 'PID', label: 'Pidgin' },
   ];
 
   private API = 'http://localhost:4000/api';
@@ -43,7 +40,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     public auth: AuthService,
     private http: HttpClient,
-    public themeService: ThemeService  // ← inject here, not in imports[]
+    public themeService: ThemeService
   ) {}
 
   private headers() {
@@ -57,26 +54,20 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  setLight() { if (this.themeService.isDark()) this.themeService.toggleDarkMode(); }
+  setDark() { if (!this.themeService.isDark()) this.themeService.toggleDarkMode(); }
+
   save() {
     this.saving = true;
     this.http.put<any>(`${this.API}/users/profile`, {
-      name: this.profile.name,
-      phone: this.profile.phone,
-      whatsapp: this.profile.whatsapp,
-      language: this.profile.language,
-      emailNotifications: this.profile.emailNotifications,
+      name: this.profile.name, phone: this.profile.phone, whatsapp: this.profile.whatsapp,
+      language: this.profile.language, emailNotifications: this.profile.emailNotifications,
       whatsappNotifications: this.profile.whatsappNotifications,
-      bankName: this.profile.bankName,
-      bankAccountNumber: this.profile.bankAccountNumber,
+      bankName: this.profile.bankName, bankAccountNumber: this.profile.bankAccountNumber,
       bankAccountName: this.profile.bankAccountName,
     }, { headers: this.headers() }).subscribe({
-      next: u => {
-        this.profile = { ...u };
-        this.saving = false;
-        this.saved = true;
-        setTimeout(() => this.saved = false, 2500);
-      },
-      error: err => { this.error = err.error?.error || 'Failed to save.'; this.saving = false; }
+      next: u => { this.profile = { ...u }; this.saving = false; this.saved = true; setTimeout(() => this.saved = false, 2500); },
+      error: err => { this.error = err.error?.error || 'Failed.'; this.saving = false; }
     });
   }
 
@@ -87,17 +78,9 @@ export class ProfileComponent implements OnInit {
     this.changingPassword = true;
     this.passwordError = '';
     this.http.post(`${this.API}/users/change-password`, {
-      currentPassword: this.currentPassword,
-      newPassword: this.newPassword
+      currentPassword: this.currentPassword, newPassword: this.newPassword
     }, { headers: this.headers() }).subscribe({
-      next: () => {
-        this.passwordSaved = true;
-        this.changingPassword = false;
-        this.currentPassword = '';
-        this.newPassword = '';
-        this.confirmPassword = '';
-        setTimeout(() => this.passwordSaved = false, 3000);
-      },
+      next: () => { this.passwordSaved = true; this.changingPassword = false; this.currentPassword = ''; this.newPassword = ''; this.confirmPassword = ''; setTimeout(() => this.passwordSaved = false, 3000); },
       error: err => { this.passwordError = err.error?.error || 'Failed.'; this.changingPassword = false; }
     });
   }

@@ -16,7 +16,7 @@
 
   <!-- Upgrade modal -->
   <div class="modal-overlay" *ngIf="showUpgradeModal" (click)="showUpgradeModal = false">
-    <div class="modal" style="max-width:420px; text-align:center;" (click)="$event.stopPropagation()">
+    <div class="modal" style="max-width:420px; text-align:center; position:relative;" (click)="$event.stopPropagation()">
       <button class="modal-close" (click)="showUpgradeModal = false" style="position:absolute; top:12px; right:14px; background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -25,13 +25,13 @@
         <p style="font-size:14px; color:var(--text-muted); font-family:var(--sans);">Upgrade to host more events with more guests</p>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px 24px 24px;">
-        <div class="plan-card" style="background:var(--surface-1); border:0.5px solid var(--border); border-radius:12px; padding:16px; text-align:left;">
+        <div style="background:var(--surface-1); border:0.5px solid var(--border); border-radius:12px; padding:16px; text-align:left;">
           <div style="font-size:12px; color:var(--text-muted); font-family:var(--sans); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em;">Standard</div>
           <div style="font-size:24px; font-weight:500; font-family:var(--sans); margin-bottom:2px;">₦15,000</div>
           <div style="font-size:11px; color:var(--text-muted); font-family:var(--sans); margin-bottom:12px;">per event · 500 guests</div>
           <button class="btn btn-primary" style="width:100%; justify-content:center; padding:9px; font-size:13px;">Choose</button>
         </div>
-        <div class="plan-card" style="background:var(--surface-1); border:1.5px solid var(--accent); border-radius:12px; padding:16px; text-align:left; position:relative;">
+        <div style="background:var(--surface-1); border:1.5px solid var(--accent); border-radius:12px; padding:16px; text-align:left; position:relative;">
           <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--accent); color:#fff; font-size:10px; font-family:var(--sans); font-weight:600; padding:3px 10px; border-radius:10px; white-space:nowrap;">Popular</div>
           <div style="font-size:12px; color:var(--text-muted); font-family:var(--sans); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em;">Premium</div>
           <div style="font-size:24px; font-weight:500; font-family:var(--sans); margin-bottom:2px;">₦35,000</div>
@@ -42,12 +42,12 @@
     </div>
   </div>
 
-
   <div class="pp-body container" *ngIf="!loading">
     <div class="pp-tabs">
       <button class="pp-tab" [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'">Profile</button>
+      <button class="pp-tab" [class.active]="activeTab === 'appearance'" (click)="activeTab = 'appearance'">Appearance</button>
       <button class="pp-tab" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'">Notifications</button>
-      <button class="pp-tab" [class.active]="activeTab === 'payment'" (click)="activeTab = 'payment'">Payment details</button>
+      <button class="pp-tab" [class.active]="activeTab === 'payment'" (click)="activeTab = 'payment'">Payment</button>
       <button class="pp-tab" [class.active]="activeTab === 'security'" (click)="activeTab = 'security'">Security</button>
     </div>
 
@@ -70,18 +70,56 @@
       <div class="form-group">
         <label>Preferred language</label>
         <div class="lang-row">
-          <button *ngFor="let l of languages"
-            class="lang-pill"
-            [class.active]="profile.language === l.code"
-            (click)="profile.language = l.code">
-            {{ l.label }}
-          </button>
+          <button *ngFor="let l of languages" class="lang-pill" [class.active]="profile.language === l.code" (click)="profile.language = l.code">{{ l.label }}</button>
         </div>
       </div>
       <div class="auth-error" *ngIf="error">{{ error }}</div>
-      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
-        {{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save changes' }}
-      </button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">{{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save changes' }}</button>
+    </div>
+
+    <!-- APPEARANCE TAB -->
+    <div class="pp-panel" *ngIf="activeTab === 'appearance'">
+      <h3 class="pp-section-title">Theme preference</h3>
+      <p class="pp-section-sub">Controls how Invitely looks across all your pages. Changing this here applies everywhere — dashboard, builder, profile.</p>
+
+      <div class="theme-toggle-cards">
+        <div class="ttc-option" [class.active]="!themeService.isDark()" (click)="setLight()">
+          <div class="ttc-preview light-prev">
+            <div class="ttcp-bar"></div>
+            <div class="ttcp-content">
+              <div class="ttcp-line"></div>
+              <div class="ttcp-line short"></div>
+            </div>
+          </div>
+          <div class="ttc-label">Light</div>
+          <div class="ttc-check" *ngIf="!themeService.isDark()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="ttc-option" [class.active]="themeService.isDark()" (click)="setDark()">
+          <div class="ttc-preview dark-prev">
+            <div class="ttcp-bar dark"></div>
+            <div class="ttcp-content dark">
+              <div class="ttcp-line dark"></div>
+              <div class="ttcp-line short dark"></div>
+            </div>
+          </div>
+          <div class="ttc-label">Dark</div>
+          <div class="ttc-check" *ngIf="themeService.isDark()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="dm-toggle-row">
+        <div>
+          <div class="tr-title">Dark mode</div>
+          <div class="tr-sub">Easier on the eyes in low-light environments</div>
+        </div>
+        <div class="tr-toggle" [class.on]="themeService.isDark()" (click)="themeService.toggleDarkMode()">
+          <div class="tt-knob"></div>
+        </div>
+      </div>
     </div>
 
     <!-- NOTIFICATIONS TAB -->
@@ -99,15 +137,13 @@
       <div class="toggle-row">
         <div class="tr-info">
           <div class="tr-title">WhatsApp notifications</div>
-          <div class="tr-sub">Get instant WhatsApp messages for new RSVPs and arrivals (Pro plan)</div>
+          <div class="tr-sub">Get instant WhatsApp messages for new RSVPs and arrivals</div>
         </div>
         <div class="tr-toggle" [class.on]="profile.whatsappNotifications" (click)="profile.whatsappNotifications = !profile.whatsappNotifications">
           <div class="tt-knob"></div>
         </div>
       </div>
-      <button class="btn btn-primary" style="margin-top:16px;" (click)="save()" [disabled]="saving">
-        {{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save preferences' }}
-      </button>
+      <button class="btn btn-primary" style="margin-top:16px;" (click)="save()" [disabled]="saving">{{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save preferences' }}</button>
     </div>
 
     <!-- PAYMENT TAB -->
@@ -128,41 +164,23 @@
           <input [(ngModel)]="profile.bankAccountName" placeholder="As on your bank account" />
         </div>
       </div>
-      <div class="pp-info-box">
-        ℹ️ Paystack processes all payments securely. Invitely charges 1.5% + ₦100 per transaction (max ₦2,000).
-      </div>
-      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
-        {{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save bank details' }}
-      </button>
+      <div class="pp-info-box">Paystack processes all payments securely. Invitely charges 1.5% + ₦100 per transaction (max ₦2,000).</div>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">{{ saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save bank details' }}</button>
     </div>
 
     <!-- SECURITY TAB -->
     <div class="pp-panel" *ngIf="activeTab === 'security'">
       <h3 class="pp-section-title">Change password</h3>
-      <div class="form-group">
-        <label>Current password</label>
-        <input type="password" [(ngModel)]="currentPassword" placeholder="Enter current password" />
-      </div>
-      <div class="form-group">
-        <label>New password</label>
-        <input type="password" [(ngModel)]="newPassword" placeholder="At least 8 characters" />
-      </div>
-      <div class="form-group">
-        <label>Confirm new password</label>
-        <input type="password" [(ngModel)]="confirmPassword" placeholder="Repeat new password" />
-      </div>
+      <div class="form-group"><label>Current password</label><input type="password" [(ngModel)]="currentPassword" placeholder="Enter current password" /></div>
+      <div class="form-group"><label>New password</label><input type="password" [(ngModel)]="newPassword" placeholder="At least 8 characters" /></div>
+      <div class="form-group"><label>Confirm new password</label><input type="password" [(ngModel)]="confirmPassword" placeholder="Repeat new password" /></div>
       <div class="auth-error" *ngIf="passwordError">{{ passwordError }}</div>
       <div class="pp-success" *ngIf="passwordSaved">✓ Password changed successfully!</div>
-      <button class="btn btn-primary" (click)="changePassword()" [disabled]="changingPassword">
-        {{ changingPassword ? 'Changing...' : 'Change password' }}
-      </button>
-
+      <button class="btn btn-primary" (click)="changePassword()" [disabled]="changingPassword">{{ changingPassword ? 'Changing...' : 'Change password' }}</button>
       <div class="danger-zone">
         <h3 class="pp-section-title" style="color:var(--error);">Danger zone</h3>
         <p class="pp-section-sub">Permanently delete your account and all your events. This cannot be undone.</p>
-        <button class="btn" style="background:transparent; border:1px solid var(--error); color:var(--error);">
-          Delete my account
-        </button>
+        <button class="btn" style="background:transparent; border:1px solid var(--error); color:var(--error);">Delete my account</button>
       </div>
     </div>
   </div>
