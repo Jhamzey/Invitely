@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Guest } from '../models/guest.model';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class GuestService {
-  private API = 'http://localhost:4000/api/guests';
+  private API = `${environment.apiUrl}/guests`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

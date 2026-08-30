@@ -7,7 +7,7 @@
       <p class="al-sub">Authorised personnel only. Sessions expire after 5 minutes of inactivity.</p>
     </div>
 
-    <form (ngSubmit)="submit()" (keydown)="resetInactivityTimer()">
+    <form (ngSubmit)="submit()">
       <div class="form-group">
         <label for="email">Admin email</label>
         <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="admin@invitely.app" autocomplete="email" required />

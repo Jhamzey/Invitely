@@ -2,10 +2,11 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private API = 'http://localhost:4000/api/auth';
+  private API = `${environment.apiUrl}/auth`;
   user = signal<any>(this.getStoredUser());
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -34,7 +35,17 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+    // Check token not expired
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (Date.now() >= payload.exp * 1000) {
+        this.logout();
+        return false;
+      }
+    } catch { return false; }
+    return true;
   }
 
   private storeSession(res: any) {

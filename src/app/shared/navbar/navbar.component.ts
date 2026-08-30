@@ -15,9 +15,9 @@ export class NavbarComponent implements OnInit {
   mobileMenuOpen = false;
   hidden = false;
 
-  // Hide on these routes — they have their own nav
-  private readonly hiddenRoutes = ['/', '/auth/login', '/auth/register'];
-  private readonly hiddenPrefixes = ['/invite/'];
+  // Routes where navbar should NOT show (they have their own nav/header)
+  private readonly hiddenRoutes = ['/', '/auth/login', '/auth/register', '/vendor/register'];
+  private readonly hiddenPrefixes = ['/invite/', '/scan/session/', '/admin'];
 
   constructor(public auth: AuthService, private router: Router) {}
 

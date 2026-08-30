@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment.prod';
 
 @Component({
   selector: 'app-admin',
@@ -12,31 +12,48 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
   activeTab = 'overview';
   loading = true;
+  private inactivityTimer: any;
 
   stats = { hosts: 0, vendors: 0, events: 0, guests: 0, revenue: 0 };
   users: any[] = [];
   vendors: any[] = [];
-  events: any[] = [];
 
   searchUsers = '';
   searchVendors = '';
   filterVerified = 'all';
 
-  private API = 'http://localhost:4000/api';
+  adminUser: any = null;
 
-  constructor(private auth: AuthService, private http: HttpClient) {}
+  private API = environment.apiUrl;
 
+  constructor(private http: HttpClient, private router: Router) {}
+
+  // FIX: use admin token, not regular user token
   private headers() {
-    return new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken()}` });
+    const token = localStorage.getItem('invitely_admin_token');
+    return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
   ngOnInit() {
+    const raw = localStorage.getItem('invitely_admin_user');
+    this.adminUser = raw ? JSON.parse(raw) : null;
+    this.resetInactivityTimer();
     this.loadStats();
     this.loadUsers();
     this.loadVendors();
+  }
+
+  ngOnDestroy() { clearTimeout(this.inactivityTimer); }
+
+  @HostListener('document:mousemove')
+  @HostListener('document:keydown')
+  @HostListener('document:click')
+  resetInactivityTimer() {
+    clearTimeout(this.inactivityTimer);
+    this.inactivityTimer = setTimeout(() => this.logout(), 5 * 60 * 1000);
   }
 
   loadStats() {
@@ -66,10 +83,23 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  rejectVendor(id: string) {
+    if (!confirm('Reject and remove this vendor?')) return;
+    this.http.patch(`${this.API}/admin/vendors/${id}/reject`, {}, { headers: this.headers() }).subscribe({
+      next: () => this.vendors = this.vendors.filter(x => x._id !== id)
+    });
+  }
+
   suspendUser(id: string) {
     if (!confirm('Suspend this user?')) return;
     this.http.patch(`${this.API}/admin/users/${id}/suspend`, {}, { headers: this.headers() }).subscribe({
       next: () => { const u = this.users.find(x => x._id === id); if (u) u.suspended = true; }
+    });
+  }
+
+  unsuspendUser(id: string) {
+    this.http.patch(`${this.API}/admin/users/${id}/unsuspend`, {}, { headers: this.headers() }).subscribe({
+      next: () => { const u = this.users.find(x => x._id === id); if (u) u.suspended = false; }
     });
   }
 
@@ -85,5 +115,11 @@ export class AdminComponent implements OnInit {
     return this.users.filter(u => !this.searchUsers || u.name?.toLowerCase().includes(this.searchUsers.toLowerCase()) || u.email?.toLowerCase().includes(this.searchUsers.toLowerCase()));
   }
 
-  logout() { this.auth.logout(); }
+  // FIX: clear admin token, go to admin login
+  logout() {
+    clearTimeout(this.inactivityTimer);
+    localStorage.removeItem('invitely_admin_token');
+    localStorage.removeItem('invitely_admin_user');
+    this.router.navigate(['/admin/login']);
+  }
 }

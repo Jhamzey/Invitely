@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Vendor } from '../models/vendor.model';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class VendorService {
-  private API = 'http://localhost:4000/api/vendors';
+  private API = `${environment.apiUrl}/vendors`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
