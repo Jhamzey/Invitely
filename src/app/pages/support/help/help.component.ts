@@ -40,8 +40,8 @@ export class HelpComponent {
     { q: 'How are QR codes generated?', a: 'Every guest receives a unique, cryptographically secure QR code when they are added to your event. No two guests share the same code, and codes cannot be duplicated or transferred.', open: false },
     { q: 'Can I scan QR codes without my phone?', a: 'Yes — go to the Scan page for your event and generate a Temporary Security Link. Share this with your security team; it gives one device scan-only access for up to 48 hours, then expires automatically.', open: false },
     { q: 'How does asoebi payment work?', a: 'Enable asoebi on your event builder, add the items and prices. Guests see them on their invite and can order and pay directly through Paystack. Funds are sent to your registered bank account.', open: false },
-    { q: 'What image formats are supported?', a: 'Invitely accepts all image and video formats including JPG, PNG, HEIC, HEIF, WebP, MP4, MOV and more. HD and 4K quality is preserved in full.', open: false },
+    { q: 'What image formats are supported?', a: 'Innvitely accepts all image and video formats including JPG, PNG, HEIC, HEIF, WebP, MP4, MOV and more. HD and 4K quality is preserved in full.', open: false },
     { q: 'Can I change my theme after publishing?', a: 'Yes — you can update your theme, colours and any event details at any time. Changes reflect immediately on the guest invite links.', open: false },
-    { q: 'How do I contact support?', a: 'Click "WhatsApp support" in the Support section, or email support@invitely.app. We typically respond within 2 hours during business hours.', open: false },
+    { q: 'How do I contact support?', a: 'Click "WhatsApp support" in the Support section, or email support@innvitely.app. We typically respond within 2 hours during business hours.', open: false },
   ];
 }

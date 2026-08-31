@@ -29,11 +29,11 @@ import { RouterModule } from '@angular/router';
 export class PrivacyComponent {
   sections = [
     { title: '1. Information we collect', body: 'We collect information you provide when creating an account (name, email, password), event information (venue, guest list, seating plans), and payment information processed securely by Paystack. We do not store payment card details on our servers.' },
-    { title: '2. How we use your information', body: 'We use your information to provide the Invitely service, send event-related notifications, process payments, verify vendor credentials, and improve our platform. We never sell your data to third parties.' },
-    { title: '3. Guest data', body: 'When you add guests to your event, you are responsible for having their permission to share their contact details with Invitely. Guest QR codes and attendance records are stored securely and only accessible to the event host.' },
+    { title: '2. How we use your information', body: 'We use your information to provide the Innvitely service, send event-related notifications, process payments, verify vendor credentials, and improve our platform. We never sell your data to third parties.' },
+    { title: '3. Guest data', body: 'When you add guests to your event, you are responsible for having their permission to share their contact details with Innvitely. Guest QR codes and attendance records are stored securely and only accessible to the event host.' },
     { title: '4. Data storage', body: 'All data is stored on secure servers with encryption at rest and in transit. Media files (photos, videos) are stored on Cloudinary\'s secure CDN infrastructure. We retain your data for as long as your account is active.' },
-    { title: '5. Your rights', body: 'You can request deletion of your account and all associated data at any time by contacting support@invitely.app. We will process deletion requests within 30 days.' },
+    { title: '5. Your rights', body: 'You can request deletion of your account and all associated data at any time by contacting support@innvitely.app. We will process deletion requests within 30 days.' },
     { title: '6. Cookies', body: 'We use essential cookies to keep you logged in and remember your preferences (such as dark mode). We do not use advertising or tracking cookies.' },
-    { title: '7. Contact', body: 'For privacy-related questions, contact us at privacy@invitely.app or WhatsApp our support team.' },
+    { title: '7. Contact', body: 'For privacy-related questions, contact us at privacy@innvitely.app or WhatsApp our support team.' },
   ];
 }

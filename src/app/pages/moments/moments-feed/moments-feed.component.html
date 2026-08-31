@@ -1,7 +1,7 @@
 <div class="feed-page">
   <div class="feed-topbar">
     <h1 class="ft-title serif">Moments</h1>
-    <p class="ft-sub">Celebrations shared by the Invitely community</p>
+    <p class="ft-sub">Celebrations shared by the Innvitely community</p>
     <div class="ft-actions">
       <div class="view-toggle">
         <button [class.active]="view === 'grid'" (click)="view = 'grid'">Grid</button>
@@ -21,7 +21,7 @@
     <div class="feed-empty" *ngIf="!loading && posts.length === 0">
       <div style="font-size:60px;">📸</div>
       <h2 class="serif">No moments yet</h2>
-      <p>Be the first to share your celebration with the Invitely community.</p>
+      <p>Be the first to share your celebration with the Innvitely community.</p>
       <p class="fe-note" *ngIf="!auth.isLoggedIn()">
         <a routerLink="/auth/register">Create an account</a> to start sharing moments.
       </p>
