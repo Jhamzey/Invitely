@@ -2,30 +2,105 @@
 
   <div class="builder-topbar">
     <div class="bt-left">
-      <a class="bt-back" routerLink="/dashboard">← Dashboard</a>
+      <a class="bt-back" routerLink="/dashboard">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Dashboard
+      </a>
       <div class="bt-title">{{ event.title }}</div>
     </div>
     <div class="bt-actions">
-      <button class="btn btn-outline bt-nav" (click)="goToGuests()">👥 Guests</button>
-      <button class="btn btn-outline bt-nav" (click)="goToSeating()">🪑 Seating</button>
-      <button class="btn btn-outline bt-nav" (click)="goToMoments()">📸 Moments</button>
-      <button class="btn btn-outline bt-nav" (click)="goToScan()">🔐 Scan</button>
-      <button class="btn btn-outline bt-nav" (click)="goToCollaborate()">Collaborate</button>
+
+      <!-- Mobile preview button -->
+      <button class="bt-preview-btn" type="button" (click)="showMobilePreview = true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        Preview
+      </button>
+
+      <button class="btn btn-outline bt-nav" (click)="goToGuests()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Guests
+      </button>
+
+      <button class="btn btn-outline bt-nav" (click)="goToSeating()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Seating
+      </button>
+
+      <button class="btn btn-outline bt-nav" (click)="goToMoments()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        Moments
+      </button>
+
+      <button class="btn btn-outline bt-nav" (click)="goToScan()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9V5a2 2 0 0 1 2-2h4M15 3h4a2 2 0 0 1 2 2v4M21 15v4a2 2 0 0 1-2 2h-4M9 21H5a2 2 0 0 1-2-2v-4"/>
+        </svg>
+        Scan
+      </button>
+
+      <button class="btn btn-outline bt-nav" (click)="goToCollaborate()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Collaborate
+      </button>
+
       <button class="btn btn-outline" (click)="save()" [disabled]="saving">
-        {{ saving ? 'Saving...' : saved ? '✓ Saved' : 'Save' }}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        {{ saving ? 'Saving...' : saved ? 'Saved' : 'Save' }}
       </button>
+
       <button class="btn btn-gold" (click)="publish()" [disabled]="saving || event.published">
-        {{ event.published ? '✓ Live' : 'Publish & send' }}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        {{ event.published ? 'Live' : 'Publish & send' }}
       </button>
+
     </div>
   </div>
+
 
   <div class="builder-layout">
 
     <!-- LEFT CONTROLS -->
     <div class="builder-controls">
       <div class="bc-tabs">
-        <button *ngFor="let t of tabs" class="bc-tab" [class.active]="activeTab === t.id" (click)="activeTab = t.id">
+        <button *ngFor="let t of tabs" class="bc-tab"
+                [class.active]="activeTab === t.id" (click)="activeTab = t.id">
           {{ t.label }}
         </button>
       </div>
@@ -36,12 +111,17 @@
         <div class="bc-section-title">Templates</div>
         <div class="template-grid">
           <div *ngFor="let t of templates"
-            class="template-opt"
-            [class.active]="event.theme === t.id"
-            [style.background]="t.bg"
-            [style.color]="t.color"
-            (click)="setTheme(t.id)">
-            <div class="to-check" *ngIf="event.theme === t.id">✓</div>
+               class="template-opt"
+               [class.active]="event.theme === t.id"
+               [style.background]="t.bg"
+               [style.color]="t.color"
+               (click)="setTheme(t.id)">
+            <div class="to-check" *ngIf="event.theme === t.id">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
             <div class="to-emoji">{{ t.preview }}</div>
             <div class="to-label">{{ t.label }}</div>
           </div>
@@ -50,10 +130,10 @@
         <div class="bc-section-title">Accent colour</div>
         <div class="color-presets">
           <div *ngFor="let c of colorPresets"
-            class="cp-dot"
-            [style.background]="c"
-            [class.active]="event.accentColor === c"
-            (click)="event.accentColor = c">
+               class="cp-dot"
+               [style.background]="c"
+               [class.active]="event.accentColor === c"
+               (click)="event.accentColor = c">
           </div>
         </div>
 
@@ -75,20 +155,24 @@
             <span class="cm-val">{{ customAccentColor }}</span>
           </div>
           <button class="btn btn-primary cm-apply" (click)="applyCustomColors()">
-            Apply custom colours →
+            Apply custom colours
           </button>
           <div class="cm-active" *ngIf="event.theme === 'custom'">
-            ✓ Custom colours active — preview updated
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Custom colours active — preview updated
           </div>
         </div>
 
         <div class="bc-section-title">Font</div>
         <div class="font-list">
           <div *ngFor="let f of fonts"
-            class="font-opt"
-            [class.active]="event.font === f.id"
-            [style.font-family]="f.id"
-            (click)="event.font = f.id">
+               class="font-opt"
+               [class.active]="event.font === f.id"
+               [style.font-family]="f.id"
+               (click)="event.font = f.id">
             {{ f.label }}
           </div>
         </div>
@@ -96,21 +180,29 @@
         <div class="bc-section-title">Language</div>
         <div class="lang-row">
           <div *ngFor="let l of languages"
-            class="lang-pill"
-            [class.active]="event.language === l"
-            (click)="event.language = l">
+               class="lang-pill"
+               [class.active]="event.language === l"
+               (click)="event.language = l">
             {{ l }}
           </div>
         </div>
 
         <div class="bc-section-title">Cover image</div>
         <div class="cover-upload" (click)="coverInput.click()">
-          <img *ngIf="coverPreview || event.coverImage" [src]="coverPreview || event.coverImage" class="cover-img" alt="cover" />
+          <img *ngIf="coverPreview || event.coverImage"
+               [src]="coverPreview || event.coverImage" class="cover-img" alt="cover" />
           <div *ngIf="!coverPreview && !event.coverImage" class="cover-placeholder">
-            <span>📷</span><span>Click to upload cover</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>Click to upload cover</span>
           </div>
         </div>
-        <input #coverInput type="file" accept="image/*,video/*" style="display:none" (change)="onCoverSelected($event)" />
+        <input #coverInput type="file" accept="image/*,video/*"
+               style="display:none" (change)="onCoverSelected($event)" />
 
       </div>
 
@@ -143,24 +235,31 @@
           <input [(ngModel)]="event.venueAddress" placeholder="Type address or pin on map below" />
         </div>
         <div class="map-toggle">
-          <button class="btn btn-outline" style="font-size:12px; padding:6px 14px;" (click)="showMapPicker = !showMapPicker">
-            {{ showMapPicker ? '🗺️ Hide map' : '📍 Pin exact location on map' }}
+          <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;"
+                  (click)="showMapPicker = !showMapPicker">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {{ showMapPicker ? 'Hide map' : 'Pin exact location on map' }}
           </button>
         </div>
-        <app-map-picker *ngIf="showMapPicker" (locationSelected)="onLocationSelected($event)"></app-map-picker>
+        <app-map-picker *ngIf="showMapPicker"
+                        (locationSelected)="onLocationSelected($event)"></app-map-picker>
         <div class="form-group">
           <label>Dress code</label>
           <input [(ngModel)]="event.dressCode" placeholder="e.g. Black Tie · Ivory & Gold" />
         </div>
 
-        <!-- Gift support toggle -->
         <div class="gift-toggle-section">
           <div class="gts-header">
             <div class="gts-info">
               <div class="gts-title">Guest gift support</div>
               <div class="gts-sub">Invitely will gently ask guests if they'd like to send a gift — not you, us.</div>
             </div>
-            <div class="tr-toggle" [class.on]="event.giftEnabled" (click)="event.giftEnabled = !event.giftEnabled">
+            <div class="tr-toggle" [class.on]="event.giftEnabled"
+                 (click)="event.giftEnabled = !event.giftEnabled">
               <div class="tt-knob"></div>
             </div>
           </div>
@@ -181,7 +280,12 @@
               <div class="ai-price">₦{{ a.price | number }}</div>
               <div class="ai-desc" *ngIf="a.description">{{ a.description }}</div>
             </div>
-            <button class="ai-remove" (click)="removeAsoebi(i)">×</button>
+            <button class="ai-remove" (click)="removeAsoebi(i)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </div>
           <p *ngIf="!event.asoebi?.length" class="bc-empty">No asoebi options yet.</p>
         </div>
@@ -189,7 +293,13 @@
           <input [(ngModel)]="newAsoebi.name" placeholder="e.g. Women's set" />
           <input [(ngModel)]="newAsoebi.price" type="number" placeholder="Price (₦)" />
           <input [(ngModel)]="newAsoebi.description" placeholder="Description (optional)" />
-          <button class="btn btn-outline" (click)="addAsoebi()">+ Add option</button>
+          <button class="btn btn-outline" (click)="addAsoebi()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add option
+          </button>
         </div>
       </div>
 
@@ -199,25 +309,38 @@
         <div class="meal-list">
           <div class="meal-item" *ngFor="let m of event.meals; let i = index">
             <span>{{ m.name }}</span>
-            <button (click)="removeMeal(i)">×</button>
+            <button (click)="removeMeal(i)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </div>
           <p *ngIf="!event.meals?.length" class="bc-empty">No meal options yet.</p>
         </div>
         <div class="bc-add-row">
           <input [(ngModel)]="newMeal" placeholder="e.g. Jollof rice" (keyup.enter)="addMeal()" />
-          <button class="btn btn-outline" (click)="addMeal()">+ Add</button>
+          <button class="btn btn-outline" (click)="addMeal()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add
+          </button>
         </div>
       </div>
+
     </div>
+
 
     <!-- RIGHT PREVIEW -->
     <div class="builder-preview">
       <div class="bp-label">Live preview · updates as you design</div>
       <div class="invite-preview"
-        [style.background]="previewBg"
-        [style.color]="previewColor"
-        [style.font-family]="event.font || 'Cormorant Garamond'"
-        [style.transition]="'background 0.4s ease, color 0.4s ease'">
+           [style.background]="previewBg"
+           [style.color]="previewColor"
+           [style.font-family]="event.font || 'Cormorant Garamond'"
+           [style.transition]="'background 0.4s ease, color 0.4s ease'">
 
         <div class="ip-cover" *ngIf="coverPreview || event.coverImage">
           <img [src]="coverPreview || event.coverImage" alt="cover" />
@@ -245,9 +368,8 @@
             </div>
           </div>
 
-          <!-- Gift support line -->
           <div class="ip-gift" *ngIf="event.giftEnabled">
-            <div class="ipg-line">"Innvitely gives you the option to send a gift to celebrate this occasion."</div>
+            <div class="ipg-line">"Invitely gives you the option to send a gift to celebrate this occasion."</div>
           </div>
 
           <div class="ip-footer">
@@ -267,17 +389,88 @@
       </div>
 
       <div class="bp-actions">
-        <button class="btn btn-outline bp-action" (click)="goToGuests()">Guests →</button>
-        <button class="btn btn-outline bp-action" (click)="goToSeating()">Seating →</button>
-        <button class="btn btn-outline bp-action" (click)="goToMoments()">Moments →</button>
+        <button class="btn btn-outline bp-action" (click)="goToGuests()">Guests</button>
+        <button class="btn btn-outline bp-action" (click)="goToSeating()">Seating</button>
+        <button class="btn btn-outline bp-action" (click)="goToMoments()">Moments</button>
       </div>
     </div>
+
   </div>
 </div>
 
+
+<!-- LOADING STATE -->
 <div class="builder-loading" *ngIf="loading">
-  <div style="display:grid; grid-template-columns:300px 1fr; gap:20px; height:80vh; padding:20px;">
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;height:80vh;padding:20px;">
     <div class="skeleton"></div>
     <div class="skeleton"></div>
+  </div>
+</div>
+
+
+<!-- MOBILE PREVIEW MODAL -->
+<div class="preview-modal-overlay" [class.open]="showMobilePreview"
+     (click)="showMobilePreview = false">
+  <div class="preview-modal-inner" (click)="$event.stopPropagation()">
+
+    <button class="preview-modal-close" type="button" (click)="showMobilePreview = false">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <div class="invite-preview"
+         [style.background]="previewBg"
+         [style.color]="previewColor"
+         [style.font-family]="event.font || 'Cormorant Garamond'"
+         [style.transition]="'background 0.4s ease, color 0.4s ease'">
+
+      <div class="ip-cover" *ngIf="coverPreview || event.coverImage">
+        <img [src]="coverPreview || event.coverImage" alt="cover" />
+      </div>
+
+      <div class="ip-body">
+        <div class="ip-ornament">✦</div>
+        <div class="ip-type">{{ event.type | titlecase }} Invitation</div>
+        <div class="ip-names">{{ event.coupleNames || event.title || 'Couple Name' }}</div>
+        <div class="ip-divider"></div>
+        <div class="ip-details">
+          {{ event.date ? (event.date | date:'EEEE, MMMM d, y') : 'Date TBD' }}<br>
+          {{ event.time || '—' }}<br>
+          {{ event.venue || 'Venue name' }}<br>
+          <span *ngIf="event.dressCode" style="opacity:0.7;">{{ event.dressCode }}</span>
+        </div>
+
+        <div class="ip-asoebi" *ngIf="event.asoebi?.length">
+          <div class="ipa-title">Asoebi available</div>
+          <div class="ipa-items">
+            <div class="ipa-item" *ngFor="let a of event.asoebi">
+              <span>{{ a.name }}</span>
+              <span>₦{{ a.price | number }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ip-gift" *ngIf="event.giftEnabled">
+          <div class="ipg-line">"Invitely gives you the option to send a gift to celebrate this occasion."</div>
+        </div>
+
+        <div class="ip-footer">
+          <div>
+            <div class="ip-guest-label">You are invited</div>
+            <div class="ip-guest-name">Guest Name · Table — · Seat —</div>
+          </div>
+          <div class="ip-qr">
+            <div class="qr-mini">
+              <div class="qm filled"></div><div class="qm"></div><div class="qm filled"></div>
+              <div class="qm filled"></div><div class="qm filled"></div><div class="qm"></div>
+              <div class="qm"></div><div class="qm filled"></div><div class="qm filled"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

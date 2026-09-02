@@ -10,7 +10,7 @@ import { RouterModule } from '@angular/router';
     <div class="help-page container">
       <a class="back-link" routerLink="/support">← Support</a>
       <h1 class="serif" style="font-size:2rem; margin-bottom:8px;">Help centre</h1>
-      <p style="color:var(--text-muted); margin-bottom:32px;">Answers to the most common questions about Invitely.</p>
+      <p style="color:var(--text-muted); margin-bottom:32px;">Answers to the most common questions about Innvitely.</p>
 
       <div class="faqs">
         <div class="faq-item" *ngFor="let faq of faqs" (click)="faq.open = !faq.open">

@@ -26,9 +26,7 @@ export class VendorService {
     return this.http.get<Vendor[]>(`${this.API}${params}`);
   }
 
-  getById(id: string) {
-    return this.http.get<Vendor>(`${this.API}/${id}`);
-  }
+  getById(id: string) { return this.http.get<Vendor>(`${this.API}/${id}`); }
 
   create(data: Partial<Vendor>) {
     return this.http.post<Vendor>(this.API, data, { headers: this.headers() });

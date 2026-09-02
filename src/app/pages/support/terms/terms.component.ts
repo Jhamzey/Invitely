@@ -10,7 +10,7 @@ import { RouterModule } from '@angular/router';
     <div class="policy-page container">
       <a class="back-link" routerLink="/support">← Support</a>
       <h1 class="serif" style="font-size:2rem; margin-bottom:4px;">Terms of use</h1>
-      <p style="color:var(--text-muted); font-family:var(--sans); font-size:13px; margin-bottom:32px;">Last updated: January 2026</p>
+      <p style="color:var(--text-muted); font-family:var(--sans); font-size:13px; margin-bottom:32px;">Last updated: September 2026</p>
       <div class="policy-body" *ngFor="let s of sections">
         <h2>{{ s.title }}</h2>
         <p>{{ s.body }}</p>

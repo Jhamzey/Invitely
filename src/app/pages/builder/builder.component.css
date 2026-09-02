@@ -456,3 +456,83 @@
   .bt-title { max-width: 160px; font-size: 13px; }
 }
 
+/* ============================================================
+   MOBILE PREVIEW BUTTON
+   ============================================================ */
+
+.bt-preview-btn { display: none; }
+
+@media (max-width: 900px) {
+  .bt-preview-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 0.5px solid var(--border);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    font-family: var(--sans);
+  }
+  .bt-preview-btn:hover { border-color: var(--accent); }
+}
+
+/* ============================================================
+   MOBILE PREVIEW MODAL
+   ============================================================ */
+
+.preview-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 600;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.preview-modal-overlay.open { display: flex; }
+
+.preview-modal-inner {
+  background: var(--bg);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.preview-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 10;
+  transition: background 0.15s;
+}
+.preview-modal-close:hover { background: rgba(0,0,0,0.6); }
+
+/* ============================================================
+   MOBILE TOPBAR — hide non-essential buttons on small phones
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .bt-actions .btn:not(.btn-gold):not(.bt-preview-btn) { display: none; }
+  .bt-preview-btn { display: flex; }
+  .bt-title { max-width: 130px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bt-actions { gap: 6px; }
+}

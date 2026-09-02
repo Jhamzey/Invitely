@@ -178,3 +178,80 @@
 .ssai-table { font-size: 12px; color: rgba(255,255,255,0.35); font-family: var(--sans); }
 .ssai-time { font-size: 12px; color: rgba(255,255,255,0.3); font-family: var(--sans); }
 .ssa-empty { text-align: center; padding: 24px; font-size: 13px; color: rgba(255,255,255,0.25); font-family: var(--sans); }
+
+/* ============================================================
+   MOBILE — scan session is a phone-first UI
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .ss-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .ssh-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .ss-stat-num { font-size: 28px; }
+  .ss-stat-label { font-size: 9px; }
+
+  .ss-scan-area { padding: 14px; }
+
+  .cl-btn {
+    padding: 22px 14px;
+    font-size: 14px;
+  }
+
+  .ssa-input {
+    font-size: 16px;
+    padding: 16px;
+  }
+
+  .ssa-btn {
+    width: 56px;
+    height: 56px;
+  }
+
+  .camera-view {
+    aspect-ratio: 3/4;
+    width: 100%;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ss-arrivals {
+    padding: 0 14px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+
+  .sar-name { font-size: 18px; }
+  .sar-time { font-size: 12px; }
+
+  .ss-arrival-row {
+    padding: 12px 0;
+  }
+
+  .ssh-event {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+
+}
+
+@media (max-width: 380px) {
+  .ss-stat-num { font-size: 22px; }
+  .ssh-event { max-width: 160px; }
+  .cl-btn { padding: 18px 10px; font-size: 13px; }
+}

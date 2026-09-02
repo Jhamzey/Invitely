@@ -23,6 +23,8 @@ export class BuilderComponent implements OnInit {
   coverFile: File | null = null;
   coverPreview = '';
   showMapPicker = false;
+  showMobilePreview = false;
+  showInvitePreview = false;
 
   readonly templates = [
     { id: 'ivory', label: 'Ivory Classic', bg: 'linear-gradient(135deg,#F8F3E8,#E8DFD0)', color: '#3D2E1A', preview: '🤍' },
