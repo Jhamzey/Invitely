@@ -20,7 +20,7 @@ export class VendorRegisterComponent implements OnInit {
   form = {
     name: '', email: '', password: '',
     businessName: '', businessCategories: [] as string[], otherCategory: '',
-    businessCity: '', businessDescription: '',
+    businessCity: [] as string[], businessDescription: '',
     phone: '', whatsapp: '', instagramHandle: '',
     termsAccepted: false,
   };
@@ -66,6 +66,12 @@ export class VendorRegisterComponent implements OnInit {
     } else {
       this.form.businessCategories.push(id);
     }
+  }
+
+  toggleCity(city: string) {
+    const idx = this.form.businessCity.indexOf(city);
+    if (idx > -1) this.form.businessCity.splice(idx, 1);
+    else this.form.businessCity.push(city);
   }
 
   onNINSelected(e: any) {

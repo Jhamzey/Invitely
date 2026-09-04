@@ -50,7 +50,10 @@ export class MapPickerComponent implements AfterViewInit {
     this.map = new google.maps.Map(this.mapEl.nativeElement, {
       center: { lat: 6.5244, lng: 3.3792 }, // Lagos default
       zoom: 13,
-      styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
+      styles: [],
+      backgroundColor: '#ffffff',
+      mapTypeControl: false,
+      //styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
     });
 
     this.map.addListener('click', (e: any) => {

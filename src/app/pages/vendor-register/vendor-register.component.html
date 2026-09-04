@@ -96,11 +96,17 @@
         </div>
 
         <div class="form-group">
-          <label>City *</label>
-          <select [(ngModel)]="form.businessCity">
+          <label>City where you operate *</label>
+          <div class="city-chips">
+            <div *ngFor="let c of cities" class="city-chip" 
+                 [class.active]="form.businessCity.includes(c)" 
+                 (click)="toggleCity(c)">
+                 {{ c }}
+            </div>
+            <select [(ngModel)]="form.businessCity">
             <option value="">Select city</option>
             <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
-          </select>
+            </select>
         </div>
 
         <div class="form-group">
@@ -126,7 +132,7 @@
       </div>
 
       <!-- STEP 3 — Upload credentials -->
-      <div *ngIf="step === 3">
+      <div *ngIf="step > 2">
         <div class="verify-intro">
           <div class="vi-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -221,7 +227,7 @@
           Continue
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
-        <button class="btn btn-primary" *ngIf="step === 3" (click)="submit()" [disabled]="loading">
+        <button class="btn btn-primary" *ngIf="step === 2" (click)="submit()" [disabled]="loading">
           {{ loading ? 'Creating account...' : 'Create vendor account' }}
         </button>
       </div>

@@ -29,7 +29,16 @@ export class VendorDashboardComponent implements OnInit {
   mediaError = '';
   certError = '';
 
-  newListing = { businessName: '', businessCategory: [] as string[], businessCity: '', businessDescription: '', otherCategory: '' };
+  showListingMediaModal: number | null = null;
+  showListingCertModal:  number | null = null;
+  listingMediaFiles: File[] = [];
+  listingCertFiles:  File[] = [];
+  listingMediaUploading = false;
+  listingCertUploading  = false;
+  listingMediaError = '';
+  listingCertError  = '';
+
+  newListing = { businessName: '', businessCategory: [] as string[], businessCity: [] as string[], businessDescription: '', otherCategory: '' };
   addingListing = false;
 
   stats = { views: 0, enquiries: 0, rating: 0, reviewCount: 0 };
@@ -129,24 +138,28 @@ export class VendorDashboardComponent implements OnInit {
       .subscribe({ next: user => this.vendor = user });
   }
 
-  toggleNewCategory(id: string) {
-    const idx = this.newListing.businessCategory.indexOf(id);
-    if (idx > -1) this.newListing.businessCategory.splice(idx, 1);
-    else this.newListing.businessCategory.push(id);
+  selectNewCategory(id: string) {
+    this.newListing.businessCategory = [id];
+  }
+
+  toggleNewCity(city: string) {
+    const idx = this.newListing.businessCity.indexOf(city);
+    if (idx > -1) this.newListing.businessCity.splice(idx, 1);
+    else this.newListing.businessCity.push(city);
   }
 
   submitNewListing() {
-    if (!this.newListing.businessName || !this.newListing.businessCategory.length || !this.newListing.businessCity) return;
+    if (!this.newListing.businessName || !this.newListing.businessCategory.length || !this.newListing.businessCity.length) return;
     this.addingListing = true;
     this.http.post<any>(`${this.API}/users/add-listing`, {
       businessName:        this.newListing.businessName,
       businessCategory:    this.newListing.businessCategory.join(','),
-      businessCity:        this.newListing.businessCity,
+      businessCity:        this.newListing.businessCity.join(','),
       businessDescription: this.newListing.businessDescription,
     }, { headers: this.jsonHeaders() }).subscribe({
       next: user => {
         this.vendor = user; this.showAddListingModal = false; this.addingListing = false;
-        this.newListing = { businessName: '', businessCategory: [], businessCity: '', businessDescription: '', otherCategory: '' };
+        this.newListing = { businessName: '', businessCategory: [], businessCity: [], businessDescription: '', otherCategory: '' };
       },
       error: () => { this.addingListing = false; }
     });
@@ -165,6 +178,64 @@ export class VendorDashboardComponent implements OnInit {
     });
     handler?.openIframe();
   }
+
+  onListingMediaSelected(e: any) {
+    const files = Array.from(e.target.files || []) as File[];
+    this.listingMediaFiles = [...this.listingMediaFiles, ...files].slice(0, 20);
+  }
+
+  uploadListingMedia() {
+    if (!this.listingMediaFiles.length || this.showListingMediaModal === null) return;
+    this.listingMediaUploading = true;
+    const fd = new FormData();
+    this.listingMediaFiles.forEach(f => fd.append('files', f));
+    const idx = this.showListingMediaModal;
+    this.http.post<any>(`${this.API}/users/add-listing/${idx}/media`, fd, { headers: this.fileHeaders() }).subscribe({
+      next: user => {
+        this.vendor = user;
+        this.listingMediaFiles = [];
+        this.listingMediaUploading = false;
+        this.showListingMediaModal = null;
+      },
+      error: err => {
+        this.listingMediaError = err.error?.error || 'Upload failed.';
+        this.listingMediaUploading = false;
+      }
+    });
+  }
+
+  onListingCertSelected(e: any) {
+    const files = Array.from(e.target.files || []) as File[];
+    this.listingCertFiles = [...this.listingCertFiles, ...files].slice(0, 10);
+  }
+
+  toggleVendorCity(city: string) {
+    if (!Array.isArray(this.vendor.businessCity)) this.vendor.businessCity = [];
+    const idx = this.vendor.businessCity.indexOf(city);
+    if (idx > -1) this.vendor.businessCity.splice(idx, 1);
+    else this.vendor.businessCity.push(city);
+  }
+
+  uploadListingCerts() {
+    if (!this.listingCertFiles.length || this.showListingCertModal === null) return;
+    this.listingCertUploading = true;
+    const fd = new FormData();
+    this.listingCertFiles.forEach(f => fd.append('files', f));
+    const idx = this.showListingCertModal;
+    this.http.post<any>(`${this.API}/users/add-listing/${idx}/certificates`, fd, { headers: this.fileHeaders() }).subscribe({
+      next: user => {
+        this.vendor = user;
+        this.listingCertFiles = [];
+        this.listingCertUploading = false;
+        this.showListingCertModal = null;
+      },
+      error: err => {
+        this.listingCertError = err.error?.error || 'Upload failed.';
+        this.listingCertUploading = false;
+      }
+    });
+  }
+
 
   verifyPayment(reference: string) {
     this.http.post<any>(`${this.API}/vendors/upgrade`, { reference, vendorId: this.vendor._id }, { headers: this.jsonHeaders() }).subscribe({

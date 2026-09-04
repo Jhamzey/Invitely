@@ -118,6 +118,18 @@ label {
   letter-spacing: 0.06em;
 }
 
+input, select, textarea {
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
+}
+
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
+}
+
 .form-group { margin-bottom: 16px; }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }

@@ -50,7 +50,14 @@
       </div>
 
       <div class="form-group">
-        <label>City</label>
+        <label>Cities where you operate *</label>
+        <div class="city-chips">
+          <div *ngFor="let c of cities" class="city-chip"
+            [class.active]="profile.businessCity === c"
+            (click)="profile.businessCity = c">
+            {{ c }}
+          </div>
+        </div>
         <select [(ngModel)]="profile.businessCity">
           <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
         </select>
