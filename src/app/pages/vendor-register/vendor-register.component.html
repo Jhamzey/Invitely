@@ -1,7 +1,9 @@
 <div class="vr-page">
 
   <!-- Left visual -->
-  <div class="vr-visual" [style.background]="themeService.current().previewBg" [style.color]="themeService.current().previewColor">
+  <div class="vr-visual"
+       [style.background]="themeService.current().previewBg"
+       [style.color]="themeService.current().previewColor">
     <div class="vrv-inner">
       <a class="vrv-logo serif" routerLink="/">Innvitel<span>y</span></a>
       <h2 class="vrv-title serif">List your services.<br>Reach thousands<br>of event hosts.</h2>
@@ -13,17 +15,30 @@
           { text: 'Verified vendor badge after screening' },
           { text: 'Dashboard to track enquiries and bookings' }
         ]">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
           <span class="vrp-text">{{ p.text }}</span>
         </div>
       </div>
       <div class="vrv-pricing">
-        <div class="vrp-plan"><div class="vrp-name">Free tier</div><div class="vrp-price">₦0</div><div class="vrp-desc">Basic listing, email alerts</div></div>
+        <div class="vrp-plan">
+          <div class="vrp-name">Free tier</div>
+          <div class="vrp-price">₦0</div>
+          <div class="vrp-desc">Basic listing, email alerts</div>
+        </div>
         <div class="vrp-divider"></div>
-        <div class="vrp-plan"><div class="vrp-name">Pro</div><div class="vrp-price">₦5,000<span>/mo</span></div><div class="vrp-desc">WhatsApp alerts, featured listing</div></div>
+        <div class="vrp-plan">
+          <div class="vrp-name">Pro</div>
+          <div class="vrp-price">₦5,000<span>/mo</span></div>
+          <div class="vrp-desc">WhatsApp alerts, featured listing</div>
+        </div>
       </div>
       <div class="av-dots" style="margin-top:12px;">
-        <div *ngFor="let t of themeService.themes" class="av-dot" [style.background]="t.accentColor" [class.active]="themeService.current().id === t.id"></div>
+        <div *ngFor="let t of themeService.themes" class="av-dot"
+             [style.background]="t.accentColor"
+             [class.active]="themeService.current().id === t.id"></div>
       </div>
     </div>
   </div>
@@ -33,17 +48,28 @@
     <div class="vr-form-inner">
 
       <a class="auth-back" routerLink="/auth/register">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
         Back
       </a>
 
       <!-- Steps indicator -->
       <div class="vr-steps">
-        <div *ngFor="let s of [1,2,3]" class="vrs-step" [class.active]="step >= s" [class.current]="step === s">
-          <div class="vrs-num">{{ s }}</div>
-          <div class="vrs-label">{{ s === 1 ? 'Account' : s === 2 ? 'Business' : 'Verify' }}</div>
+        <div *ngFor="let s of [1,2,3]" class="vrs-step"
+             [class.active]="step >= s" [class.current]="step === s">
+          <div class="vrs-num">
+            <svg *ngIf="step > s" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span *ngIf="step <= s">{{ s }}</span>
+          </div>
+          <div class="vrs-label">
+            {{ s === 1 ? 'Account' : s === 2 ? 'Business' : 'Verify' }}
+          </div>
         </div>
-        <div class="vrs-line" [style.width]="step >= 2 ? '100%' : '0'"></div>
       </div>
 
       <h2 class="vr-title serif">
@@ -52,75 +78,112 @@
         <span *ngIf="step === 3">Verification &amp; credentials</span>
       </h2>
 
-      <!-- STEP 1 -->
+      <!-- ════════════════ STEP 1 — Account ════════════════ -->
       <div *ngIf="step === 1">
         <div class="form-group">
           <label>Your full name *</label>
-          <input [(ngModel)]="form.name" placeholder="Contact person name" />
+          <input [(ngModel)]="form.name" placeholder="Contact person name"
+                 autocomplete="name" />
         </div>
         <div class="form-group">
           <label>Email address *</label>
-          <input type="email" [(ngModel)]="form.email" placeholder="business@email.com" />
+          <input type="email" [(ngModel)]="form.email" placeholder="business@email.com"
+                 autocomplete="email" />
         </div>
         <div class="form-group">
           <label>Password *</label>
-          <input type="password" [(ngModel)]="form.password" placeholder="At least 8 characters" />
+          <div class="pw-wrap">
+            <input [type]="showPassword ? 'text' : 'password'"
+                   [(ngModel)]="form.password"
+                   placeholder="At least 8 characters"
+                   autocomplete="new-password" />
+            <button type="button" class="pw-toggle" (click)="showPassword = !showPassword">
+              <svg *ngIf="!showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- STEP 2 -->
+      <!-- ════════════════ STEP 2 — Business ════════════════ -->
       <div *ngIf="step === 2">
+
         <div class="form-group">
           <label>Business / brand name *</label>
           <input [(ngModel)]="form.businessName" placeholder="e.g. Mama Tee's Catering" />
         </div>
 
+        <!-- Multi-select categories -->
         <div class="form-group">
-          <label>Service categories * <span class="label-hint">(select all that apply)</span></label>
+          <label>
+            Service categories *
+            <span class="label-hint">Select all that apply</span>
+          </label>
           <div class="cat-grid">
-            <div *ngFor="let c of categories"
-              class="cat-opt"
-              [class.active]="form.businessCategories.includes(c.id)"
-              (click)="toggleCategory(c.id)">
+            <div *ngFor="let c of categories" class="cat-opt"
+                 [class.active]="form.businessCategories.includes(c.id)"
+                 (click)="toggleCategory(c.id)">
               <div class="cat-check" *ngIf="form.businessCategories.includes(c.id)">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
               </div>
               <span class="co-label">{{ c.label }}</span>
             </div>
           </div>
-          <!-- Other text area -->
           <div class="other-field" *ngIf="hasOther">
             <label>Describe your service *</label>
-            <textarea [(ngModel)]="form.otherCategory" rows="2" placeholder="Tell us exactly what you do..."></textarea>
+            <textarea [(ngModel)]="form.otherCategory" rows="2"
+                      placeholder="Tell us exactly what you do..."></textarea>
           </div>
         </div>
 
+        <!-- Multi-city chips — replaces the old single <select> -->
         <div class="form-group">
-          <label>City where you operate *</label>
+          <label>
+            Cities where you operate *
+            <span class="label-hint">Select all that apply</span>
+          </label>
           <div class="city-chips">
-            <div *ngFor="let c of cities" class="city-chip" 
-                 [class.active]="form.businessCity.includes(c)" 
+            <div *ngFor="let c of cities" class="city-chip"
+                 [class.active]="form.businessCity.includes(c)"
                  (click)="toggleCity(c)">
-                 {{ c }}
+              {{ c }}
             </div>
-            <select [(ngModel)]="form.businessCity">
-            <option value="">Select city</option>
-            <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
-            </select>
+          </div>
+          <div class="city-selected" *ngIf="form.businessCity.length > 0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {{ cityDisplay }}
+          </div>
         </div>
 
         <div class="form-group">
           <label>About your business</label>
-          <textarea [(ngModel)]="form.businessDescription" rows="3" placeholder="Describe your services, experience and what makes you stand out..."></textarea>
+          <textarea [(ngModel)]="form.businessDescription" rows="3"
+                    placeholder="Describe your services, experience and what makes you stand out..."></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Phone *</label>
-            <input [(ngModel)]="form.phone" placeholder="+2348..." />
+            <label>Phone number *</label>
+            <input [(ngModel)]="form.phone" placeholder="+2348..." autocomplete="tel" />
           </div>
           <div class="form-group">
-            <label>WhatsApp</label>
+            <label>WhatsApp number</label>
             <input [(ngModel)]="form.whatsapp" placeholder="+2348..." />
           </div>
         </div>
@@ -129,13 +192,18 @@
           <label>Instagram handle</label>
           <input [(ngModel)]="form.instagramHandle" placeholder="@yourbusiness" />
         </div>
+
       </div>
 
-      <!-- STEP 3 — Upload credentials -->
-      <div *ngIf="step > 2">
+      <!-- ════════════════ STEP 3 — Verify ════════════════ -->
+      <div *ngIf="step === 3">
+
         <div class="verify-intro">
           <div class="vi-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
           </div>
           <div>
             <h3 class="serif">Why we verify vendors</h3>
@@ -149,59 +217,99 @@
             <div class="us-title">Government-issued ID *</div>
             <div class="us-sub">NIN slip, Driver's licence or International passport</div>
           </div>
-          <div class="upload-box" (click)="ninInput.click()" [class.uploaded]="ninFile">
-            <input #ninInput type="file" accept="image/*,.pdf" style="display:none" (change)="onNINSelected($event)" />
+          <label class="upload-box" [class.uploaded]="ninFile">
+            <input type="file" accept="image/*,.pdf" style="display:none"
+                   (change)="onNINSelected($event)" />
             <ng-container *ngIf="!ninFile">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-              <span>Click to upload ID document</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 16 12 12 8 16"/>
+                <line x1="12" y1="12" x2="12" y2="21"/>
+                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+              </svg>
+              <span>Tap to upload ID document</span>
               <span class="ub-hint">JPG, PNG or PDF · Max 10MB</span>
             </ng-container>
             <ng-container *ngIf="ninFile">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
               <span class="ub-uploaded">{{ ninPreview }}</span>
-              <span class="ub-change">Click to change</span>
+              <span class="ub-change">Tap to change</span>
             </ng-container>
-          </div>
+          </label>
         </div>
 
         <!-- CAC Certificate -->
         <div class="upload-section">
           <div class="us-header">
-            <div class="us-title">CAC Certificate <span class="us-optional">Optional</span></div>
+            <div class="us-title">
+              CAC Certificate
+              <span class="us-optional">Optional</span>
+            </div>
             <div class="us-sub">Business registration certificate from Corporate Affairs Commission</div>
           </div>
-          <div class="upload-box" (click)="cacInput.click()" [class.uploaded]="cacFile">
-            <input #cacInput type="file" accept="image/*,.pdf" style="display:none" (change)="onCACSelected($event)" />
+          <label class="upload-box" [class.uploaded]="cacFile">
+            <input type="file" accept="image/*,.pdf" style="display:none"
+                   (change)="onCACSelected($event)" />
             <ng-container *ngIf="!cacFile">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-              <span>Click to upload CAC certificate</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 16 12 12 8 16"/>
+                <line x1="12" y1="12" x2="12" y2="21"/>
+                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+              </svg>
+              <span>Tap to upload CAC certificate</span>
               <span class="ub-hint">JPG, PNG or PDF · Max 10MB</span>
             </ng-container>
             <ng-container *ngIf="cacFile">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
               <span class="ub-uploaded">{{ cacPreview }}</span>
-              <span class="ub-change">Click to change</span>
+              <span class="ub-change">Tap to change</span>
             </ng-container>
-          </div>
+          </label>
         </div>
 
         <!-- Portfolio / work samples -->
         <div class="upload-section">
           <div class="us-header">
-            <div class="us-title">Work samples <span class="us-optional">Optional</span></div>
+            <div class="us-title">
+              Work samples
+              <span class="us-optional">Optional</span>
+            </div>
             <div class="us-sub">Photos or videos of your work — up to 10 files, all formats, HD/4K accepted</div>
           </div>
-          <div class="upload-box portfolio" (click)="portfolioInput.click()">
-            <input #portfolioInput type="file" accept="image/*,video/*" multiple style="display:none" (change)="onPortfolioSelected($event)" />
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span>Add photos / videos of your work</span>
-            <span class="ub-hint">All image & video formats accepted · HD & 4K supported</span>
-          </div>
+          <label class="upload-box portfolio">
+            <input type="file" accept="image/*,video/*" multiple style="display:none"
+                   capture="environment" (change)="onPortfolioSelected($event)" />
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>Add photos &amp; videos of your work</span>
+            <span class="ub-hint">All image &amp; video formats · HD &amp; 4K supported</span>
+          </label>
           <div class="portfolio-previews" *ngIf="portfolioFiles.length > 0">
             <div class="pp-item" *ngFor="let f of portfolioFiles; let i = index">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                <polyline points="13 2 13 9 20 9"/>
+              </svg>
               <div class="pp-name">{{ f.name }}</div>
+              <div class="pp-size">{{ (f.size / 1024 / 1024).toFixed(1) }}MB</div>
               <button class="pp-remove" (click)="removePortfolio(i); $event.stopPropagation()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
               </button>
             </div>
           </div>
@@ -210,31 +318,55 @@
         <!-- Terms -->
         <div class="vr-checkbox" (click)="form.termsAccepted = !form.termsAccepted">
           <div class="vrch-box" [class.checked]="form.termsAccepted">
-            <svg *ngIf="form.termsAccepted" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg *ngIf="form.termsAccepted" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
           </div>
-          <span>I agree to Innvitely's <a class="terms-link">Vendor terms of service</a> and understand that false credentials will result in permanent removal.</span>
+          <span>
+            I agree to Innvitely's
+            <a class="terms-link" routerLink="/support/terms">Vendor terms of service</a>
+            and understand that false credentials will result in permanent removal.
+          </span>
         </div>
+
       </div>
 
+      <!-- Error -->
       <div class="auth-error" *ngIf="error">{{ error }}</div>
 
+      <!-- Actions -->
       <div class="vr-actions">
-        <button class="btn btn-outline" *ngIf="step > 1" (click)="step = step - 1">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <button class="btn btn-outline" *ngIf="step > 1" (click)="prevStep()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
           Back
         </button>
-        <button class="btn btn-primary" *ngIf="step < 3" (click)="nextStep()">
+        <button class="btn btn-primary vr-next" *ngIf="step < 3" (click)="nextStep()">
           Continue
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
         </button>
-        <button class="btn btn-primary" *ngIf="step === 2" (click)="submit()" [disabled]="loading">
+        <button class="btn btn-primary vr-next" *ngIf="step === 3"
+                (click)="submit()" [disabled]="loading">
+          <svg *ngIf="!loading" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
           {{ loading ? 'Creating account...' : 'Create vendor account' }}
         </button>
       </div>
 
       <div class="auth-switch">
-        Already have an account? <a routerLink="/auth/login" class="auth-switch-link">Sign in</a>
+        Already have an account?
+        <a routerLink="/auth/login" class="auth-switch-link">Sign in</a>
       </div>
+
     </div>
   </div>
+
 </div>
