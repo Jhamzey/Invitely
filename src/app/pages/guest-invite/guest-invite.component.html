@@ -193,9 +193,10 @@
           <div class="ao-desc" *ngIf="a.description">{{ a.description }}</div>
         </div>
       </div>
-      <button class="btn btn-gold ao-btn" *ngIf="asoebiSelected && !asoebiDone" (click)="asoebiDone = true">
-        Order {{ asoebiSelected }} — proceed to payment
+      <button class="btn btn-gold ao-btn" *ngIf="asoebiSelected && !asoebiDone" [disabled]="asoebiSubmitting" (click)="orderAsoebi()">
+        {{ asoebiSubmitting ? 'Placing order...' : 'Order ' + asoebiSelected + ' — proceed to payment' }}
       </button>
+      <div class="ao-error" *ngIf="asoebiError">{{ asoebiError }}</div>
       <div class="ao-done" *ngIf="asoebiDone">✓ Order received! The host will contact you for payment.</div>
     </div>
 

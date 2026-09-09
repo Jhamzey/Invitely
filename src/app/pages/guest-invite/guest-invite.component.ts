@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
@@ -15,6 +15,9 @@ import { Guest } from '../../core/models/guest.model';
   styleUrls: ['./guest-invite.component.css']
 })
 export class GuestInviteComponent implements OnInit, OnDestroy {
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
   token = '';
   event!: Event;
   guest!: Guest;
@@ -28,6 +31,8 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
 
   asoebiSelected = '';
   asoebiDone = false;
+  asoebiSubmitting = false;
+  asoebiError = '';
 
   countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   private countdownInterval: any;
@@ -55,7 +60,7 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() { clearInterval(this.countdownInterval); }
+  ngOnDestroy() { if (this.isBrowser) clearInterval(this.countdownInterval); }
 
   get currentTheme() {
     const map: Record<string, { bg: string; color: string; accent: string }> = {
@@ -70,6 +75,7 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   }
 
   startCountdown() {
+    if (!this.isBrowser) return;
     const update = () => {
       const diff = new Date(this.event.date).getTime() - Date.now();
       if (diff <= 0) { clearInterval(this.countdownInterval); return; }
@@ -91,12 +97,24 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
     });
   }
 
+  orderAsoebi() {
+    if (!this.asoebiSelected || this.asoebiSubmitting) return;
+    this.asoebiSubmitting = true;
+    this.asoebiError = '';
+    this.eventService.orderAsoebi(this.token, this.asoebiSelected).subscribe({
+      next: () => { this.asoebiDone = true; this.asoebiSubmitting = false; },
+      error: err => { this.asoebiError = err.error?.error || 'Could not place your order. Please try again.'; this.asoebiSubmitting = false; }
+    });
+  }
+
   openMaps() {
+    if (!this.isBrowser) return;
     const addr = encodeURIComponent(this.event.venueAddress || this.event.venue);
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${addr}`, '_blank');
   }
 
   setReminder() {
+    if (!this.isBrowser) return;
     const eventDate = new Date(this.event.date);
     const title = encodeURIComponent(this.event.title);
     const details = encodeURIComponent(`You are invited to ${this.event.title} at ${this.event.venue}`);
