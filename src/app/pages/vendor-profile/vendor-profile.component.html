@@ -64,6 +64,24 @@
       </div>
 
       <div class="form-group">
+        <label>State</label>
+        <select [(ngModel)]="profile.businessState">
+          <option value="">Select state</option>
+          <option *ngFor="let s of states" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Office / store address</label>
+        <input [(ngModel)]="profile.businessAddress" placeholder="e.g. Suite 4, Block B, 12 Adeola Odeku Street" />
+      </div>
+
+      <div class="form-group">
+        <label>Starting price (₦)</label>
+        <input type="number" min="0" [(ngModel)]="profile.priceFrom" placeholder="e.g. 150000" />
+      </div>
+
+      <div class="form-group">
         <label>About your business</label>
         <textarea [(ngModel)]="profile.businessDescription" rows="5" placeholder="Describe your services..."></textarea>
       </div>
@@ -82,6 +100,10 @@
         <div class="form-group">
           <label>WhatsApp number</label>
           <input [(ngModel)]="profile.whatsapp" placeholder="+2348..." />
+        </div>
+        <div class="tr-field">
+          <label>Starting price (₦)</label>
+          <input type="number" min="0" [(ngModel)]="profile.priceFrom" placeholder="e.g. 150000" />
         </div>
       </div>
       <div class="toggle-section">

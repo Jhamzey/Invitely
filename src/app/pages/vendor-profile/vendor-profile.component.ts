@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-vendor-profile',
@@ -28,7 +29,7 @@ export class VendorProfileComponent implements OnInit {
   passwordSaved = false;
   passwordError = '';
 
-  originalCategories: string[] = []; // locked — cannot be removed
+  originalCategories: string[] = [];
 
   readonly categories = [
     { id: 'catering', label: 'Catering' }, { id: 'hall', label: 'Event hall' },
@@ -40,7 +41,15 @@ export class VendorProfileComponent implements OnInit {
 
   readonly cities = ['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu', 'Kaduna', 'Benin City', 'Owerri', 'Uyo', 'Other'];
 
-  private API = 'http://localhost:4000/api';
+  readonly states = [
+    'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
+    'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT (Abuja)', 'Gombe',
+    'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos',
+    'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto',
+    'Taraba', 'Yobe', 'Zamfara',
+  ];
+
+  private API = environment.apiUrl;
 
   constructor(
     public auth: AuthService,
@@ -56,7 +65,6 @@ export class VendorProfileComponent implements OnInit {
     this.http.get<any>(`${this.API}/auth/me`, { headers: this.headers() }).subscribe({
       next: u => {
         this.profile = { ...u };
-        // Lock original categories
         this.originalCategories = (u.businessCategory || '').split(',').map((c: string) => c.trim()).filter(Boolean);
         this.loading = false;
       },
@@ -74,7 +82,6 @@ export class VendorProfileComponent implements OnInit {
   }
 
   toggleCategory(id: string) {
-    // Cannot remove original categories
     if (this.isOriginalCategory(id)) return;
     const current = [...this.selectedCategories];
     const idx = current.indexOf(id);
@@ -91,8 +98,10 @@ export class VendorProfileComponent implements OnInit {
     this.http.put<any>(`${this.API}/users/profile`, {
       name: this.profile.name, businessName: this.profile.businessName,
       businessCategory: this.profile.businessCategory, businessCity: this.profile.businessCity,
-      businessDescription: this.profile.businessDescription, phone: this.profile.phone,
-      whatsapp: this.profile.whatsapp, emailNotifications: this.profile.emailNotifications,
+      businessAddress: this.profile.businessAddress, businessState: this.profile.businessState,
+      businessDescription: this.profile.businessDescription, priceFrom: this.profile.priceFrom,
+      phone: this.profile.phone, whatsapp: this.profile.whatsapp,
+      emailNotifications: this.profile.emailNotifications,
       whatsappNotifications: this.profile.whatsappNotifications,
     }, { headers: this.headers() }).subscribe({
       next: u => { this.profile = { ...u }; this.saving = false; this.saved = true; setTimeout(() => this.saved = false, 2500); },

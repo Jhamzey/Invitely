@@ -85,7 +85,7 @@ body {
 .badge { display: inline-block; font-size: 11px; font-family: var(--sans); padding: 3px 10px; border-radius: 20px; }
 .badge-green { background: rgba(26,138,94,0.12); color: #1a8a5e; }
 .badge-yellow { background: rgba(201,168,76,0.12); color: #854d0e; }
-.badge-red { background: rgba(190,18,60,0.1); color: #be123c; }
+.badge-red { background: rgba(220,38,38,0.12); color: #dc2626; }
 .badge-gray { background: var(--surface-2); color: var(--text-muted); border: 0.5px solid var(--border); }
 .badge-gold { background: rgba(201,168,76,0.15); color: var(--accent-dark); border: 0.5px solid rgba(201,168,76,0.3); }
 

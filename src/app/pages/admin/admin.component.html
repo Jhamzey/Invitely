@@ -3,29 +3,18 @@
     <div class="as-logo serif">Innvitely<span> Admin</span></div>
 
     <nav class="as-nav">
-      <button class="as-link" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Overview
-      </button>
-      <button class="as-link" [class.active]="activeTab === 'hosts'" (click)="activeTab = 'hosts'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        Hosts
-      </button>
-      <button class="as-link" [class.active]="activeTab === 'vendors'" (click)="activeTab = 'vendors'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-        Vendors
-      </button>
-      <button class="as-link" [class.active]="activeTab === 'events'" (click)="activeTab = 'events'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Events
-      </button>
+      <button class="as-link" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">Overview</button>
+      <button class="as-link" [class.active]="activeTab === 'hosts'" (click)="activeTab = 'hosts'">Hosts</button>
+      <button class="as-link" [class.active]="activeTab === 'vendors'" (click)="activeTab = 'vendors'">Vendors</button>
+      <button class="as-link" [class.active]="activeTab === 'listings'" (click)="activeTab = 'listings'">Pending listings</button>
+      <button class="as-link" [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">Reviews</button>
+      <button class="as-link" [class.active]="activeTab === 'events'" (click)="activeTab = 'events'">Events</button>
+      <button class="as-link" [class.active]="activeTab === 'deleted'" (click)="activeTab = 'deleted'">Deleted accounts</button>
+      <button class="as-link" [class.active]="activeTab === 'audit'" (click)="activeTab = 'audit'">Audit log</button>
     </nav>
 
     <div class="as-spacer"></div>
-    <button class="as-logout" (click)="logout()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sign out
-    </button>
+    <button class="as-logout" (click)="logout()">Sign out</button>
   </aside>
 
   <main class="admin-main">
@@ -34,27 +23,17 @@
     <div *ngIf="activeTab === 'overview'">
       <h1 class="serif admin-title">Platform overview</h1>
       <div class="stat-grid">
-        <div class="stat-card">
-          <div class="sc-num">{{ stats.hosts }}</div>
-          <div class="sc-label">Host accounts</div>
-        </div>
-        <div class="stat-card">
-          <div class="sc-num">{{ stats.vendors }}</div>
-          <div class="sc-label">Vendor accounts</div>
-        </div>
-        <div class="stat-card">
-          <div class="sc-num">{{ stats.events }}</div>
-          <div class="sc-label">Events created</div>
-        </div>
-        <div class="stat-card">
-          <div class="sc-num">{{ stats.guests }}</div>
-          <div class="sc-label">Total guests</div>
-        </div>
-        <div class="stat-card highlight">
-          <div class="sc-num">₦{{ stats.revenue | number }}</div>
-          <div class="sc-label">Platform revenue</div>
-        </div>
+        <div class="stat-card"><div class="sc-num">{{ stats.hosts }}</div><div class="sc-label">Host accounts</div></div>
+        <div class="stat-card"><div class="sc-num">{{ stats.vendors }}</div><div class="sc-label">Vendor accounts</div></div>
+        <div class="stat-card"><div class="sc-num">{{ stats.events }}</div><div class="sc-label">Events created</div></div>
+        <div class="stat-card"><div class="sc-num">{{ stats.guests }}</div><div class="sc-label">Total guests</div></div>
+        <div class="stat-card"><div class="sc-num">{{ stats.pendingVendors }}</div><div class="sc-label">Pending vendor verification</div></div>
+        <div class="stat-card"><div class="sc-num">{{ stats.pendingListings }}</div><div class="sc-label">Pending listing verification</div></div>
+        <div class="stat-card"><div class="sc-num">{{ stats.suspendedUsers }}</div><div class="sc-label">Suspended accounts</div></div>
+        <div class="stat-card"><div class="sc-num">{{ stats.deletedUsers }}</div><div class="sc-label">Deleted accounts</div></div>
+        <div class="stat-card highlight"><div class="sc-num">₦{{ stats.revenue | number }}</div><div class="sc-label">Platform revenue</div></div>
       </div>
+      <p class="admin-note">Revenue tracking isn't wired to real payments yet — this will show ₦0 until that's built.</p>
     </div>
 
     <!-- HOSTS -->
@@ -64,19 +43,18 @@
         <input class="admin-search" [(ngModel)]="searchUsers" placeholder="Search hosts..." />
       </div>
       <div class="admin-table">
-        <div class="at-header">
-          <span>Name</span><span>Email</span><span>Plan</span><span>Events</span><span>Joined</span><span>Actions</span>
-        </div>
+        <div class="at-header"><span>Name</span><span>Email</span><span>Joined</span><span>Status</span><span>Actions</span></div>
         <div class="at-row" *ngFor="let u of filteredUsers">
           <span class="at-name">{{ u.name }}</span>
           <span class="at-email">{{ u.email }}</span>
-          <span><div class="badge badge-gold">{{ u.plan }}</div></span>
-          <span class="at-num">—</span>
           <span class="at-date">{{ u.createdAt | date:'MMM d, y' }}</span>
+          <span>
+            <div class="badge badge-red" *ngIf="u.suspended">Suspended</div>
+            <div class="badge badge-green" *ngIf="!u.suspended">Active</div>
+          </span>
           <span class="at-actions">
-            <button class="at-btn warn" (click)="suspendUser(u._id)" [disabled]="u.suspended">
-              {{ u.suspended ? 'Suspended' : 'Suspend' }}
-            </button>
+            <button class="at-btn warn" *ngIf="!u.suspended" (click)="suspendUser(u._id)">Suspend</button>
+            <button class="at-btn primary" *ngIf="u.suspended" (click)="unsuspendUser(u._id)">Unsuspend</button>
           </span>
         </div>
         <div class="at-empty" *ngIf="filteredUsers.length === 0">No hosts found</div>
@@ -97,24 +75,61 @@
         </div>
       </div>
       <div class="admin-table">
-        <div class="at-header">
-          <span>Business</span><span>Category</span><span>City</span><span>Plan</span><span>Status</span><span>Actions</span>
-        </div>
+        <div class="at-header"><span>Business</span><span>Category</span><span>City</span><span>Plan</span><span>Status</span><span>Actions</span></div>
         <div class="at-row" *ngFor="let v of filteredVendors">
           <span class="at-name">{{ v.businessName || v.name }}</span>
           <span class="at-email">{{ v.businessCategory | titlecase }}</span>
           <span>{{ v.businessCity }}</span>
-          <span><div class="badge" [class.badge-gold]="v.vendorPlan === 'pro'" [class.badge-gray]="v.vendorPlan !== 'pro'">{{ v.vendorPlan }}</div></span>
+          <span><div class="badge" [class.badge-gold]="v.vendorPlan === 'pro'" [class.badge-gray]="v.vendorPlan !== 'pro'">{{ v.vendorPlan || 'free' }}</div></span>
           <span>
             <div class="badge badge-green" *ngIf="v.verified">Verified</div>
-            <div class="badge badge-yellow" *ngIf="!v.verified">Pending</div>
+            <div class="badge badge-yellow" *ngIf="!v.verified && !v.suspended">Pending</div>
+            <div class="badge badge-red" *ngIf="v.suspended">Suspended</div>
           </span>
           <span class="at-actions">
             <button class="at-btn primary" *ngIf="!v.verified" (click)="verifyVendor(v._id)">Verify</button>
-            <button class="at-btn warn" *ngIf="v.verified" disabled>Verified</button>
+            <button class="at-btn warn" *ngIf="!v.suspended" (click)="rejectVendor(v._id)">Reject</button>
           </span>
         </div>
         <div class="at-empty" *ngIf="filteredVendors.length === 0">No vendors found</div>
+      </div>
+    </div>
+
+    <!-- PENDING LISTINGS -->
+    <div *ngIf="activeTab === 'listings'">
+      <h1 class="serif admin-title">Pending listing verification</h1>
+      <div class="admin-table" *ngFor="let v of pendingListingVendors">
+        <div class="at-header"><span colspan="5">{{ v.businessName || v.name }}</span></div>
+        <div class="at-row" *ngFor="let l of v.additionalListings; let i = index" [style.display]="l.verified ? 'none' : 'grid'">
+          <span class="at-name">{{ l.businessName }}</span>
+          <span class="at-email">{{ l.businessCategory }}</span>
+          <span>{{ l.businessCity?.join(', ') }}</span>
+          <span><div class="badge badge-yellow">Pending</div></span>
+          <span class="at-actions">
+            <button class="at-btn primary" (click)="verifyListing(v._id, i)">Verify</button>
+            <button class="at-btn warn" (click)="rejectListing(v._id, i)">Reject</button>
+          </span>
+        </div>
+      </div>
+      <div class="at-empty" *ngIf="pendingListingVendors.length === 0">No pending listings</div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div *ngIf="activeTab === 'reviews'">
+      <h1 class="serif admin-title">Reviews ({{ reviewsTotal }})</h1>
+      <div class="admin-table">
+        <div class="at-header"><span>Vendor</span><span>Reviewer</span><span>Rating</span><span>Comment</span><span>Date</span><span>Actions</span></div>
+        <div class="at-row" *ngFor="let r of reviews">
+          <span class="at-name">{{ r.vendorId?.businessName || r.vendorId?.name || 'Unknown' }}</span>
+          <span>{{ r.hostName }}</span>
+          <span>{{ r.rating }}★</span>
+          <span>{{ r.comment || '—' }}</span>
+          <span class="at-date">{{ r.createdAt | date:'MMM d, y' }}</span>
+          <span class="at-actions">
+            <button class="at-btn warn" (click)="removeReview(r._id)">Remove</button>
+          </span>
+        </div>
+        <div class="at-empty" *ngIf="reviews.length === 0">No reviews yet</div>
       </div>
     </div>
 
@@ -122,10 +137,58 @@
     <div *ngIf="activeTab === 'events'">
       <h1 class="serif admin-title">All events</h1>
       <div class="admin-table">
-        <div class="at-header">
-          <span>Event</span><span>Host</span><span>Type</span><span>Date</span><span>Guests</span><span>Status</span>
+        <div class="at-header"><span>Event</span><span>Host</span><span>Date</span><span>Venue</span><span>Created</span></div>
+        <div class="at-row" *ngFor="let e of events">
+          <span class="at-name">{{ e.title }}</span>
+          <span class="at-email">{{ e.hostId?.name }} ({{ e.hostId?.email }})</span>
+          <span class="at-date">{{ e.date | date:'MMM d, y' }}</span>
+          <span>{{ e.venue }}</span>
+          <span class="at-date">{{ e.createdAt | date:'MMM d, y' }}</span>
         </div>
-        <div class="at-empty">Connect backend admin/events endpoint to view</div>
+        <div class="at-empty" *ngIf="events.length === 0">No events found</div>
+      </div>
+    </div>
+
+    <!-- DELETED -->
+    <div *ngIf="activeTab === 'deleted'">
+      <h1 class="serif admin-title">Deleted accounts</h1>
+      <div class="admin-table">
+        <div class="at-header"><span>Was</span><span>Role</span><span>Deleted at</span><span>Logins</span></div>
+        <div class="at-row" *ngFor="let d of deletedUsers">
+          <span class="at-name">{{ d.deletedEmail }}</span>
+          <span>{{ d.role | titlecase }}</span>
+          <span class="at-date">{{ d.deletedAt | date:'MMM d, y, h:mm a' }}</span>
+          <span>{{ d.loginCount }}</span>
+        </div>
+        <div class="at-empty" *ngIf="deletedUsers.length === 0">No deleted accounts</div>
+      </div>
+    </div>
+
+    <!-- AUDIT LOG -->
+    <div *ngIf="activeTab === 'audit'">
+      <div class="admin-toolbar">
+        <h1 class="serif admin-title">Audit log</h1>
+        <div class="at-filters">
+          <input class="admin-search" [(ngModel)]="auditFilterAction" placeholder="Filter by action, e.g. suspend" (change)="loadAuditLogs()" />
+          <select [(ngModel)]="auditFilterRole" class="admin-filter" (change)="loadAuditLogs()">
+            <option value="">All roles</option>
+            <option value="admin">Admin</option>
+            <option value="host">Host</option>
+            <option value="vendor">Vendor</option>
+          </select>
+        </div>
+      </div>
+      <p class="admin-note">This trail is immutable — no one, including admins, can edit or delete an entry from here.</p>
+      <div class="admin-table">
+        <div class="at-header"><span>When</span><span>Actor</span><span>Action</span><span>Target</span><span>IP</span></div>
+        <div class="at-row" *ngFor="let l of auditLogs">
+          <span class="at-date">{{ l.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
+          <span class="at-name">{{ l.actorName }} ({{ l.actorRole }})</span>
+          <span>{{ l.action }}</span>
+          <span>{{ l.targetType }}</span>
+          <span class="at-date">{{ l.ip }}</span>
+        </div>
+        <div class="at-empty" *ngIf="auditLogs.length === 0">No log entries match this filter</div>
       </div>
     </div>
 

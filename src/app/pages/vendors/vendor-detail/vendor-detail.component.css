@@ -131,6 +131,32 @@
 .vd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .vd-btn { flex: 1; min-width: 140px; justify-content: center; padding: 12px; }
 
+.vd-fav { background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 10px 16px; cursor: pointer; font-family: var(--sans); transition: all 0.15s; }
+.vd-fav.active { background: rgba(220,38,38,0.08); border-color: #dc2626; color: #dc2626; }
+.vd-fav:disabled { opacity: 0.6; cursor: default; }
+
+.vd-reviews { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+.vd-sec-title { font-family: var(--serif); font-size: 1.2rem; margin-bottom: 16px; }
+
+.vd-review-form { margin-bottom: 24px; padding: 16px; background: var(--surface-2); border-radius: 10px; }
+.vd-star-input { display: flex; gap: 4px; font-size: 26px; margin-bottom: 10px; }
+.vd-star-input span { color: var(--border); cursor: pointer; transition: color 0.1s, transform 0.1s; user-select: none; }
+.vd-star-input span:hover { transform: scale(1.15); }
+.vd-star-input span.filled { color: var(--accent); }
+.vd-review-form textarea { width: 100%; min-height: 80px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--sans); resize: vertical; margin-bottom: 10px; box-sizing: border-box; }
+.vd-review-error { color: #dc2626; font-size: 0.85rem; margin-bottom: 8px; }
+.vd-review-cta { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+.vd-review-cta a { color: var(--accent); }
+
+.vd-review-list { display: flex; flex-direction: column; gap: 16px; }
+.vd-review { padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.vd-review:last-child { border-bottom: none; }
+.vd-review-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.vd-review-name { font-weight: 600; font-size: 0.9rem; }
+.vd-review-stars { color: var(--accent); font-size: 0.9rem; letter-spacing: 1px; }
+.vd-review-comment { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+.vd-review-empty { color: var(--text-muted); font-size: 0.9rem; }
+
 /* Mobile */
 @media (max-width: 768px) {
   .vd-layout { grid-template-columns: 1fr; gap: 24px; padding: 20px 16px; }

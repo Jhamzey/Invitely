@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { AuthService } from '../../core/services/auth.service';
+import { PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-landing',
@@ -62,6 +64,9 @@ export class LandingComponent implements OnInit, OnDestroy {
 
   get currentYear(): number { return new Date().getFullYear(); }
 
+  private platformId = inject(PLATFORM_ID);
+  private intervalId: any;
+
   constructor(
     public themeService: ThemeService,
     private auth: AuthService,
@@ -69,15 +74,15 @@ export class LandingComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.themeService.startRotation();
-    const interval = setInterval(() => {
+    this.intervalId = setInterval(() => {
       this.activeThemeId = this.themeService.current().id;
     }, 500);
-    (this as any)._interval = interval;
   }
 
   ngOnDestroy() {
-    clearInterval((this as any)._interval);
+    if (this.intervalId) clearInterval(this.intervalId);
     this.themeService.stopRotation();
   }
 

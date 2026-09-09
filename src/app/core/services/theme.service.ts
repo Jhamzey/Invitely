@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface Theme {
   id: string;
@@ -11,7 +12,9 @@ export interface Theme {
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  // Landing page rotating themes — ONLY used on landing
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
   readonly themes: Theme[] = [
     { id: 'ivory', label: 'Ivory Classic', dataTheme: '', accentColor: '#8B7355', previewBg: 'linear-gradient(135deg,#F8F3E8,#E8DFD0)', previewColor: '#3D2E1A' },
     { id: 'gold', label: 'Golden Hour', dataTheme: '', accentColor: '#C9A84C', previewBg: 'linear-gradient(135deg,#2A1F0E,#4A3520)', previewColor: '#F5E6C4' },
@@ -24,21 +27,22 @@ export class ThemeService {
   current = signal<Theme>(this.themes[0]);
   private interval: any;
 
-  // Dark mode — separate from landing themes
   isDark = signal<boolean>(this.getStoredDarkMode());
 
   private getStoredDarkMode(): boolean {
+    if (!this.isBrowser) return false;
     return localStorage.getItem('invitely_dark') === 'true';
   }
 
   toggleDarkMode() {
     const next = !this.isDark();
     this.isDark.set(next);
-    localStorage.setItem('invitely_dark', String(next));
+    if (this.isBrowser) localStorage.setItem('invitely_dark', String(next));
     this.applyDarkMode(next);
   }
 
   applyDarkMode(dark: boolean) {
+    if (!this.isBrowser) return;
     if (dark) {
       document.documentElement.setAttribute('data-mode', 'dark');
     } else {
@@ -50,9 +54,8 @@ export class ThemeService {
     this.applyDarkMode(this.isDark());
   }
 
-  // Landing page theme rotation
   startRotation() {
-    // Reset any data-theme on start
+    if (!this.isBrowser) return;
     document.documentElement.removeAttribute('data-theme');
     let i = 0;
     this.interval = setInterval(() => {
@@ -62,8 +65,8 @@ export class ThemeService {
   }
 
   stopRotation() {
+    if (!this.isBrowser) return;
     if (this.interval) clearInterval(this.interval);
-    // Clear landing theme on leave — restore dark mode if needed
     document.documentElement.removeAttribute('data-theme');
     this.applyDarkMode(this.isDark());
   }

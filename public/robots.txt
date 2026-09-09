@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/login
+Disallow: /dashboard
+Disallow: /vendor/dashboard
+Disallow: /profile
+Disallow: /event/
+
+Sitemap: https://invitely-eight-nu.vercel.app/sitemap.xml

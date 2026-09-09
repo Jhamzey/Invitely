@@ -12,4 +12,6 @@ export interface Vendor {
   email: string;
   instagram: string;
   verified: boolean;
+  address?: string;
+  state?: string;
 }

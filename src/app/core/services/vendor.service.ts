@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Vendor } from '../models/vendor.model';
-import { environment } from '../../../environments/environment.prod';
+import { Review } from '../models/review.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class VendorService {
@@ -30,5 +31,27 @@ export class VendorService {
 
   create(data: Partial<Vendor>) {
     return this.http.post<Vendor>(this.API, data, { headers: this.headers() });
+  }
+
+  getReviews(vendorId: string) {
+    return this.http.get<Review[]>(`${environment.apiUrl}/reviews/vendor/${vendorId}`);
+  }
+
+  submitReview(vendorId: string, data: { rating: number; comment: string }) {
+    return this.http.post<{ success: boolean; rating: number; reviewCount: number }>(
+      `${environment.apiUrl}/reviews/vendor/${vendorId}`, data, { headers: this.headers() }
+    );
+  }
+
+  getFavorites() {
+    return this.http.get<Vendor[]>(`${environment.apiUrl}/users/favorites`, { headers: this.headers() });
+  }
+
+  addFavorite(vendorId: string) {
+    return this.http.post<{ success: boolean }>(`${environment.apiUrl}/users/favorites/${vendorId}`, {}, { headers: this.headers() });
+  }
+
+  removeFavorite(vendorId: string) {
+    return this.http.delete<{ success: boolean }>(`${environment.apiUrl}/users/favorites/${vendorId}`, { headers: this.headers() });
   }
 }

@@ -52,7 +52,8 @@
         <div class="vd-meta-row">
           <div class="vdm-item">
             <div class="vdm-label">Location</div>
-            <div class="vdm-val">📍 {{ vendor.city }}</div>
+            <div class="vdm-val" *ngIf="vendor.address">📍 {{ vendor.address }}</div>
+            <div class="vdm-val">{{ vendor.address ? '' : '📍 ' }}{{ vendor.city }}{{ vendor.state ? ', ' + vendor.state : '' }}</div>
           </div>
           <div class="vdm-item">
             <div class="vdm-label">Starting from</div>
@@ -78,9 +79,23 @@
 
         <!-- Actions -->
         <div class="vd-actions">
-          <button class="btn btn-primary vd-btn" (click)="contact()">
+          <button class="btn btn-icon vd-fav" [class.active]="isFavorite" [disabled]="favoriteBusy" (click)="toggleFavorite()">
+            {{ isFavorite ? '♥ Saved' : '♡ Save' }}
+          </button>
+          <button class="btn btn-primary vd-btn" (click)="requestContact('whatsapp')">
             📱 WhatsApp enquiry
           </button>
+          <button class="btn btn-outline vd-btn" (click)="requestContact('call')">
+            📞 Call
+          </button>
+          <app-contact-disclaimer
+            *ngIf="showDisclaimer"
+            [vendorName]="vendor.name"
+            [method]="pendingMethod === 'call' ? 'phone call' : 'WhatsApp'"
+            [verified]="vendor.verified"
+            (proceed)="confirmContact($event)"
+            (cancel)="cancelContact()">
+          </app-contact-disclaimer>         
           <a *ngIf="vendor.instagram"
             [href]="'https://instagram.com/' + vendor.instagram"
             target="_blank"
@@ -92,6 +107,36 @@
             class="btn btn-outline vd-btn">
             Email
           </a>
+        </div>
+
+        <!-- Reviews -->
+        <div class="vd-reviews">
+          <h3 class="vd-sec-title">Reviews {{ vendor.reviewCount ? '(' + vendor.reviewCount + ')' : '' }}</h3>
+
+          <div *ngIf="isLoggedIn" class="vd-review-form">
+            <div class="vd-star-input">
+              <span *ngFor="let n of [1,2,3,4,5]" (click)="setMyRating(n)" [class.filled]="n <= myRating">★</span>
+            </div>
+            <textarea [(ngModel)]="myComment" maxlength="1000" placeholder="Share how your experience with this vendor went..."></textarea>
+            <p class="vd-review-error" *ngIf="reviewError">{{ reviewError }}</p>
+            <button class="btn btn-primary" [disabled]="submittingReview" (click)="submitReview()">
+              {{ submittingReview ? 'Submitting...' : 'Submit review' }}
+            </button>
+          </div>
+          <p *ngIf="!isLoggedIn" class="vd-review-cta">
+            <a routerLink="/auth/login">Log in</a> to leave a review for this vendor.
+          </p>
+
+          <div class="vd-review-list" *ngIf="!reviewsLoading">
+            <div class="vd-review" *ngFor="let r of reviews">
+              <div class="vd-review-head">
+                <span class="vd-review-name">{{ r.hostName }}</span>
+                <span class="vd-review-stars">{{ getStars(r.rating) }}</span>
+              </div>
+              <p class="vd-review-comment" *ngIf="r.comment">{{ r.comment }}</p>
+            </div>
+            <p *ngIf="reviews.length === 0" class="vd-review-empty">No reviews yet — be the first to share your experience.</p>
+          </div>
         </div>
       </div>
     </div>

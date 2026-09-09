@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   HostListener
 } from '@angular/core';
 
@@ -14,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 
 import { EventService } from '../../core/services/event.service';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { Event } from '../../core/models/event.model';
 
 
@@ -37,7 +39,7 @@ type EventType =
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   events: Event[] = [];
   selectedEventId = '';
@@ -53,12 +55,6 @@ export class DashboardComponent implements OnInit {
 
   readonly loadingSkeletons = [1, 2, 3];
   readonly momentSkeletons = [1, 2, 3, 4, 5, 6];
-
-  notifications = [
-    { icon: 'check', text: "Zainab Okafor has RSVP'd attending", time: '2 min ago' },
-    { icon: 'scan',  text: 'Tunde Nwosu arrived — QR scanned',  time: '15 min ago' },
-    { icon: 'star',  text: 'New asoebi order from Fatima Cole',  time: '1 hr ago' }
-  ];
 
   newEvent: {
     type: EventType; title: string; coupleNames: string;
@@ -86,10 +82,18 @@ export class DashboardComponent implements OnInit {
   constructor(
     public auth: AuthService,
     private eventService: EventService,
+    public notificationService: NotificationService,
     private router: Router
   ) {}
 
-  ngOnInit(): void { this.loadEvents(); }
+  ngOnInit(): void {
+    this.loadEvents();
+    this.notificationService.startPolling();
+  }
+
+  ngOnDestroy(): void {
+    this.notificationService.stopPolling();
+  }
 
   loadEvents(): void {
     this.loading = true;
@@ -105,6 +109,12 @@ export class DashboardComponent implements OnInit {
   toggleNotifications(event: MouseEvent): void {
     event.stopPropagation();
     this.showNotifications = !this.showNotifications;
+    if (this.showNotifications) this.notificationService.markAllRead();
+  }
+
+  openNotification(link: string): void {
+    this.showNotifications = false;
+    if (link) this.router.navigateByUrl(link);
   }
 
   toggleSidebar(): void { this.sidebarOpen = !this.sidebarOpen; }
@@ -142,7 +152,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openMomentFull(): void { this.router.navigate(['/moments']); }
-  clearNotifications(): void { this.notifications = []; this.showNotifications = false; }
+  clearNotifications(): void { this.notificationService.clearAll(); this.showNotifications = false; }
 
   createEvent(): void {
     if (!this.newEvent.title.trim() || !this.newEvent.date || !this.newEvent.venue.trim()) {

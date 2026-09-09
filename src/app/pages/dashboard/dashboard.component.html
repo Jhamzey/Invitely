@@ -107,30 +107,23 @@
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
-          <div class="nb-dot" *ngIf="notifications.length > 0">
-            {{ notifications.length > 9 ? '9+' : notifications.length }}
+          <div class="nb-dot" *ngIf="(notificationService.unreadCount$ | async) as count" >
+            {{ count > 9 ? '9+' : count }}
           </div>
           <div class="notif-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
             <div class="nd-header">
               <span>Notifications</span>
               <button type="button" class="nd-clear" (click)="clearNotifications()">Clear all</button>
             </div>
-            <div class="nd-empty" *ngIf="notifications.length === 0">No new notifications</div>
-            <div class="nd-item" *ngFor="let n of notifications">
-              <svg class="ndi-icon" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline *ngIf="n.icon === 'check'" points="20 6 9 17 4 12"/>
-                <path *ngIf="n.icon === 'scan'" d="M3 9V5a2 2 0 0 1 2-2h4M15 3h4a2 2 0 0 1 2 2v4M21 15v4a2 2 0 0 1-2 2h-4M9 21H5a2 2 0 0 1-2-2v-4"/>
-                <polygon *ngIf="n.icon === 'star'" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
+            <div class="nd-empty" *ngIf="(notificationService.notifications$ | async)?.length === 0">No new notifications</div>
+            <div class="nd-item" *ngFor="let n of (notificationService.notifications$ | async)" [class.unread]="!n.read" (click)="openNotification(n.link)">
               <div class="ndi-body">
-                <div class="ndi-text">{{ n.text }}</div>
-                <div class="ndi-time">{{ n.time }}</div>
+                <div class="ndi-text">{{ n.message }}</div>
+                <div class="ndi-time">{{ n.createdAt | date:'short' }}</div>
               </div>
             </div>
           </div>
         </div>
-
         <button type="button" class="btn btn-primary" (click)="showNewModal = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

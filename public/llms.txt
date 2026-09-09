@@ -1,0 +1,8 @@
+# Invitely
+
+> Invitely is a digital invitations platform for weddings, birthdays, and owambe (Nigerian celebrations). Hosts build custom invitations, send them via WhatsApp/SMS/email, manage guest lists and seating, issue unique QR codes for entry, and browse a vendor marketplace for caterers, halls, and photographers. Guests view live countdowns, get turn-by-turn directions, and can order asoebi payments directly from their invite.
+
+## Key pages
+- [Home](https://invitely-eight-nu.vercel.app/): product overview and signup
+- [Vendor registration](https://invitely-eight-nu.vercel.app/vendor/register): for businesses joining the marketplace
+- [Support](https://invitely-eight-nu.vercel.app/support): help center, privacy policy, terms of service
