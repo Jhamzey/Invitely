@@ -77,7 +77,11 @@ export class EventService {
   verifyAsoebiPayment(token: string, itemName: string, quantity: number, reference: string) {
     return this.http.post<{ success: boolean }>(`${this.API}/invite/${token}/asoebi/verify`, { itemName, quantity, reference });
   }
-  
+
+  verifyGift(token: string, amount: number, reference: string) {
+    return this.http.post<{ success: boolean }>(`${this.API}/invite/${token}/gift/verify`, { amount, reference });
+  }
+
   delete(id: string) {
     return this.http.delete(`${this.API}/${id}`, { headers: this.headers() });
   }

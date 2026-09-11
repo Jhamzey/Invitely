@@ -38,6 +38,12 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   asoebiError = '';
   payerEmail = '';
 
+  giftAmount = 5000;
+  giftCustom = false;
+  giftSubmitting = false;
+  giftDone = false;
+  giftError = '';
+
   countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   private countdownInterval: any;
 
@@ -141,6 +147,34 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
     this.eventService.verifyAsoebiPayment(this.token, this.asoebiSelected, this.asoebiQuantity, reference).subscribe({
       next: () => { this.asoebiDone = true; this.asoebiSubmitting = false; },
       error: err => { this.asoebiError = err.error?.error || 'Payment went through but we could not confirm your order — please contact the host directly.'; this.asoebiSubmitting = false; }
+    });
+  }
+
+  payGift() {
+    if (!this.isBrowser || this.giftSubmitting || this.giftAmount < 100) return;
+    const email = this.guest.email || this.payerEmail;
+    if (!email) { this.giftError = 'Please enter your email to continue.'; return; }
+
+    this.giftError = '';
+    this.loadPaystackScript(() => {
+      const handler = (window as any).PaystackPop.setup({
+        key: environment.paystackPublicKey,
+        email,
+        amount: this.giftAmount * 100,
+        currency: 'NGN',
+        metadata: { guestName: this.guest.name },
+        callback: (response: any) => this.verifyGiftPayment(response.reference),
+        onClose: () => {},
+      });
+      handler.openIframe();
+    });
+  }
+
+  private verifyGiftPayment(reference: string) {
+    this.giftSubmitting = true;
+    this.eventService.verifyGift(this.token, this.giftAmount, reference).subscribe({
+      next: () => { this.giftDone = true; this.giftSubmitting = false; },
+      error: err => { this.giftError = err.error?.error || 'Payment went through but we could not confirm it — please contact support.'; this.giftSubmitting = false; }
     });
   }
 

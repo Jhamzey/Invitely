@@ -124,7 +124,7 @@
           ✗ Sorry, I can't make it
         </button>
       </div>
-      <div class="meal-select" *ngIf="rsvpChoice === 'attending' && event.meals?.length">
+      <div class="meal-select" *ngIf="rsvpChoice === 'attending' && event.meals.length">
         <label>Meal preference</label>
         <div class="meal-opts">
           <button *ngFor="let m of event.meals"
@@ -180,7 +180,7 @@
     </div>
 
     <!-- Asoebi -->
-    <div class="asoebi-section" *ngIf="event.asoebi?.length && guest.rsvp === 'attending'">
+    <div class="asoebi-section" *ngIf="event.asoebi.length && guest.rsvp === 'attending'">
       <div class="section-title serif">Asoebi</div>
       <p class="as-intro">Show your support — order your asoebi directly here.</p>
       <div class="asoebi-options">
@@ -208,6 +208,29 @@
       </button>
       <div class="ao-error" *ngIf="asoebiError">{{ asoebiError }}</div>
       <div class="ao-done" *ngIf="asoebiDone">✓ Payment received! The host has been notified.</div>
+    </div>
+
+    <div class="gift-section" *ngIf="event.giftEnabled && guest.rsvp === 'attending' && !giftDone">
+      <div class="section-title">Send a gift</div>
+      <p class="as-intro">Innvitely gives you the option to send a small gift to help celebrate this occasion — this is entirely optional, and not a request from the host.</p>
+      <div class="meal-opts" style="margin-bottom:12px;">
+        <button class="meal-opt" *ngFor="let a of [1000, 5000, 10000, 20000]" [class.active]="giftAmount === a && !giftCustom" (click)="giftAmount = a; giftCustom = false">₦{{ a | number }}</button>
+        <button class="meal-opt" [class.active]="giftCustom" (click)="giftCustom = true">Custom</button>
+      </div>
+      <div class="form-group" *ngIf="giftCustom">
+        <input type="number" min="100" [(ngModel)]="giftAmount" placeholder="Enter amount in ₦" />
+      </div>
+      <div class="form-group" *ngIf="!guest.email">
+        <label>Your email (for payment receipt)</label>
+        <input [(ngModel)]="payerEmail" placeholder="you@example.com" type="email" />
+      </div>
+      <button class="btn btn-gold ao-btn" [disabled]="giftSubmitting" (click)="payGift()">
+        {{ giftSubmitting ? 'Confirming...' : 'Send ₦' + (giftAmount | number) }}
+      </button>
+      <div class="ao-error" *ngIf="giftError">{{ giftError }}</div>
+    </div>
+    <div class="gift-section" *ngIf="event.giftEnabled && giftDone">
+      <div class="ao-done">✓ Thank you — your gift has been sent!</div>
     </div>
 
   </div>
