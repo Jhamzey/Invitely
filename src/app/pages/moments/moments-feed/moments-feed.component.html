@@ -12,12 +12,10 @@
 
   <div class="feed-body container">
 
-    <!-- Loading -->
     <div class="feed-grid" *ngIf="loading">
       <div class="skeleton" *ngFor="let s of [1,2,3,4,5,6,7,8,9]" style="aspect-ratio:1; border-radius:6px;"></div>
     </div>
 
-    <!-- Empty -->
     <div class="feed-empty" *ngIf="!loading && posts.length === 0">
       <div style="font-size:60px;">📸</div>
       <h2 class="serif">No moments yet</h2>
@@ -25,18 +23,15 @@
       <p class="fe-note" *ngIf="!auth.isLoggedIn()">
         <a routerLink="/auth/register">Create an account</a> to start sharing moments.
       </p>
-      <p class="fe-note" *ngIf="auth.isLoggedIn() && auth.user()?.plan === 'free'">
-        Upgrade to Standard or Premium to post moments.
-      </p>
     </div>
 
     <!-- Grid view -->
     <div class="feed-grid" *ngIf="!loading && view === 'grid' && posts.length > 0">
-      <div class="fg-cell" *ngFor="let p of posts" (click)="selectedPost = p">
-        <img [src]="p.imageUrl" [alt]="p.caption" loading="lazy" />
+      <div class="fg-cell" *ngFor="let p of posts" (click)="openPost(p)">
+        <img [src]="p.imageUrl" [alt]="p.caption || (p.eventTitle + ' moment')" loading="lazy" />
         <div class="fg-overlay">
-          <div class="fg-stat">❤️ {{ p.likes }}</div>
-          <div class="fg-stat">💬 {{ p.comments?.length || 0 }}</div>
+          <div class="fg-stat">❤️ {{ p.likesCount }}</div>
+          <div class="fg-stat">💬 {{ p.commentsCount }}</div>
         </div>
       </div>
     </div>
@@ -45,22 +40,53 @@
     <div class="feed-posts" *ngIf="!loading && view === 'feed' && posts.length > 0">
       <div class="fp-card" *ngFor="let p of posts">
         <div class="fpc-header">
-          <div class="fpc-avatar">{{ p.postedBy?.charAt(0) }}</div>
+          <div class="fpc-avatar">{{ p.postedBy.charAt(0) }}</div>
           <div>
             <div class="fpc-name">{{ p.postedBy }}</div>
-            <div class="fpc-meta">{{ p.eventType }} · {{ p.createdAt | date:'MMM d' }}</div>
+            <div class="fpc-meta">{{ p.eventTitle }} · {{ p.createdAt | date:'MMM d' }}</div>
           </div>
         </div>
-        <img [src]="p.imageUrl" class="fpc-img" [alt]="p.caption" loading="lazy" />
+        <img [src]="p.imageUrl" class="fpc-img" [alt]="p.caption || (p.eventTitle + ' moment')" loading="lazy" (click)="openPost(p)" />
         <div class="fpc-body">
           <div class="fpc-actions">
-            <button class="fpa-btn" (click)="like(p)" [class.liked]="p.liked">❤️ {{ p.likes }}</button>
-            <button class="fpa-btn">💬 {{ p.comments?.length || 0 }}</button>
+            <button class="fpa-btn" (click)="like(p)" [class.liked]="p.liked">❤️ {{ p.likesCount }}</button>
+            <button class="fpa-btn" (click)="openPost(p)">💬 {{ p.commentsCount }}</button>
           </div>
           <div class="fpc-caption" *ngIf="p.caption">{{ p.caption }}</div>
+          <div class="fpc-comments-preview" *ngIf="p.comments && p.comments.length > 0">
+            <div class="fpc-comment" *ngFor="let c of p.comments.slice(-2)">
+              <strong>{{ c.authorName }}</strong> {{ c.text }}
+            </div>
+            <a class="fpc-viewall" *ngIf="p.commentsCount > 2" (click)="openPost(p)">View all {{ p.commentsCount }} comments</a>
+          </div>
           <div class="fpc-comment-input" *ngIf="auth.isLoggedIn()">
             <input [(ngModel)]="comment" placeholder="Add a comment..." (keyup.enter)="addComment(p)" />
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="moment-lightbox" *ngIf="selectedPost" (click)="closePost()">
+    <div class="ml-content" (click)="$event.stopPropagation()">
+      <button class="ml-close" (click)="closePost()">✕</button>
+      <img [src]="selectedPost.imageUrl" [alt]="selectedPost.caption || 'moment'" />
+      <div class="ml-body">
+        <div class="fpc-name">{{ selectedPost.postedBy }} · {{ selectedPost.eventTitle }}</div>
+        <div class="fpc-caption" *ngIf="selectedPost.caption">{{ selectedPost.caption }}</div>
+        <div class="fpc-actions">
+          <button class="fpa-btn" (click)="like(selectedPost)" [class.liked]="selectedPost.liked">❤️ {{ selectedPost.likesCount }}</button>
+          <span class="fpa-btn">💬 {{ selectedPost.commentsCount }}</span>
+        </div>
+        <div class="ml-comments">
+          <div class="fpc-comment" *ngFor="let c of selectedPost.comments">
+            <strong>{{ c.authorName }}</strong> {{ c.text }}
+          </div>
+          <p *ngIf="!selectedPost.comments?.length" class="fe-note">No comments yet.</p>
+        </div>
+        <div class="fpc-comment-input" *ngIf="auth.isLoggedIn()">
+          <input [(ngModel)]="comment" placeholder="Add a comment..." (keyup.enter)="addComment(selectedPost)" />
         </div>
       </div>
     </div>

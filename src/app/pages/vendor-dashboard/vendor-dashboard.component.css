@@ -31,6 +31,10 @@
   transition: left 0.3s;
 }
 
+.welcome-banner { display: flex; justify-content: space-between; align-items: center; gap: 16px; background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.welcome-banner strong { font-size: 15px; }
+.welcome-banner p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
 .vds-logo {
   font-size: 20px;
   font-weight: 500;

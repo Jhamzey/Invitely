@@ -15,6 +15,16 @@
   animation: spin 0.8s linear infinite;
 }
 
+@media (max-width: 480px) {
+  .invite-hero { padding: 28px 16px 24px; }
+  .ih-names { font-size: 2rem; word-wrap: break-word; }
+  .invite-body { padding: 20px 14px; gap: 22px; }
+  .invite-footer { padding: 24px 16px; }
+  .if-names { font-size: 1.4rem; }
+  .qrs-body { flex-direction: column; align-items: center; text-align: center; }
+  .qr-image { width: 120px; height: 120px; }
+}
+
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .invite-notfound {

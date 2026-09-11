@@ -193,11 +193,21 @@
           <div class="ao-desc" *ngIf="a.description">{{ a.description }}</div>
         </div>
       </div>
-      <button class="btn btn-gold ao-btn" *ngIf="asoebiSelected && !asoebiDone" [disabled]="asoebiSubmitting" (click)="orderAsoebi()">
-        {{ asoebiSubmitting ? 'Placing order...' : 'Order ' + asoebiSelected + ' — proceed to payment' }}
+      <div class="ao-qty" *ngIf="asoebiSelected && !asoebiDone" style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <label style="margin:0;">Quantity</label>
+        <button class="btn btn-outline" style="padding:4px 12px;" (click)="asoebiQuantity = Math.max(1, asoebiQuantity - 1)">−</button>
+        <span>{{ asoebiQuantity }}</span>
+        <button class="btn btn-outline" style="padding:4px 12px;" (click)="asoebiQuantity = asoebiQuantity + 1">+</button>
+      </div>
+      <div class="form-group" *ngIf="asoebiSelected && !asoebiDone && !guest.email">
+        <label>Your email (for payment receipt)</label>
+        <input [(ngModel)]="payerEmail" placeholder="you@example.com" type="email" />
+      </div>
+      <button class="btn btn-gold ao-btn" *ngIf="asoebiSelected && !asoebiDone" [disabled]="asoebiSubmitting" (click)="payAsoebi()">
+       {{ asoebiSubmitting ? 'Confirming payment...' : 'Pay ₦' + (asoebiSelectedPrice * asoebiQuantity | number) + ' now' }}
       </button>
       <div class="ao-error" *ngIf="asoebiError">{{ asoebiError }}</div>
-      <div class="ao-done" *ngIf="asoebiDone">✓ Order received! The host will contact you for payment.</div>
+      <div class="ao-done" *ngIf="asoebiDone">✓ Payment received! The host has been notified.</div>
     </div>
 
   </div>

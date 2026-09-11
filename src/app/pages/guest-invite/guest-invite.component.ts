@@ -5,6 +5,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
 import { GuestService } from '../../core/services/guest.service';
 import { Event } from '../../core/models/event.model';
+import { environment } from '../../../environments/environment';
 import { Guest } from '../../core/models/guest.model';
 
 @Component({
@@ -17,6 +18,7 @@ import { Guest } from '../../core/models/guest.model';
 export class GuestInviteComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
+  readonly Math = Math;
 
   token = '';
   event!: Event;
@@ -30,9 +32,11 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   submittingRsvp = false;
 
   asoebiSelected = '';
+  asoebiQuantity = 1;
   asoebiDone = false;
   asoebiSubmitting = false;
   asoebiError = '';
+  payerEmail = '';
 
   countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   private countdownInterval: any;
@@ -74,6 +78,10 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
     return map[this.event?.theme] || map['ivory'];
   }
 
+  get asoebiSelectedPrice(): number {
+    return this.event?.asoebi?.find(a => a.name === this.asoebiSelected)?.price || 0;
+  }
+
   startCountdown() {
     if (!this.isBrowser) return;
     const update = () => {
@@ -97,13 +105,42 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
     });
   }
 
-  orderAsoebi() {
-    if (!this.asoebiSelected || this.asoebiSubmitting) return;
-    this.asoebiSubmitting = true;
+  payAsoebi() {
+    if (!this.asoebiSelected || !this.isBrowser || this.asoebiSubmitting) return;
+    const item = this.event.asoebi?.find(a => a.name === this.asoebiSelected);
+    if (!item) return;
+
+    const email = this.guest.email || this.payerEmail;
+    if (!email) { this.asoebiError = 'Please enter your email to continue.'; return; }
+
     this.asoebiError = '';
-    this.eventService.orderAsoebi(this.token, this.asoebiSelected).subscribe({
+    this.loadPaystackScript(() => {
+      const handler = (window as any).PaystackPop.setup({
+        key: environment.paystackPublicKey,
+        email,
+        amount: item.price * this.asoebiQuantity * 100,
+        currency: 'NGN',
+        metadata: { guestName: this.guest.name, itemName: item.name, quantity: this.asoebiQuantity },
+        callback: (response: any) => this.verifyAsoebiPayment(response.reference),
+        onClose: () => {},
+      });
+      handler.openIframe();
+    });
+  }
+
+  private loadPaystackScript(cb: () => void) {
+    if ((window as any).PaystackPop) { cb(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.onload = cb;
+    document.body.appendChild(script);
+  }
+
+  private verifyAsoebiPayment(reference: string) {
+    this.asoebiSubmitting = true;
+    this.eventService.verifyAsoebiPayment(this.token, this.asoebiSelected, this.asoebiQuantity, reference).subscribe({
       next: () => { this.asoebiDone = true; this.asoebiSubmitting = false; },
-      error: err => { this.asoebiError = err.error?.error || 'Could not place your order. Please try again.'; this.asoebiSubmitting = false; }
+      error: err => { this.asoebiError = err.error?.error || 'Payment went through but we could not confirm your order — please contact the host directly.'; this.asoebiSubmitting = false; }
     });
   }
 

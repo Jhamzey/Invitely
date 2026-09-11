@@ -18,6 +18,23 @@ export class EventService {
     return new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken()}` });
   }
 
+  private optionalHeaders() {
+    const token = this.auth.getToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+  }
+
+  getMomentsFeed() {
+    return this.http.get<any[]>(`${this.API}/moments/feed`, { headers: this.optionalHeaders() });
+  }
+
+  toggleMomentLike(eventId: string, momentId: string) {
+    return this.http.post<{ liked: boolean; likesCount: number }>(`${this.API}/${eventId}/moments/${momentId}/like`, {}, { headers: this.headers() });
+  }
+
+  addMomentComment(eventId: string, momentId: string, text: string) {
+    return this.http.post<{ authorName: string; text: string; createdAt: string }>(`${this.API}/${eventId}/moments/${momentId}/comments`, { text }, { headers: this.headers() });
+  }
+
   getAll() {
     return this.http.get<Event[]>(this.API, { headers: this.headers() });
   }
@@ -40,11 +57,12 @@ export class EventService {
     return this.http.post<Event>(`${this.API}/${id}/cover`, fd, { headers: this.fileHeaders() });
   }
 
-  uploadMoment(id: string, file: File, caption: string, postedBy: string) {
+  uploadMoment(id: string, file: File, caption: string, postedBy: string, taggedVendors: string = '') {
     const fd = new FormData();
     fd.append('photo', file);
     fd.append('caption', caption);
     fd.append('postedBy', postedBy);
+    fd.append('taggedVendors', taggedVendors);
     return this.http.post<Event>(`${this.API}/${id}/moments`, fd, { headers: this.fileHeaders() });
   }
 
@@ -56,10 +74,10 @@ export class EventService {
     return this.http.get<{ event: Event; guest: any }>(`${this.API}/invite/${token}`);
   }
 
-  orderAsoebi(token: string, itemName: string) {
-    return this.http.post<{ success: boolean }>(`${this.API}/invite/${token}/asoebi`, { itemName });
+  verifyAsoebiPayment(token: string, itemName: string, quantity: number, reference: string) {
+    return this.http.post<{ success: boolean }>(`${this.API}/invite/${token}/asoebi/verify`, { itemName, quantity, reference });
   }
-
+  
   delete(id: string) {
     return this.http.delete(`${this.API}/${id}`, { headers: this.headers() });
   }

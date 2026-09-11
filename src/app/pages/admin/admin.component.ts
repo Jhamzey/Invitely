@@ -15,7 +15,11 @@ import { environment } from '../../../environments/environment';
 export class AdminComponent implements OnInit, OnDestroy {
   activeTab = 'overview';
   loading = true;
+  sidebarOpen = false;
   private inactivityTimer: any;
+
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar() { this.sidebarOpen = false; }
 
   stats = { hosts: 0, vendors: 0, events: 0, guests: 0, revenue: 0, deletedUsers: 0, suspendedUsers: 0, pendingVendors: 0, pendingListings: 0 };
   users: any[] = [];
@@ -26,6 +30,9 @@ export class AdminComponent implements OnInit, OnDestroy {
   auditTotal = 0;
   reviews: any[] = [];
   reviewsTotal = 0;
+  verifications: any[] = [];
+  verificationFilter = 'pending';
+  verificationNotes: Record<string, string> = {};
 
   searchUsers = '';
   searchVendors = '';
@@ -55,6 +62,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.loadDeletedUsers();
     this.loadAuditLogs();
     this.loadReviews();
+    this.loadVerifications();
   }
 
   ngOnDestroy() { clearTimeout(this.inactivityTimer); }
@@ -117,6 +125,26 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.http.get<any>(`${this.API}/admin/reviews`, { headers: this.headers() }).subscribe({
       next: res => { this.reviews = res.reviews || []; this.reviewsTotal = res.total || 0; },
       error: () => {}
+    });
+  }
+
+  loadVerifications() {
+    this.http.get<any[]>(`${this.API}/admin/verifications?status=${this.verificationFilter}`, { headers: this.headers() }).subscribe({
+      next: res => this.verifications = res || [],
+      error: () => {}
+    });
+  }
+
+  reviewVerification(userId: string, status: 'verified' | 'rejected' | 'escalated') {
+    const notes = this.verificationNotes[userId] || '';
+    if (status === 'rejected' && !confirm('Reject this verification submission?')) return;
+    this.http.patch(`${this.API}/admin/verifications/${userId}`, { status, adminNotes: notes }, { headers: this.headers() }).subscribe({
+      next: () => {
+        this.verifications = this.verifications.filter(v => v._id !== userId);
+        this.loadAuditLogs();
+        this.loadUsers();
+        this.loadVendors();
+      }
     });
   }
 

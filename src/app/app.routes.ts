@@ -35,6 +35,9 @@ export const routes: Routes = [
   { path: 'vendor/dashboard', loadComponent: () => import('./pages/vendor-dashboard/vendor-dashboard.component').then(m => m.VendorDashboardComponent), canActivate: [vendorGuard] },
   { path: 'vendor/profile', loadComponent: () => import('./pages/vendor-profile/vendor-profile.component').then(m => m.VendorProfileComponent), canActivate: [vendorGuard] },
 
+  //Verification
+  { path: 'verify-identity', loadComponent: () => import('./pages/verification/verification.component').then(m => m.VerificationComponent), canActivate: [authGuard] },
+
   // Admin — separate auth
   { path: 'admin/login', loadComponent: () => import('./pages/admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent) },
   { path: 'admin', loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent), canActivate: [adminGuard] },

@@ -51,6 +51,15 @@
 .fpc-caption { font-size: 14px; color: var(--text-primary); font-family: var(--sans); line-height: 1.5; margin-bottom: 8px; }
 .fpc-comment-input input { font-size: 13px; padding: 7px 12px; border-radius: 20px; }
 
+.moment-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.ml-content { background: var(--bg); border-radius: 12px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
+.ml-close { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; z-index: 2; }
+.ml-content img { width: 100%; display: block; }
+.ml-body { padding: 16px; }
+.ml-comments { max-height: 200px; overflow-y: auto; margin: 12px 0; }
+.fpc-comment { font-size: 13px; padding: 4px 0; }
+.fpc-viewall { font-size: 12px; color: var(--text-muted); cursor: pointer; display: block; margin-top: 4px; }
+
 @media (max-width: 600px) {
   .feed-grid { grid-template-columns: repeat(2, 1fr); }
 }

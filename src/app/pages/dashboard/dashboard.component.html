@@ -12,6 +12,14 @@
 
     <nav class="sb-nav">
 
+      <div class="welcome-banner" *ngIf="auth.user()?.loginCount === 1">
+        <div>
+          <strong>Welcome to Innvitely! </strong>
+          <p>New here? Take a quick 2-minute look at how everything works.</p>
+        </div>
+        <a routerLink="/support/help" class="btn btn-gold">View the guide</a>
+      </div>
+
       <a class="sb-link" routerLink="/dashboard" routerLinkActive="active"
          [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()">
         <svg class="sb-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"

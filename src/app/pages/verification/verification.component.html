@@ -1,0 +1,65 @@
+<div class="verify-page container" style="max-width:640px; padding-top:32px; padding-bottom:60px;">
+  <h1 class="serif" style="margin-bottom:8px;">Identity verification</h1>
+  <p style="color:var(--text-muted); margin-bottom:24px;">
+    A quick selfie and a photo of a valid ID help keep Innvitely safe for everyone. This is reviewed by a real person on our team — usually within a day or two.
+  </p>
+
+  <div *ngIf="!loading">
+
+    <div class="card" style="padding:20px;" *ngIf="status.status === 'verified'">
+      <h3 style="color:var(--success);">✓ Verified</h3>
+      <p style="color:var(--text-muted);">Your account carries a Verified badge.</p>
+    </div>
+
+    <div class="card" style="padding:20px;" *ngIf="status.status === 'pending'">
+      <h3>⏳ Under review</h3>
+      <p style="color:var(--text-muted);">Submitted {{ status.submittedAt | date:'MMM d, y' }}. We'll notify you once it's reviewed.</p>
+    </div>
+
+    <div class="card" style="padding:20px;" *ngIf="status.status === 'escalated'">
+      <h3>🔍 Under further review</h3>
+      <p style="color:var(--text-muted);">Your submission needs a closer look from our team. No action needed from you right now.</p>
+    </div>
+
+    <div *ngIf="status.status === 'unsubmitted' || status.status === 'rejected'">
+      <div class="card" style="padding:16px; margin-bottom:20px; background:rgba(220,38,38,0.06);" *ngIf="status.status === 'rejected'">
+        <p style="color:#dc2626; margin:0;">Your previous submission wasn't approved{{ status.adminNotes ? ': ' + status.adminNotes : '.' }} Please try again with clearer photos.</p>
+      </div>
+
+      <div class="form-group">
+        <label>ID type</label>
+        <select [(ngModel)]="idType">
+          <option value="">Select ID type</option>
+          <option value="nin">NIN (National ID)</option>
+          <option value="drivers_license">Driver's License</option>
+          <option value="passport">International Passport</option>
+          <option value="voters_card">Voter's Card</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ID number</label>
+        <input [(ngModel)]="idNumber" placeholder="As shown on your ID" />
+      </div>
+
+      <div class="form-group">
+        <label>Take a selfie</label>
+        <input type="file" accept="image/*" capture="user" (change)="onSelfieSelected($event)" />
+        <img *ngIf="selfiePreview" [src]="selfiePreview" style="max-width:160px; border-radius:8px; margin-top:8px;" alt="Selfie preview" />
+      </div>
+
+      <div class="form-group">
+        <label>Photo of your ID</label>
+        <input type="file" accept="image/*" capture="environment" (change)="onIdDocSelected($event)" />
+        <img *ngIf="idDocPreview" [src]="idDocPreview" style="max-width:160px; border-radius:8px; margin-top:8px;" alt="ID document preview" />
+      </div>
+
+      <p style="color:#dc2626; font-size:0.85rem;" *ngIf="error">{{ error }}</p>
+
+      <button class="btn btn-primary" [disabled]="submitting" (click)="submit()">
+        {{ submitting ? 'Submitting...' : 'Submit for review' }}
+      </button>
+    </div>
+
+  </div>
+</div>

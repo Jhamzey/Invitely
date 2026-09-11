@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
+import { EventService } from '../../../core/services/event.service';
+import { Moment } from '../../../core/models/event.model';
 
 @Component({
   selector: 'app-moments-feed',
@@ -13,33 +14,46 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./moments-feed.component.css']
 })
 export class MomentsFeedComponent implements OnInit {
-  posts: any[] = [];
+  posts: Moment[] = [];
   loading = true;
   view: 'grid' | 'feed' = 'grid';
-  selectedPost: any = null;
+  selectedPost: Moment | null = null;
   comment = '';
+  commenting = false;
 
-  constructor(public auth: AuthService, private http: HttpClient) {}
+  constructor(public auth: AuthService, private eventService: EventService) {}
 
   ngOnInit() {
-    // Load all public moments from all events
-    setTimeout(() => {
-      // Placeholder — real data comes from backend
-      this.posts = [];
-      this.loading = false;
-    }, 500);
+    this.eventService.getMomentsFeed().subscribe({
+      next: posts => { this.posts = posts; this.loading = false; },
+      error: () => { this.loading = false; }
+    });
   }
 
-  like(post: any) {
-    if (!this.auth.isLoggedIn()) return;
-    post.liked = !post.liked;
-    post.likes += post.liked ? 1 : -1;
+  like(post: Moment) {
+    if (!this.auth.isLoggedIn() || !post.eventId || !post._id) return;
+    const wasLiked = !!post.liked;
+    post.liked = !wasLiked;
+    post.likesCount += post.liked ? 1 : -1;
+    this.eventService.toggleMomentLike(post.eventId, post._id).subscribe({
+      error: () => { post.liked = wasLiked; post.likesCount += wasLiked ? 1 : -1; }
+    });
   }
 
-  addComment(post: any) {
-    if (!this.auth.isLoggedIn() || !this.comment.trim()) return;
-    post.comments = post.comments || [];
-    post.comments.push({ author: this.auth.user()?.name, text: this.comment, time: 'Just now' });
-    this.comment = '';
+  addComment(post: Moment) {
+    if (!this.auth.isLoggedIn() || !this.comment.trim() || this.commenting || !post.eventId || !post._id) return;
+    this.commenting = true;
+    this.eventService.addMomentComment(post.eventId, post._id, this.comment.trim()).subscribe({
+      next: c => {
+        post.comments = [...(post.comments || []), c];
+        post.commentsCount = (post.commentsCount || 0) + 1;
+        this.comment = '';
+        this.commenting = false;
+      },
+      error: () => { this.commenting = false; }
+    });
   }
+
+  openPost(post: Moment) { this.selectedPost = post; }
+  closePost() { this.selectedPost = null; }
 }

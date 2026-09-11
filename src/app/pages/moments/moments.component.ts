@@ -81,7 +81,8 @@ export class MomentsComponent implements OnInit {
             this.eventId,
             this.uploadFiles[i],
             i === 0 ? this.uploadCaption : '',
-            this.auth.user()?.name || 'Host'
+            this.auth.user()?.name || 'Host',
+            i === 0 ? this.tagInput : ''
           ).subscribe({
             next: e => { this.event = e; resolve(); },
             error: err => reject(err)
@@ -94,6 +95,7 @@ export class MomentsComponent implements OnInit {
       this.uploadPreviews = [];
       this.uploadCaption = '';
       this.uploadProgress = 0;
+      this.tagInput = '';
     } catch {
       this.uploadError = 'Some files failed to upload. Please try again.';
     } finally {

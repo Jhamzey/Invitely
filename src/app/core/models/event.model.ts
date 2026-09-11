@@ -21,10 +21,15 @@ export interface Asoebi {
 
 export interface Moment {
   _id?: string;
+  eventId?: string;
+  eventTitle?: string;
   imageUrl: string;
   caption: string;
   postedBy: string;
-  likes: number;
+  likesCount: number;
+  liked?: boolean;
+  commentsCount: number;
+  comments?: { authorName: string; text: string; createdAt: string }[];
   createdAt: string;
 }
 

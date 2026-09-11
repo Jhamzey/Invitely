@@ -1,16 +1,19 @@
 <div class="admin-page">
-  <aside class="admin-sidebar">
+  <button class="admin-mobile-toggle" (click)="toggleSidebar()">☰ Menu</button>
+  <div class="admin-sidebar-backdrop" [class.open]="sidebarOpen" (click)="closeSidebar()"></div>
+  <aside class="admin-sidebar" [class.open]="sidebarOpen">
     <div class="as-logo serif">Innvitely<span> Admin</span></div>
 
     <nav class="as-nav">
-      <button class="as-link" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">Overview</button>
-      <button class="as-link" [class.active]="activeTab === 'hosts'" (click)="activeTab = 'hosts'">Hosts</button>
-      <button class="as-link" [class.active]="activeTab === 'vendors'" (click)="activeTab = 'vendors'">Vendors</button>
-      <button class="as-link" [class.active]="activeTab === 'listings'" (click)="activeTab = 'listings'">Pending listings</button>
-      <button class="as-link" [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">Reviews</button>
-      <button class="as-link" [class.active]="activeTab === 'events'" (click)="activeTab = 'events'">Events</button>
-      <button class="as-link" [class.active]="activeTab === 'deleted'" (click)="activeTab = 'deleted'">Deleted accounts</button>
-      <button class="as-link" [class.active]="activeTab === 'audit'" (click)="activeTab = 'audit'">Audit log</button>
+            <button class="as-link" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'; closeSidebar()">Overview</button>
+      <button class="as-link" [class.active]="activeTab === 'hosts'" (click)="activeTab = 'hosts'; closeSidebar()">Hosts</button>
+      <button class="as-link" [class.active]="activeTab === 'vendors'" (click)="activeTab = 'vendors'; closeSidebar()">Vendors</button>
+      <button class="as-link" [class.active]="activeTab === 'listings'" (click)="activeTab = 'listings'; closeSidebar()">Pending listings</button>
+      <button class="as-link" [class.active]="activeTab === 'verification'" (click)="activeTab = 'verification'; closeSidebar()">Identity verification</button>
+      <button class="as-link" [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'; closeSidebar()">Reviews</button>
+      <button class="as-link" [class.active]="activeTab === 'events'" (click)="activeTab = 'events'; closeSidebar()">Events</button>
+      <button class="as-link" [class.active]="activeTab === 'deleted'" (click)="activeTab = 'deleted'; closeSidebar()">Deleted accounts</button>
+      <button class="as-link" [class.active]="activeTab === 'audit'" (click)="activeTab = 'audit'; closeSidebar()">Audit log</button>
     </nav>
 
     <div class="as-spacer"></div>
@@ -112,6 +115,50 @@
         </div>
       </div>
       <div class="at-empty" *ngIf="pendingListingVendors.length === 0">No pending listings</div>
+    </div>
+
+    <!-- IDENTITY VERIFICATION -->
+    <div *ngIf="activeTab === 'verification'">
+      <div class="admin-toolbar">
+        <h1 class="serif admin-title">Identity verification</h1>
+        <select [(ngModel)]="verificationFilter" class="admin-filter" (change)="loadVerifications()">
+          <option value="pending">Pending</option>
+          <option value="verified">Verified</option>
+          <option value="rejected">Rejected</option>
+          <option value="escalated">Escalated</option>
+        </select>
+      </div>
+
+      <div class="card" style="padding:20px; margin-bottom:16px;" *ngFor="let v of verifications">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+          <div>
+            <strong>{{ v.name }}</strong> ({{ v.role }}{{ v.businessName ? ' — ' + v.businessName : '' }})
+            <div style="color:var(--text-muted); font-size:0.85rem;">{{ v.email }} · {{ v.idType }}: {{ v.idNumber }}</div>
+            <div style="color:var(--text-muted); font-size:0.8rem;">Submitted {{ v.submittedAt | date:'MMM d, y' }}</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:16px; margin-bottom:12px; flex-wrap:wrap;">
+          <div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Selfie</div>
+            <img [src]="v.selfieUrl" style="width:140px; height:140px; object-fit:cover; border-radius:8px;" alt="Submitted selfie" />
+          </div>
+          <div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">ID document</div>
+            <img [src]="v.idDocUrl" style="width:220px; height:140px; object-fit:cover; border-radius:8px;" alt="Submitted ID document" />
+          </div>
+        </div>
+
+        <textarea [(ngModel)]="verificationNotes[v._id]" placeholder="Notes (optional) — visible to the user if rejected" style="width:100%; min-height:50px; margin-bottom:10px;"></textarea>
+
+        <div style="display:flex; gap:8px;" *ngIf="v.status === 'pending' || v.status === 'escalated'">
+          <button class="at-btn primary" (click)="reviewVerification(v._id, 'verified')">Verify</button>
+          <button class="at-btn warn" (click)="reviewVerification(v._id, 'rejected')">Reject</button>
+          <button class="at-btn" (click)="reviewVerification(v._id, 'escalated')" *ngIf="v.status !== 'escalated'">Escalate</button>
+        </div>
+      </div>
+
+      <div class="at-empty" *ngIf="verifications.length === 0">No submissions in this category</div>
     </div>
 
     <!-- REVIEWS -->

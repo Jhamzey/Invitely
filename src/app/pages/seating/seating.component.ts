@@ -22,6 +22,7 @@ export class SeatingComponent implements OnInit {
   saving = false;
   saved = false;
   dragGuest: Guest | null = null;
+  selectedGuest: Guest | null = null;
 
   newTable = { shape: 'round' as 'round' | 'rectangular', capacity: 10, label: '' };
 
@@ -69,6 +70,20 @@ export class SeatingComponent implements OnInit {
       seats
     });
     this.newTable = { shape: 'round', capacity: 10, label: '' };
+  }
+
+  selectGuestForSeat(guest: Guest) {
+    this.selectedGuest = this.selectedGuest?._id === guest._id ? null : guest;
+  }
+
+  tapSeat(seat: Seat) {
+    if (!this.selectedGuest || seat.guestId) return;
+    this.event.tables.forEach(t => t.seats.forEach(s => {
+      if (s.guestId === this.selectedGuest!._id) { s.guestId = undefined; s.guestName = ''; }
+    }));
+    seat.guestId = this.selectedGuest._id;
+    seat.guestName = this.selectedGuest.name;
+    this.selectedGuest = null;
   }
 
   removeTable(idx: number) {
