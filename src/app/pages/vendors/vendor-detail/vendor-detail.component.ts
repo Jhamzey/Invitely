@@ -6,6 +6,7 @@ import { VendorService } from '../../../core/services/vendor.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Vendor } from '../../../core/models/vendor.model';
 import { Review } from '../../../core/models/review.model';
+import { SeoService } from '../../../core/services/seo.service';
 import { ContactDisclaimerComponent } from '../../../shared/contact-disclaimer/contact-disclaimer.component';
 
 const DISMISS_KEY = 'invitely_contact_disclaimer_dismissed';
@@ -44,14 +45,26 @@ export class VendorDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private vendorService: VendorService,
-    private auth: AuthService
+    private auth: AuthService,
+    private seo: SeoService
   ) {}
 
   ngOnInit() {
     this.isLoggedIn = this.auth.isLoggedIn();
     const id = this.route.snapshot.paramMap.get('id')!;
     this.vendorService.getById(id).subscribe({
-      next: v => { this.vendor = v; this.loading = false; },
+      next: v => { 
+        this.vendor = v; this.loading = false;
+        this.seo.update({ title: v.name, description: v.description || `${v.name} — ${v.category} in ${v.city}`, path: `/vendors/${id}`, image: v.images?.[0] });
+        this.seo.setJsonLd('vendor-schema', {
+          '@context': 'https://schema.org',
+          '@type': 'LocalBusiness',
+          name: v.name,
+          image: v.images?.[0],
+          address: { '@type': 'PostalAddress', streetAddress: v.address, addressLocality: v.city, addressRegion: v.state, addressCountry: 'NG' },
+          telephone: v.phone,
+          aggregateRating: v.reviewCount > 0 ? { '@type': 'AggregateRating', ratingValue: v.rating, reviewCount: v.reviewCount } : undefined,
+        }); },
       error: () => { this.loading = false; this.router.navigate(['/vendors']); }
     });
     this.vendorService.getReviews(id).subscribe({

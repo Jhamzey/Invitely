@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { SeoService } from './core/services/seo.service';
 import { AuthService } from './core/services/auth.service';
 import { ThemeService } from './core/services/theme.service';
 
@@ -19,7 +20,9 @@ export class AppComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private seoService: SeoService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -37,6 +40,15 @@ export class AppComponent implements OnInit {
         } else {
           this.router.navigate(['/dashboard'], { replaceUrl: true });
         }
+      }
+    });
+
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+      let child = this.activatedRoute.firstChild;
+      while (child?.firstChild) child = child.firstChild;
+      const data = child?.snapshot.data;
+      if (data?.['title']) {
+        this.seoService.update({ title: data['title'], description: data['description'], path: this.router.url });
       }
     });
   }

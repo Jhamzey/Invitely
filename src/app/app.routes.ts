@@ -2,22 +2,22 @@ import { Routes } from '@angular/router';
 import { authGuard, vendorGuard, adminGuard, requireAuthGuard, momentsCategoryGuard } from './core/guards/auth.guards';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./pages/landing/landing.component').then(m => m.LandingComponent) },
-  { path: 'auth/login', loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent) },
-  { path: 'auth/register', loadComponent: () => import('./pages/auth/register/register.component').then(m => m.RegisterComponent) },
-  { path: 'invite/:token', loadComponent: () => import('./pages/guest-invite/guest-invite.component').then(m => m.GuestInviteComponent) },
+  { path: '', loadComponent: () => import('./pages/landing/landing.component').then(m => m.LandingComponent), data: { title: 'Home', description: 'Discover and connect with vendors for your next event.' } },
+  { path: 'auth/login', loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent), data: { title: 'Login', description: 'Access your account to manage events, vendors, and more.' } },
+  { path: 'auth/register', loadComponent: () => import('./pages/auth/register/register.component').then(m => m.RegisterComponent), data: { title: 'Register', description: 'Create a new account to get started.' } },
+  { path: 'invite/:token', loadComponent: () => import('./pages/guest-invite/guest-invite.component').then(m => m.GuestInviteComponent)},
   { path: 'scan/session/:token', loadComponent: () => import('./pages/scan/scan-session/scan-session.component').then(m => m.ScanSessionComponent) },
 
   // Support
-  { path: 'support', loadComponent: () => import('./pages/support/support.component').then(m => m.SupportComponent) },
-  { path: 'support/help', loadComponent: () => import('./pages/support/help/help.component').then(m => m.HelpComponent) },
-  { path: 'support/privacy', loadComponent: () => import('./pages/support/privacy/privacy.component').then(m => m.PrivacyComponent) },
-  { path: 'support/terms', loadComponent: () => import('./pages/support/terms/terms.component').then(m => m.TermsComponent) },
+  { path: 'support', loadComponent: () => import('./pages/support/support.component').then(m => m.SupportComponent), data: { title: 'Support', description: 'Get help and support for your account and services.' } },
+  { path: 'support/help', loadComponent: () => import('./pages/support/help/help.component').then(m => m.HelpComponent), data: { title: 'Help Center', description: 'Find answers to your questions and get assistance.' } },
+  { path: 'support/privacy', loadComponent: () => import('./pages/support/privacy/privacy.component').then(m => m.PrivacyComponent), data: { title: 'Privacy Policy', description: 'Learn how we collect, use, and protect your information.' } },
+  { path: 'support/terms', loadComponent: () => import('./pages/support/terms/terms.component').then(m => m.TermsComponent), data: { title: 'Terms of Service', description: 'Understand the terms and conditions of using our services.' } },
 
   // Auth-required public pages
-  { path: 'vendors', loadComponent: () => import('./pages/vendors/vendors.component').then(m => m.VendorsComponent), canActivate: [requireAuthGuard] },
+  { path: 'vendors', loadComponent: () => import('./pages/vendors/vendors.component').then(m => m.VendorsComponent), canActivate: [requireAuthGuard], data: { title: 'Find Vendors', description: 'Browse verified caterers, halls, photographers and more for your next event.' } },
   { path: 'vendors/:id', loadComponent: () => import('./pages/vendors/vendor-detail/vendor-detail.component').then(m => m.VendorDetailComponent), canActivate: [requireAuthGuard] },
-  { path: 'moments', loadComponent: () => import('./pages/moments/moments-feed/moments-feed.component').then(m => m.MomentsFeedComponent), canActivate: [momentsCategoryGuard] },
+  { path: 'moments', loadComponent: () => import('./pages/moments/moments-feed/moments-feed.component').then(m => m.MomentsFeedComponent), canActivate: [momentsCategoryGuard], data: { title: 'Moments', description: 'Share and discover memorable moments from your events.' } },
   { path: 'moments/:category', loadComponent: () => import('./pages/moments/moments-feed/moments-feed.component').then(m => m.MomentsFeedComponent), canActivate: [momentsCategoryGuard] },
 
   // Host
@@ -36,7 +36,7 @@ export const routes: Routes = [
   { path: 'vendor/profile', loadComponent: () => import('./pages/vendor-profile/vendor-profile.component').then(m => m.VendorProfileComponent), canActivate: [vendorGuard] },
 
   //Verification
-  { path: 'verify-identity', loadComponent: () => import('./pages/verification/verification.component').then(m => m.VerificationComponent), canActivate: [authGuard] },
+  { path: 'verify-identity', loadComponent: () => import('./pages/verification/verification.component').then(m => m.VerificationComponent), canActivate: [authGuard], data: { title: 'Verify Identity', description: 'Verify your identity to ensure the security of your account.' } },
 
   // Admin — separate auth
   { path: 'admin/login', loadComponent: () => import('./pages/admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent) },

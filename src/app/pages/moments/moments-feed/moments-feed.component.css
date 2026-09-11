@@ -30,6 +30,10 @@
 .fg-cell img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s; display: block; }
 .fg-cell:hover img { transform: scale(1.05); }
 
+.fpc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.fpc-tag { color: var(--accent); font-size: 13px; cursor: pointer; text-decoration: none; }
+.fpc-tag:hover { text-decoration: underline; }
+
 .fg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0); display: flex; align-items: center; justify-content: center; gap: 20px; transition: background 0.2s; }
 .fg-cell:hover .fg-overlay { background: rgba(0,0,0,0.4); }
 .fg-stat { font-size: 14px; color: #fff; font-family: var(--sans); font-weight: 500; opacity: 0; transition: opacity 0.2s; }

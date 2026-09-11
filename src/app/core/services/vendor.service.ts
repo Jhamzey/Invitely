@@ -51,6 +51,10 @@ export class VendorService {
     return this.http.post<{ success: boolean }>(`${environment.apiUrl}/users/favorites/${vendorId}`, {}, { headers: this.headers() });
   }
 
+  getByUsername(username: string) {
+    return this.http.get<Vendor>(`${this.API}/username/${username}`);
+  }
+
   removeFavorite(vendorId: string) {
     return this.http.delete<{ success: boolean }>(`${environment.apiUrl}/users/favorites/${vendorId}`, { headers: this.headers() });
   }

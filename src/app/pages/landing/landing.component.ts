@@ -4,6 +4,8 @@ import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { AuthService } from '../../core/services/auth.service';
 import { PLATFORM_ID, inject } from '@angular/core';
+import { SeoService } from '../../core/services/seo.service';
+import { environment } from '../../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
@@ -70,7 +72,9 @@ export class LandingComponent implements OnInit, OnDestroy {
   constructor(
     public themeService: ThemeService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private seo: SeoService
+
   ) {}
 
   ngOnInit() {
@@ -79,6 +83,14 @@ export class LandingComponent implements OnInit, OnDestroy {
     this.intervalId = setInterval(() => {
       this.activeThemeId = this.themeService.current().id;
     }, 500);
+
+    this.seo.setJsonLd('org-schema', {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Innvitely',
+      url: environment.siteUrl,
+      description: 'Digital invitations platform for weddings, birthdays and owambe celebrations.',
+    });
   }
 
   ngOnDestroy() {

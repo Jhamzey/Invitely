@@ -29,6 +29,7 @@ export interface Moment {
   likesCount: number;
   liked?: boolean;
   commentsCount: number;
+  taggedVendors?: string[];
   comments?: { authorName: string; text: string; createdAt: string }[];
   createdAt: string;
 }

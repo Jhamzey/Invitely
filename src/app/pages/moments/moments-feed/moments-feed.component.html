@@ -53,6 +53,9 @@
             <button class="fpa-btn" (click)="openPost(p)">💬 {{ p.commentsCount }}</button>
           </div>
           <div class="fpc-caption" *ngIf="p.caption">{{ p.caption }}</div>
+          <div class="fpc-tags" *ngIf="p.taggedVendors && p.taggedVendors.length > 0">
+            <a class="fpc-tag" *ngFor="let t of p.taggedVendors" (click)="goToTag(t)">{{ t.startsWith('@') ? t : '@' + t }}</a>
+          </div>
           <div class="fpc-comments-preview" *ngIf="p.comments && p.comments.length > 0">
             <div class="fpc-comment" *ngFor="let c of p.comments.slice(-2)">
               <strong>{{ c.authorName }}</strong> {{ c.text }}

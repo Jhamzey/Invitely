@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { EventService } from '../../../core/services/event.service';
+import { VendorService } from '../../../core/services/vendor.service';
 import { Moment } from '../../../core/models/event.model';
 
 @Component({
@@ -21,7 +22,20 @@ export class MomentsFeedComponent implements OnInit {
   comment = '';
   commenting = false;
 
-  constructor(public auth: AuthService, private eventService: EventService) {}
+  constructor(
+    public auth: AuthService,
+    private eventService: EventService,
+    private vendorService: VendorService,
+    private router: Router
+  ) {}
+
+  goToTag(tag: string) {
+    const username = tag.replace(/^@/, '').trim();
+    this.vendorService.getByUsername(username).subscribe({
+      next: v => this.router.navigate(['/vendors', v._id]),
+      error: () => {} // not a real username — silently ignore rather than error loudly
+    });
+  }
 
   ngOnInit() {
     this.eventService.getMomentsFeed().subscribe({
