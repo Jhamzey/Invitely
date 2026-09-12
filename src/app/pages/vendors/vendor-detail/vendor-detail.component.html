@@ -5,6 +5,12 @@
     <div class="il-spinner"></div>
   </div>
 
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/">Home</a> <span>/</span>
+    <a routerLink="/vendors">Vendors</a> <span>/</span>
+    <span>{{ vendor.name }}</span>
+  </nav>
+
   <ng-container *ngIf="!loading && vendor">
 
     <!-- Top bar -->

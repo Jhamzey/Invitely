@@ -35,7 +35,7 @@
       <div class="moment-cell" *ngFor="let m of moments; let i = index"
         [class.featured]="i === 0"
         (click)="openMoment(m, i)">
-        <img [src]="m.imageUrl" [alt]="m.caption" loading="lazy" class="mc-img" />
+        <img [src]="m.imageUrl" [alt]="m.caption || 'Event moment'" loading="lazy" class="mc-img" />
         <div class="mc-overlay">
           <div class="mc-caption" *ngIf="m.caption">{{ m.caption }}</div>
         </div>
@@ -52,7 +52,7 @@
             <div class="fp-time">{{ m.createdAt | date:'MMM d, y' }}</div>
           </div>
         </div>
-        <img [src]="m.imageUrl" [alt]="m.caption" class="fp-image" loading="lazy" />
+        <img [src]="m.imageUrl" [alt]="m.caption || 'Event moment'" loading="lazy" class="mc-img" />
         <div class="fp-body" *ngIf="m.caption">
           <div class="fp-caption">{{ m.caption }}</div>
         </div>
@@ -92,7 +92,7 @@
         <!-- Previews -->
         <div class="upload-previews" *ngIf="uploadPreviews.length > 0">
           <div class="up-item" *ngFor="let p of uploadPreviews; let i = index">
-            <img [src]="p" class="up-thumb" alt="preview" />
+            <img [src]="p" class="up-thumb" [alt]="uploadFiles[i] ? uploadFiles[i].name : 'Preview'" />
             <div class="up-name">{{ uploadFiles[i] ? uploadFiles[i].name : '' }}</div>
             <button class="up-remove" (click)="removeFile(i)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -137,7 +137,7 @@
       <button class="lb-nav lb-prev" (click)="prevMoment()" [disabled]="selectedIdx === 0">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <img [src]="selectedMoment.imageUrl" [alt]="selectedMoment.caption" class="lb-img" />
+      <img [src]="selectedMoment.imageUrl" [alt]="selectedMoment.caption || 'Event moment'" class="lb-img" />
       <button class="lb-nav lb-next" (click)="nextMoment()" [disabled]="selectedIdx === moments.length - 1">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
