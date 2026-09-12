@@ -193,25 +193,33 @@
           <div class="ao-desc" *ngIf="a.description">{{ a.description }}</div>
         </div>
       </div>
-      <div class="ao-qty" *ngIf="asoebiSelected && !asoebiDone" style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-        <label style="margin:0;">Quantity</label>
-        <button class="btn btn-outline" style="padding:4px 12px;" (click)="asoebiQuantity = Math.max(1, asoebiQuantity - 1)">−</button>
-        <span>{{ asoebiQuantity }}</span>
-        <button class="btn btn-outline" style="padding:4px 12px;" (click)="asoebiQuantity = asoebiQuantity + 1">+</button>
+
+      <div *ngIf="asoebiSelected && !asoebiDone">
+        <div class="ao-qty" style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <label style="margin:0;">Quantity</label>
+          <button class="btn btn-outline" style="padding:4px 12px;" (click)="asoebiQuantity = Math.max(1, asoebiQuantity - 1)">−</button>
+          <span>{{ asoebiQuantity }}</span>
+          <button class="btn btn-outline" style="padding:4px 12px;" (click)="asoebiQuantity = asoebiQuantity + 1">+</button>
+        </div>
+        <div class="form-group" *ngIf="!guest.email">
+          <label>Your email (for payment receipt)</label>
+          <input [(ngModel)]="payerEmail" placeholder="you@example.com" type="email" />
+        </div>
+
+        <p class="ao-error" *ngIf="!hostSubaccountCode">
+          The host hasn't set up payments for this event yet — please check back later.
+        </p>
+        <button class="btn btn-gold ao-btn" *ngIf="hostSubaccountCode" [disabled]="asoebiSubmitting" (click)="payAsoebi()">
+          {{ asoebiSubmitting ? 'Confirming payment...' : 'Pay ₦' + (asoebiSelectedPrice * asoebiQuantity | number) + ' now' }}
+        </button>
+        <div class="ao-error" *ngIf="asoebiError">{{ asoebiError }}</div>
       </div>
-      <div class="form-group" *ngIf="asoebiSelected && !asoebiDone && !guest.email">
-        <label>Your email (for payment receipt)</label>
-        <input [(ngModel)]="payerEmail" placeholder="you@example.com" type="email" />
-      </div>
-      <button class="btn btn-gold ao-btn" *ngIf="asoebiSelected && !asoebiDone" [disabled]="asoebiSubmitting" (click)="payAsoebi()">
-       {{ asoebiSubmitting ? 'Confirming payment...' : 'Pay ₦' + (asoebiSelectedPrice * asoebiQuantity | number) + ' now' }}
-      </button>
-      <div class="ao-error" *ngIf="asoebiError">{{ asoebiError }}</div>
       <div class="ao-done" *ngIf="asoebiDone">✓ Payment received! The host has been notified.</div>
     </div>
 
+    <!-- Gift -->
     <div class="gift-section" *ngIf="event.giftEnabled && guest.rsvp === 'attending' && !giftDone">
-      <div class="section-title">Send a gift</div>
+      <div class="section-title serif">Send a gift</div>
       <p class="as-intro">Innvitely gives you the option to send a small gift to help celebrate this occasion — this is entirely optional, and not a request from the host.</p>
       <div class="meal-opts" style="margin-bottom:12px;">
         <button class="meal-opt" *ngFor="let a of [1000, 5000, 10000, 20000]" [class.active]="giftAmount === a && !giftCustom" (click)="giftAmount = a; giftCustom = false">₦{{ a | number }}</button>
@@ -224,7 +232,11 @@
         <label>Your email (for payment receipt)</label>
         <input [(ngModel)]="payerEmail" placeholder="you@example.com" type="email" />
       </div>
-      <button class="btn btn-gold ao-btn" [disabled]="giftSubmitting" (click)="payGift()">
+
+      <p class="ao-error" *ngIf="!hostSubaccountCode">
+        The host hasn't set up payments for this event yet — please check back later.
+      </p>
+      <button class="btn btn-gold ao-btn" *ngIf="hostSubaccountCode" [disabled]="giftSubmitting" (click)="payGift()">
         {{ giftSubmitting ? 'Confirming...' : 'Send ₦' + (giftAmount | number) }}
       </button>
       <div class="ao-error" *ngIf="giftError">{{ giftError }}</div>

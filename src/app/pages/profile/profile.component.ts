@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -29,17 +30,29 @@ export class ProfileComponent implements OnInit {
   passwordSaved = false;
   passwordError = '';
 
+  banks: { name: string; code: string }[] = [];
+  selectedBankCode = '';
+  payoutAccountNumber = '';
+  connectingPayout = false;
+  payoutError = '';
+
+  showDeleteConfirm = false;
+  deletePassword = '';
+  deleteError = '';
+  deleting = false;
+
   readonly languages = [
     { code: 'EN', label: 'English' }, { code: 'YO', label: 'Yoruba' },
     { code: 'IG', label: 'Igbo' }, { code: 'HA', label: 'Hausa' },
     { code: 'FR', label: 'French' }, { code: 'PID', label: 'Pidgin' },
   ];
 
-  private API = 'http://localhost:4000/api';
+  private API = environment.apiUrl;
 
   constructor(
     public auth: AuthService,
     private http: HttpClient,
+    private router: Router,
     public themeService: ThemeService
   ) {}
 
@@ -52,6 +65,7 @@ export class ProfileComponent implements OnInit {
       next: u => { this.profile = { ...u }; this.loading = false; },
       error: () => this.loading = false
     });
+    this.loadBanks();
   }
 
   setLight() { if (this.themeService.isDark()) this.themeService.toggleDarkMode(); }
@@ -63,8 +77,6 @@ export class ProfileComponent implements OnInit {
       name: this.profile.name, phone: this.profile.phone, whatsapp: this.profile.whatsapp,
       language: this.profile.language, emailNotifications: this.profile.emailNotifications,
       whatsappNotifications: this.profile.whatsappNotifications,
-      bankName: this.profile.bankName, bankAccountNumber: this.profile.bankAccountNumber,
-      bankAccountName: this.profile.bankAccountName,
     }, { headers: this.headers() }).subscribe({
       next: u => { this.profile = { ...u }; this.saving = false; this.saved = true; setTimeout(() => this.saved = false, 2500); },
       error: err => { this.error = err.error?.error || 'Failed.'; this.saving = false; }
@@ -77,11 +89,43 @@ export class ProfileComponent implements OnInit {
     if (this.newPassword.length < 8) { this.passwordError = 'At least 8 characters.'; return; }
     this.changingPassword = true;
     this.passwordError = '';
-    this.http.post(`${this.API}/users/change-password`, {
+    this.http.post<any>(`${this.API}/users/change-password`, {
       currentPassword: this.currentPassword, newPassword: this.newPassword
     }, { headers: this.headers() }).subscribe({
-      next: () => { this.passwordSaved = true; this.changingPassword = false; this.currentPassword = ''; this.newPassword = ''; this.confirmPassword = ''; setTimeout(() => this.passwordSaved = false, 3000); },
+      next: res => {
+        if (res.token) localStorage.setItem('invitely_token', res.token);
+        this.passwordSaved = true; this.changingPassword = false;
+        this.currentPassword = ''; this.newPassword = ''; this.confirmPassword = '';
+        setTimeout(() => this.passwordSaved = false, 3000);
+      },
       error: err => { this.passwordError = err.error?.error || 'Failed.'; this.changingPassword = false; }
+    });
+  }
+
+  loadBanks() {
+    this.http.get<any[]>(`${this.API}/users/paystack-banks`, { headers: this.headers() }).subscribe({
+      next: banks => this.banks = banks,
+      error: () => {}
+    });
+  }
+
+  connectPayout() {
+    if (!this.selectedBankCode || !this.payoutAccountNumber) { this.payoutError = 'Select a bank and enter your account number.'; return; }
+    this.connectingPayout = true;
+    this.payoutError = '';
+    this.http.post<any>(`${this.API}/users/paystack-subaccount`, { bankCode: this.selectedBankCode, accountNumber: this.payoutAccountNumber }, { headers: this.headers() }).subscribe({
+      next: res => { this.profile.bankAccountName = res.accountName; this.connectingPayout = false; },
+      error: err => { this.payoutError = err.error?.error || 'Could not connect payout account.'; this.connectingPayout = false; }
+    });
+  }
+
+  deleteAccount() {
+    if (!this.deletePassword) { this.deleteError = 'Enter your password to confirm.'; return; }
+    this.deleting = true;
+    this.deleteError = '';
+    this.http.post<any>(`${this.API}/users/delete-account`, { password: this.deletePassword }, { headers: this.headers() }).subscribe({
+      next: () => { this.auth.logout(); this.router.navigate(['/']); },
+      error: err => { this.deleteError = err.error?.error || 'Could not delete account.'; this.deleting = false; }
     });
   }
 }

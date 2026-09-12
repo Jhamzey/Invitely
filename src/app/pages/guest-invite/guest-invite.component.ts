@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
 import { GuestService } from '../../core/services/guest.service';
 import { Event } from '../../core/models/event.model';
-import { environment } from '../../../environments/environment';
 import { Guest } from '../../core/models/guest.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-guest-invite',
@@ -25,18 +25,20 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   guest!: Guest;
   loading = true;
   notFound = false;
+  hostSubaccountCode: string | null = null;
 
   rsvpDone = false;
   rsvpChoice = '';
   mealChoice = '';
   submittingRsvp = false;
 
+  payerEmail = '';
+
   asoebiSelected = '';
   asoebiQuantity = 1;
   asoebiDone = false;
   asoebiSubmitting = false;
   asoebiError = '';
-  payerEmail = '';
 
   giftAmount = 5000;
   giftCustom = false;
@@ -52,6 +54,7 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private eventService: EventService,
     private guestService: GuestService
   ) {}
@@ -59,9 +62,10 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.token = this.route.snapshot.paramMap.get('token')!;
     this.eventService.getInvite(this.token).subscribe({
-      next: ({ event, guest }) => {
+      next: ({ event, guest, hostSubaccountCode }: any) => {
         this.event = event;
         this.guest = guest;
+        this.hostSubaccountCode = hostSubaccountCode;
         this.loading = false;
         if (this.guest.rsvp !== 'pending') this.rsvpDone = true;
         this.startCountdown();
@@ -82,10 +86,6 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
       navy: { bg: 'linear-gradient(135deg,#0A1628,#1A2D4A)', color: '#C5D8F0', accent: '#4A7FC0' },
     };
     return map[this.event?.theme] || map['ivory'];
-  }
-
-  get asoebiSelectedPrice(): number {
-    return this.event?.asoebi?.find(a => a.name === this.asoebiSelected)?.price || 0;
   }
 
   startCountdown() {
@@ -111,8 +111,20 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
     });
   }
 
+  get asoebiSelectedPrice(): number {
+    return this.event?.asoebi?.find(a => a.name === this.asoebiSelected)?.price || 0;
+  }
+
+  private loadPaystackScript(cb: () => void) {
+    if ((window as any).PaystackPop) { cb(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.onload = cb;
+    document.body.appendChild(script);
+  }
+
   payAsoebi() {
-    if (!this.asoebiSelected || !this.isBrowser || this.asoebiSubmitting) return;
+    if (!this.asoebiSelected || !this.isBrowser || this.asoebiSubmitting || !this.hostSubaccountCode) return;
     const item = this.event.asoebi?.find(a => a.name === this.asoebiSelected);
     if (!item) return;
 
@@ -126,20 +138,14 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
         email,
         amount: item.price * this.asoebiQuantity * 100,
         currency: 'NGN',
+        subaccount: this.hostSubaccountCode,
+        bearer: 'subaccount',
         metadata: { guestName: this.guest.name, itemName: item.name, quantity: this.asoebiQuantity },
         callback: (response: any) => this.verifyAsoebiPayment(response.reference),
         onClose: () => {},
       });
       handler.openIframe();
     });
-  }
-
-  private loadPaystackScript(cb: () => void) {
-    if ((window as any).PaystackPop) { cb(); return; }
-    const script = document.createElement('script');
-    script.src = 'https://js.paystack.co/v1/inline.js';
-    script.onload = cb;
-    document.body.appendChild(script);
   }
 
   private verifyAsoebiPayment(reference: string) {
@@ -151,7 +157,7 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   }
 
   payGift() {
-    if (!this.isBrowser || this.giftSubmitting || this.giftAmount < 100) return;
+    if (!this.isBrowser || this.giftSubmitting || this.giftAmount < 100 || !this.hostSubaccountCode) return;
     const email = this.guest.email || this.payerEmail;
     if (!email) { this.giftError = 'Please enter your email to continue.'; return; }
 
@@ -162,6 +168,9 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
         email,
         amount: this.giftAmount * 100,
         currency: 'NGN',
+        subaccount: this.hostSubaccountCode,
+        bearer: 'subaccount',
+        transaction_charge: 0,
         metadata: { guestName: this.guest.name },
         callback: (response: any) => this.verifyGiftPayment(response.reference),
         onClose: () => {},

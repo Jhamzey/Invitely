@@ -78,11 +78,6 @@
           <input [(ngModel)]="profile.phone" placeholder="+2348..." />
         </div>
         <div class="form-group">
-          <label>Username</label>
-          <input [(ngModel)]="profile.username" placeholder="e.g. adaora_events" />
-          <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Used for tagging you in moments. Letters and numbers only.</p>
-        </div>
-        <div class="form-group">
           <label>WhatsApp number</label>
           <input [(ngModel)]="profile.whatsapp" placeholder="+2348..." />
         </div>
@@ -180,27 +175,28 @@
 
     <!-- PAYMENT TAB -->
     <div class="pp-panel" *ngIf="activeTab === 'payment'">
-      <h3 class="pp-section-title">Bank account for gift support</h3>
-      <p class="pp-section-sub">When guests choose to support your event, funds go directly to this account.</p>
+      <h3 class="pp-section-title">Payout account</h3>
+      <p class="pp-section-sub">When guests pay for asoebi or send a gift, funds settle directly to this bank account — Innvitely never holds your money.</p>
       <div class="form-group">
-        <label>Bank name</label>
-        <input [(ngModel)]="profile.bankName" placeholder="e.g. Zenith Bank" />
+        <label>Bank</label>
+        <select [(ngModel)]="selectedBankCode">
+          <option value="">Select your bank</option>
+          <option *ngFor="let b of banks" [value]="b.code">{{ b.name }}</option>
+        </select>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Account number</label>
-          <input [(ngModel)]="profile.bankAccountNumber" placeholder="10-digit account number" maxlength="10" />
-        </div>
-        <div class="form-group">
-          <label>Account name</label>
-          <input [(ngModel)]="profile.bankAccountName" placeholder="As on your bank account" />
-        </div>
+      <div class="form-group">
+        <label>Account number</label>
+        <input [(ngModel)]="payoutAccountNumber" placeholder="10-digit account number" maxlength="10" />
       </div>
+      <p *ngIf="profile.bankAccountName" style="color:var(--success); font-size:13px;">
+        ✓ Connected: {{ profile.bankAccountName }}
+      </p>
+      <p *ngIf="payoutError" style="color:#dc2626; font-size:13px;">{{ payoutError }}</p>
       <div class="pp-info-box">
-        Paystack processes all payments securely. Innvitely charges 1.5% + ₦100 per transaction (max ₦2,000).
+        Asoebi purchases carry a 4% Innvitely service fee, automatically deducted by Paystack — the rest settles directly to your account. Gifts sent to you carry no Innvitely fee at all.
       </div>
-      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
-        {{ saving ? 'Saving...' : saved ? 'Saved!' : 'Save bank details' }}
+      <button class="btn btn-primary" [disabled]="connectingPayout" (click)="connectPayout()">
+        {{ connectingPayout ? 'Verifying...' : (profile.bankAccountName ? 'Update payout account' : 'Connect payout account') }}
       </button>
     </div>
 
@@ -227,9 +223,22 @@
       <div class="danger-zone">
         <h3 class="pp-section-title" style="color:var(--error);">Danger zone</h3>
         <p class="pp-section-sub">Permanently delete your account and all your events. This cannot be undone.</p>
-        <button class="btn" style="background:transparent;border:1px solid var(--error);color:var(--error);">
+        <button class="btn" style="background:transparent;border:1px solid var(--error);color:var(--error);" (click)="showDeleteConfirm = true" *ngIf="!showDeleteConfirm">
           Delete my account
         </button>
+        <div *ngIf="showDeleteConfirm">
+          <div class="form-group">
+            <label>Enter your password to confirm</label>
+            <input type="password" [(ngModel)]="deletePassword" placeholder="Your password" />
+          </div>
+          <div class="auth-error" *ngIf="deleteError">{{ deleteError }}</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" style="background:#dc2626;color:#fff;" [disabled]="deleting" (click)="deleteAccount()">
+              {{ deleting ? 'Deleting...' : 'Confirm delete' }}
+            </button>
+            <button class="btn btn-outline" (click)="showDeleteConfirm = false; deletePassword = ''; deleteError = ''">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>
 
