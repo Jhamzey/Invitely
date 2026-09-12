@@ -39,6 +39,12 @@ export class VendorProfileComponent implements OnInit {
     { id: 'cake', label: 'Cake maker' }, { id: 'other', label: 'Other' },
   ];
 
+  readonly languages = [
+    { code: 'EN', label: 'English' }, { code: 'YO', label: 'Yoruba' },
+    { code: 'IG', label: 'Igbo' }, { code: 'HA', label: 'Hausa' },
+    { code: 'FR', label: 'French' }, { code: 'PID', label: 'Pidgin' },
+  ];
+
   readonly cities = ['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu', 'Kaduna', 'Benin City', 'Owerri', 'Uyo', 'Other'];
 
   readonly states = [
@@ -102,6 +108,7 @@ export class VendorProfileComponent implements OnInit {
       businessDescription: this.profile.businessDescription, priceFrom: this.profile.priceFrom,
       phone: this.profile.phone, whatsapp: this.profile.whatsapp,
       emailNotifications: this.profile.emailNotifications,
+      language: this.profile.language,
       whatsappNotifications: this.profile.whatsappNotifications,
     }, { headers: this.headers() }).subscribe({
       next: u => { this.profile = { ...u }; this.saving = false; this.saved = true; setTimeout(() => this.saved = false, 2500); },

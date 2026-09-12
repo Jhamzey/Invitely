@@ -88,6 +88,15 @@
       </div>
 
       <div class="form-group">
+        <label>Preferred language</label>
+        <div class="lang-row">
+          <button *ngFor="let l of languages" class="lang-pill"
+                  [class.active]="profile.language === l.code"
+                  (click)="profile.language = l.code">{{ l.label }}</button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>About your business</label>
         <textarea [(ngModel)]="profile.businessDescription" rows="5" placeholder="Describe your services..."></textarea>
       </div>
