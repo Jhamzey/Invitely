@@ -3,5 +3,5 @@ export const environment = {
   apiUrl: 'http://localhost:4000/api',
   siteUrl: 'http://localhost:4200',
   googleMapsKey: 'AIzaSyCp0LraGBXFFkqHpShmJ6WauK5_nOUGsyk',
-  paystackPublicKey: 'pk_test_xxxxxxxxxxxx', // replace with your real test/live public key
+  paystackPublicKey: 'pk_test_xxxxxxxxxxxx',
 };
