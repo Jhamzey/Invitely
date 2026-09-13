@@ -22,14 +22,10 @@
       <div class="ss-guests">
         <div *ngFor="let g of unassignedGuests"
           class="ss-guest"
+          [class.selected]="selectedGuest?._id === g._id"
           draggable="true"
-          (dragstart)="onDragStart(g)">
-          <div *ngFor="let g of unassignedGuests"
-            class="ss-guest"
-            [class.selected]="selectedGuest?._id === g._id"
-            draggable="true"
-            (dragstart)="onDragStart(g)"
-            (click)="selectGuestForSeat(g)">
+          (dragstart)="onDragStart(g)"
+          (click)="selectGuestForSeat(g)">
           <div class="ssg-avatar">{{ g.name.charAt(0) }}</div>
           <div class="ssg-name">{{ g.name }}</div>
           <div class="ssg-drag">⠿</div>
