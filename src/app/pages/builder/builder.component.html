@@ -287,7 +287,7 @@
               </svg>
             </button>
           </div>
-          <p *ngIf="!event.asoebi?.length" class="bc-empty">No asoebi options yet.</p>
+          <p *ngIf="!event.asoebi.length" class="bc-empty">No asoebi options yet.</p>
         </div>
         <div class="bc-add-form">
           <input [(ngModel)]="newAsoebi.name" placeholder="e.g. Women's set" />
@@ -316,7 +316,7 @@
               </svg>
             </button>
           </div>
-          <p *ngIf="!event.meals?.length" class="bc-empty">No meal options yet.</p>
+          <p *ngIf="!event.meals.length" class="bc-empty">No meal options yet.</p>
         </div>
         <div class="bc-add-row">
           <input [(ngModel)]="newMeal" placeholder="e.g. Jollof rice" (keyup.enter)="addMeal()" />
@@ -358,7 +358,7 @@
             <span *ngIf="event.dressCode" style="opacity:0.7;">{{ event.dressCode }}</span>
           </div>
 
-          <div class="ip-asoebi" *ngIf="event.asoebi?.length">
+          <div class="ip-asoebi" *ngIf="event.asoebi.length">
             <div class="ipa-title">Asoebi available</div>
             <div class="ipa-items">
               <div class="ipa-item" *ngFor="let a of event.asoebi">
@@ -442,7 +442,7 @@
           <span *ngIf="event.dressCode" style="opacity:0.7;">{{ event.dressCode }}</span>
         </div>
 
-        <div class="ip-asoebi" *ngIf="event.asoebi?.length">
+        <div class="ip-asoebi" *ngIf="event.asoebi.length">
           <div class="ipa-title">Asoebi available</div>
           <div class="ipa-items">
             <div class="ipa-item" *ngFor="let a of event.asoebi">
