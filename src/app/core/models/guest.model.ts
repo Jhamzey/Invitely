@@ -15,6 +15,8 @@ export interface Guest {
   qrCodeImage: string;
   asoebiOrdered: string;
   asoebiPaid: boolean;
+  emailSent: boolean;
+  emailSentAt?: string;
   inviteSent: boolean;
   uniqueToken: string;
   createdAt?: string;

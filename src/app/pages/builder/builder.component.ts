@@ -63,6 +63,23 @@ export class BuilderComponent implements OnInit {
     { id: 'meals', label: '🍽️ Meals' },
   ];
 
+  readonly defaultGreetings: Record<string, string> = {
+    wedding: 'you are warmly invited to celebrate our special day',
+    birthday: 'you are invited to celebrate with us',
+    conference: 'you are cordially invited to attend',
+    owambe: 'you are warmly invited to join the celebration',
+    traditional: 'you are cordially invited to this traditional ceremony',
+    other: 'you are invited',
+  };
+  readonly defaultClosings: Record<string, string> = {
+    wedding: 'With love & joy',
+    birthday: 'With so much love',
+    conference: 'We look forward to your presence',
+    owambe: 'With love and celebration',
+    traditional: 'With honour and joy',
+    other: 'Looking forward to seeing you',
+  };
+
   // Custom color mixing
   customBgColor = '#F8F3E8';
   customTextColor = '#3D2E1A';
@@ -191,6 +208,14 @@ export class BuilderComponent implements OnInit {
   publish() {
     this.event.published = true;
     this.save();
+  }
+
+  setStatus(status: string) {
+    if (status === 'cancelled' && !confirm('Cancel this event? Guests will see it has been cancelled.')) return;
+    if (status === 'suspended' && !confirm('Suspend this invitation? Guests will not be able to access it until you resume it.')) return;
+    this.eventService.updateStatus(this.eventId, status).subscribe({
+      next: updated => { this.event.status = updated.status; this.event.published = updated.published; }
+    });
   }
 
   goToGuests() { this.router.navigate(['/event', this.eventId, 'guests']); }

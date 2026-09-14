@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Guest } from '../models/guest.model';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class GuestService {
@@ -31,7 +31,13 @@ export class GuestService {
   }
 
   bulkAdd(eventId: string, guests: Partial<Guest>[]) {
-    return this.http.post<Guest[]>(`${this.API}/${eventId}/bulk`, { guests }, { headers: this.headers() });
+    return this.http.post<{ created: Guest[]; duplicates: any[]; importedCount: number; duplicateCount: number }>(
+      `${this.API}/${eventId}/bulk`, { guests }, { headers: this.headers() }
+    );
+  }
+
+  revoke(eventId: string, guestId: string) {
+    return this.http.patch<Guest>(`${this.API}/${eventId}/${guestId}/revoke`, {}, { headers: this.headers() });
   }
 
   rsvp(token: string, rsvp: string, mealChoice: string) {

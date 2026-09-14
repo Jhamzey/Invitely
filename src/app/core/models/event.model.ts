@@ -49,6 +49,9 @@ export interface Event {
   dressCode: string;
   accentColor: string;
   theme: string;
+  status?: string;
+  greetingText?: string;
+  closingText?: string;
   font: string;
   language: string;
   coverImage: string;

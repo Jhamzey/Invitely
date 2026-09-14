@@ -18,23 +18,6 @@ export class EventService {
     return new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken()}` });
   }
 
-  private optionalHeaders() {
-    const token = this.auth.getToken();
-    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
-  }
-
-  getMomentsFeed() {
-    return this.http.get<any[]>(`${this.API}/moments/feed`, { headers: this.optionalHeaders() });
-  }
-
-  toggleMomentLike(eventId: string, momentId: string) {
-    return this.http.post<{ liked: boolean; likesCount: number }>(`${this.API}/${eventId}/moments/${momentId}/like`, {}, { headers: this.headers() });
-  }
-
-  addMomentComment(eventId: string, momentId: string, text: string) {
-    return this.http.post<{ authorName: string; text: string; createdAt: string }>(`${this.API}/${eventId}/moments/${momentId}/comments`, { text }, { headers: this.headers() });
-  }
-
   getAll() {
     return this.http.get<Event[]>(this.API, { headers: this.headers() });
   }
@@ -49,6 +32,10 @@ export class EventService {
 
   update(id: string, data: Partial<Event>) {
     return this.http.put<Event>(`${this.API}/${id}`, data, { headers: this.headers() });
+  }
+
+  updateStatus(id: string, status: string) {
+    return this.http.patch<Event>(`${this.API}/${id}/status`, { status }, { headers: this.headers() });
   }
 
   uploadCover(id: string, file: File) {
@@ -71,7 +58,7 @@ export class EventService {
   }
 
   getInvite(token: string) {
-    return this.http.get<{ event: Event; guest: any }>(`${this.API}/invite/${token}`);
+    return this.http.get<{ event: Event; guest: any; hostSubaccountCode: string | null; revoked?: boolean }>(`${this.API}/invite/${token}`);
   }
 
   verifyAsoebiPayment(token: string, itemName: string, quantity: number, reference: string) {
@@ -80,6 +67,23 @@ export class EventService {
 
   verifyGift(token: string, amount: number, reference: string) {
     return this.http.post<{ success: boolean }>(`${this.API}/invite/${token}/gift/verify`, { amount, reference });
+  }
+
+  getMomentsFeed() {
+    return this.http.get<any[]>(`${this.API}/moments/feed`, { headers: this.optionalHeaders() });
+  }
+
+  toggleMomentLike(eventId: string, momentId: string) {
+    return this.http.post<{ liked: boolean; likesCount: number }>(`${this.API}/${eventId}/moments/${momentId}/like`, {}, { headers: this.headers() });
+  }
+
+  addMomentComment(eventId: string, momentId: string, text: string) {
+    return this.http.post<{ authorName: string; text: string; createdAt: string }>(`${this.API}/${eventId}/moments/${momentId}/comments`, { text }, { headers: this.headers() });
+  }
+
+  private optionalHeaders() {
+    const token = this.auth.getToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
   }
 
   delete(id: string) {

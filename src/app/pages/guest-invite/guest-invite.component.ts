@@ -51,6 +51,7 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
 
   showQR = false;
   reminderSet = false;
+  revoked = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -75,6 +76,30 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() { if (this.isBrowser) clearInterval(this.countdownInterval); }
+
+  get greeting(): string {
+    return this.event.greetingText || this.defaultGreetings[this.event.type] || this.defaultGreetings['other'];
+  }
+
+  get closing(): string {
+    return this.event.closingText || this.defaultClosings[this.event.type] || this.defaultClosings['other'];
+  }
+  readonly defaultGreetings: Record<string, string> = {
+    wedding: 'you are warmly invited to celebrate our special day',
+    birthday: 'you are invited to celebrate with us',
+    conference: 'you are cordially invited to attend',
+    owambe: 'you are warmly invited to join the celebration',
+    traditional: 'you are cordially invited to this traditional ceremony',
+    other: 'you are invited',
+  };
+  readonly defaultClosings: Record<string, string> = {
+    wedding: 'With love & joy',
+    birthday: 'With so much love',
+    conference: 'We look forward to your presence',
+    owambe: 'With love and celebration',
+    traditional: 'With honour and joy',
+    other: 'Looking forward to seeing you',
+  };
 
   get currentTheme() {
     const map: Record<string, { bg: string; color: string; accent: string }> = {
