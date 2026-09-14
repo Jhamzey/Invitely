@@ -10,14 +10,31 @@
   <p>This invitation link may be invalid or expired.</p>
 </div>
 
+<!-- Revoked -->
+<div class="invite-notfound" *ngIf="!loading && revoked" style="text-align:center; padding:80px 20px;">
+  <div style="font-size:48px;">✉️</div>
+  <h2 class="serif">This invitation is no longer valid</h2>
+</div>
+
+<!-- Suspended / Cancelled -->
+<div class="invite-notfound" *ngIf="!loading && !revoked && event && (event.status === 'suspended' || event.status === 'cancelled')" style="text-align:center; padding:80px 20px;">
+  <div style="font-size:48px;">{{ event.status === 'cancelled' ? '🚫' : '⏸️' }}</div>
+  <h2 class="serif">{{ event.status === 'cancelled' ? 'This event has been cancelled' : 'This invitation is currently paused' }}</h2>
+  <p style="color:var(--text-muted);">This isn't an error — the host has {{ event.status === 'cancelled' ? 'cancelled this event' : 'temporarily paused access' }}.</p>
+</div>
+
 <!-- Invite page -->
-<div class="invite-page" *ngIf="!loading && !notFound && event && guest">
+<div class="invite-page" *ngIf="!loading && !notFound && !revoked && event && guest && event.status !== 'suspended' && event.status !== 'cancelled'">
 
   <!-- Hero section -->
   <div class="invite-hero"
     [style.background]="currentTheme.bg"
     [style.color]="currentTheme.color"
     [style.font-family]="event.font || 'Cormorant Garamond'">
+
+    <div class="postponed-banner" *ngIf="event.status === 'postponed'" style="background:rgba(220,38,38,0.1); color:#dc2626; text-align:center; padding:8px; font-size:12px; border-radius:6px; margin-bottom:12px;">
+      This event has been postponed — please check back for the updated date.
+    </div>
 
     <div class="ih-ornament">✦</div>
 
@@ -36,7 +53,7 @@
     </div>
 
     <div class="ih-welcome">
-      Dear <strong>{{ guest.name }}</strong>, you are warmly invited.
+      Dear <strong>{{ guest.name }}</strong>, {{ greeting }}.
     </div>
 
     <!-- Countdown -->
@@ -88,7 +105,7 @@
         </div>
         <div class="it-sub">Google / iOS</div>
       </div>
-      <div class="info-tile" (click)="showQR = !showQR">
+      <div class="info-tile" *ngIf="guest.rsvp === 'attending'" (click)="showQR = !showQR">
         <div class="it-icon">🔐</div>
         <div class="it-label">Entry QR</div>
         <div class="it-val" style="font-size:14px; color:var(--success);">View code</div>
@@ -97,7 +114,7 @@
     </div>
 
     <!-- QR Code -->
-    <div class="qr-section" *ngIf="showQR">
+    <div class="qr-section" *ngIf="showQR && guest.rsvp === 'attending'">
       <div class="qrs-title">Your entry QR code</div>
       <div class="qrs-body">
         <img *ngIf="guest.qrCodeImage" [src]="guest.qrCodeImage" class="qr-image" alt="QR code" />
@@ -249,7 +266,7 @@
 
   <!-- Footer -->
   <div class="invite-footer" [style.background]="currentTheme.bg" [style.color]="currentTheme.color">
-    <div class="if-text serif">With love &amp; joy</div>
+    <div class="if-text serif">{{ closing }}</div>
     <div class="if-names serif">{{ event.coupleNames || event.title }}</div>
     <div class="if-brand">Powered by <strong>Innvitely</strong></div>
   </div>

@@ -25,6 +25,7 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
   guest!: Guest;
   loading = true;
   notFound = false;
+  revoked = false;
   hostSubaccountCode: string | null = null;
 
   rsvpDone = false;
@@ -51,39 +52,7 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
 
   showQR = false;
   reminderSet = false;
-  revoked = false;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private eventService: EventService,
-    private guestService: GuestService
-  ) {}
-
-  ngOnInit() {
-    this.token = this.route.snapshot.paramMap.get('token')!;
-    this.eventService.getInvite(this.token).subscribe({
-      next: ({ event, guest, hostSubaccountCode }: any) => {
-        this.event = event;
-        this.guest = guest;
-        this.hostSubaccountCode = hostSubaccountCode;
-        this.loading = false;
-        if (this.guest.rsvp !== 'pending') this.rsvpDone = true;
-        this.startCountdown();
-      },
-      error: () => { this.notFound = true; this.loading = false; }
-    });
-  }
-
-  ngOnDestroy() { if (this.isBrowser) clearInterval(this.countdownInterval); }
-
-  get greeting(): string {
-    return this.event.greetingText || this.defaultGreetings[this.event.type] || this.defaultGreetings['other'];
-  }
-
-  get closing(): string {
-    return this.event.closingText || this.defaultClosings[this.event.type] || this.defaultClosings['other'];
-  }
   readonly defaultGreetings: Record<string, string> = {
     wedding: 'you are warmly invited to celebrate our special day',
     birthday: 'you are invited to celebrate with us',
@@ -101,6 +70,31 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
     other: 'Looking forward to seeing you',
   };
 
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private eventService: EventService,
+    private guestService: GuestService
+  ) {}
+
+  ngOnInit() {
+    this.token = this.route.snapshot.paramMap.get('token')!;
+    this.eventService.getInvite(this.token).subscribe({
+      next: (res: any) => {
+        if (res.revoked) { this.revoked = true; this.loading = false; return; }
+        this.event = res.event;
+        this.guest = res.guest;
+        this.hostSubaccountCode = res.hostSubaccountCode;
+        this.loading = false;
+        if (this.guest.rsvp !== 'pending') this.rsvpDone = true;
+        this.startCountdown();
+      },
+      error: () => { this.notFound = true; this.loading = false; }
+    });
+  }
+
+  ngOnDestroy() { if (this.isBrowser) clearInterval(this.countdownInterval); }
+
   get currentTheme() {
     const map: Record<string, { bg: string; color: string; accent: string }> = {
       ivory: { bg: 'linear-gradient(135deg,#F8F3E8,#E8DFD0)', color: '#3D2E1A', accent: '#8B7355' },
@@ -111,6 +105,14 @@ export class GuestInviteComponent implements OnInit, OnDestroy {
       navy: { bg: 'linear-gradient(135deg,#0A1628,#1A2D4A)', color: '#C5D8F0', accent: '#4A7FC0' },
     };
     return map[this.event?.theme] || map['ivory'];
+  }
+
+  get greeting(): string {
+    return this.event?.greetingText || this.defaultGreetings[this.event?.type || 'other'] || this.defaultGreetings['other'];
+  }
+
+  get closing(): string {
+    return this.event?.closingText || this.defaultClosings[this.event?.type || 'other'] || this.defaultClosings['other'];
   }
 
   startCountdown() {

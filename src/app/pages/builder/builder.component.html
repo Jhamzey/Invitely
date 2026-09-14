@@ -285,7 +285,7 @@
           <div class="gts-header">
             <div class="gts-info">
               <div class="gts-title">Guest gift support</div>
-              <div class="gts-sub">Invitely will gently ask guests if they'd like to send a gift — not you, us.</div>
+              <div class="gts-sub">Innvitely will gently ask guests if they'd like to send a gift — not you, us.</div>
             </div>
             <div class="tr-toggle" [class.on]="event.giftEnabled"
                  (click)="event.giftEnabled = !event.giftEnabled">
@@ -294,7 +294,7 @@
           </div>
           <div class="gts-preview" *ngIf="event.giftEnabled">
             <div class="gtsp-label">How guests see it:</div>
-            <div class="gtsp-msg">"Invitely gives you the option to send a small gift to help celebrate this occasion. This is entirely optional and is not a request from the host."</div>
+            <div class="gtsp-msg">"Innvitely gives you the option to send a small gift to help celebrate this occasion. This is entirely optional and is not a request from the host."</div>
           </div>
         </div>
       </div>
@@ -316,7 +316,7 @@
               </svg>
             </button>
           </div>
-          <p *ngIf="!event.asoebi?.length" class="bc-empty">No asoebi options yet.</p>
+          <p *ngIf="!event.asoebi.length" class="bc-empty">No asoebi options yet.</p>
         </div>
         <div class="bc-add-form">
           <input [(ngModel)]="newAsoebi.name" placeholder="e.g. Women's set" />
@@ -345,7 +345,7 @@
               </svg>
             </button>
           </div>
-          <p *ngIf="!event.meals?.length" class="bc-empty">No meal options yet.</p>
+          <p *ngIf="!event.meals.length" class="bc-empty">No meal options yet.</p>
         </div>
         <div class="bc-add-row">
           <input [(ngModel)]="newMeal" placeholder="e.g. Jollof rice" (keyup.enter)="addMeal()" />
@@ -387,7 +387,7 @@
             <span *ngIf="event.dressCode" style="opacity:0.7;">{{ event.dressCode }}</span>
           </div>
 
-          <div class="ip-asoebi" *ngIf="event.asoebi?.length">
+          <div class="ip-asoebi" *ngIf="event.asoebi.length">
             <div class="ipa-title">Asoebi available</div>
             <div class="ipa-items">
               <div class="ipa-item" *ngFor="let a of event.asoebi">
@@ -398,7 +398,7 @@
           </div>
 
           <div class="ip-gift" *ngIf="event.giftEnabled">
-            <div class="ipg-line">"Invitely gives you the option to send a gift to celebrate this occasion."</div>
+            <div class="ipg-line">"Innvitely gives you the option to send a gift to celebrate this occasion."</div>
           </div>
 
           <div class="ip-footer">
@@ -471,7 +471,7 @@
           <span *ngIf="event.dressCode" style="opacity:0.7;">{{ event.dressCode }}</span>
         </div>
 
-        <div class="ip-asoebi" *ngIf="event.asoebi?.length">
+        <div class="ip-asoebi" *ngIf="event.asoebi.length">
           <div class="ipa-title">Asoebi available</div>
           <div class="ipa-items">
             <div class="ipa-item" *ngFor="let a of event.asoebi">
@@ -482,7 +482,7 @@
         </div>
 
         <div class="ip-gift" *ngIf="event.giftEnabled">
-          <div class="ipg-line">"Invitely gives you the option to send a gift to celebrate this occasion."</div>
+          <div class="ipg-line">"Innvitely gives you the option to send a gift to celebrate this occasion."</div>
         </div>
 
         <div class="ip-footer">
