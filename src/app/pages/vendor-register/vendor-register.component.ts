@@ -40,22 +40,41 @@ export class VendorRegisterComponent implements OnInit, OnDestroy {
   cacPreview  = '';
 
   readonly categories = [
-    { id: 'catering',    label: 'Catering'        },
-    { id: 'hall',        label: 'Event hall'       },
-    { id: 'photography', label: 'Photography'      },
-    { id: 'decoration',  label: 'Decoration'       },
-    { id: 'dj',          label: 'DJ / Band'        },
-    { id: 'mc',          label: 'MC'               },
-    { id: 'makeup',      label: 'Makeup artist'    },
-    { id: 'fashion',     label: 'Fashion designer' },
-    { id: 'cake',        label: 'Cake maker'       },
-    { id: 'other',       label: 'Other'            },
+    { id: 'catering',    label: 'Catering',         icon: '🍲' },
+    { id: 'hall',        label: 'Event hall',        icon: '🏛️' },
+    { id: 'photography', label: 'Photography',       icon: '📸' },
+    { id: 'decoration',  label: 'Decoration',        icon: '✨' },
+    { id: 'dj',          label: 'DJ & Sound',        icon: '🎧' },
+    { id: 'mc',          label: 'MC / Host',         icon: '🎤' },
+    { id: 'makeup',      label: 'Makeup & Beauty',   icon: '💄' },
+    { id: 'fashion',     label: 'Fashion & Asoebi',  icon: '👗' },
+    { id: 'cake',        label: 'Cake & Treats',     icon: '🎂' },
+    { id: 'other',       label: 'Other service',     icon: '💼' },
   ];
 
   readonly cities = [
     'Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano',
     'Enugu', 'Kaduna', 'Benin City', 'Owerri', 'Uyo', 'Other'
   ];
+
+  get passwordStrength(): number {
+    const p = this.form.password || '';
+    let s = 0;
+    if (p.length >= 8) s++;
+    if (/[A-Z]/.test(p)) s++;
+    if (/[0-9]/.test(p)) s++;
+    if (/[^A-Za-z0-9]/.test(p)) s++;
+    return s;
+  }
+
+  get passwordStrengthLabel(): string {
+    const s = this.passwordStrength;
+    if (!this.form.password) return '';
+    if (s <= 1) return 'Weak';
+    if (s === 2) return 'Fair';
+    if (s === 3) return 'Good';
+    return 'Strong';
+  }
 
   constructor(
     private auth:         AuthService,

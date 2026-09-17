@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-scan-session',
@@ -32,7 +33,7 @@ export class ScanSessionComponent implements OnInit, OnDestroy {
   private pollInterval: any;
   private cameraStream: MediaStream | null = null;
   private barcodeInterval: any;
-  private readonly API = 'http://localhost:4000/api/scan';
+  private readonly API = `${environment.apiUrl}/scan`;
 
   offlineQueue: string[] = [];
   isOffline = false;

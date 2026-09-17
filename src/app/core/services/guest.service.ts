@@ -43,4 +43,27 @@ export class GuestService {
   rsvp(token: string, rsvp: string, mealChoice: string) {
     return this.http.patch<Guest>(`${this.API}/rsvp/${token}`, { rsvp, mealChoice });
   }
+
+  exportGuestsCsv(eventId: string) {
+    return this.http.get(`${this.API}/${eventId}/export`, {
+      headers: this.headers(),
+      responseType: 'blob'
+    });
+  }
+
+  sendInvite(eventId: string, guestId: string) {
+    return this.http.post<{ success: boolean; message: string; guest: Guest }>(
+      `${this.API}/${eventId}/${guestId}/send-invite`,
+      {},
+      { headers: this.headers() }
+    );
+  }
+
+  sendAllInvites(eventId: string) {
+    return this.http.post<{ success: boolean; totalEligible: number; sentCount: number; failedCount: number }>(
+      `${this.API}/${eventId}/send-all-invites`,
+      {},
+      { headers: this.headers() }
+    );
+  }
 }

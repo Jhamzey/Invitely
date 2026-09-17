@@ -19,6 +19,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   error = '';
   showPassword = false;
   role: 'host' | 'vendor' = 'host';
+  showForgotModal = false;
+  resetEmail = '';
+  resetSent = false;
+  resetLoading = false;
   private returnUrl = '';
 
   constructor(
@@ -69,5 +73,20 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
+  }
+
+  openForgotModal() {
+    this.showForgotModal = true;
+    this.resetEmail = this.email || '';
+    this.resetSent = false;
+  }
+
+  submitPasswordReset() {
+    if (!this.resetEmail) return;
+    this.resetLoading = true;
+    setTimeout(() => {
+      this.resetLoading = false;
+      this.resetSent = true;
+    }, 600);
   }
 }

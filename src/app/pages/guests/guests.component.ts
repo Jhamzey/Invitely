@@ -27,6 +27,7 @@ export class GuestsComponent implements OnInit {
   search = '';
   filter = 'all';
   sending: Record<string, boolean> = {};
+  exportingCsv = false;
 
   newGuest: Partial<Guest> = {
     name: '', email: '', phone: '', whatsapp: '',
@@ -223,6 +224,27 @@ export class GuestsComponent implements OnInit {
         this.loadGuests();
       },
       error: err => { this.importError = err.error?.error || 'Import failed.'; this.importSubmitting = false; }
+    });
+  }
+
+  downloadGuestList() {
+    if (this.exportingCsv) return;
+    this.exportingCsv = true;
+    this.guestService.exportGuestsCsv(this.eventId).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const safeName = (this.event?.title || 'event').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+        a.href = url;
+        a.download = `invitely-guests-${safeName}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.exportingCsv = false;
+      },
+      error: () => {
+        alert('Export failed. Please try again.');
+        this.exportingCsv = false;
+      }
     });
   }
 }
