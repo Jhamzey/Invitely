@@ -28,6 +28,7 @@
 
 .gt-title { font-size: 16px; font-weight: 500; color: var(--text-primary); white-space: nowrap; }
 .gt-event { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gt-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .guests-stats {
   display: flex;
